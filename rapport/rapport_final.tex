@@ -78,11 +78,10 @@ Le lambda calcul est composé uniquement de \(\lambda\) termes dont voici la syn
 \end{align*}
 
 Pour faire une analogie avec le modèle mathématique, une abstraction peut 
-etre vue comme une fonction,
-
+etre vue comme une fonction anonyme.
+ 
 \begin{example}
-  L'abstraction nous permet de construire des fonctions anonymes, par exemple la
-  fonction identitée peut etre définie par le lambda terme suivant :
+ La fonction identitée peut etre définie par le lambda terme suivant :
   %
   \[ 
   \lambda x. x
@@ -119,18 +118,17 @@ Un terme ne contenant aucune occurrence de variable libre est dit `clos'.
   parenthèse est libre.
 \end{example}
 
-Un des problème introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci dessus(exemple 3).  
+Un des problème introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci dessus(exemple 3). Il faut donc introduire la notion d'\(\alpha\) équivalence
 
-\subsubsection{Les indices de de Bruijn}
-
-Pour palier au problème que nous énoncions précédement, il existe une 
-représentation pour les variables liées, les indides de de Bruijn.
-Nous allons donc maintenant représenté les variables liées non pas par un 
-nom mais par un entier naturel. 
+\subsubsection{Alpha equivalence}
+On considère que deux termes sont alpha equivalents si et seulement si ils sont 
+égaux au renommage de leur variables liées près. 
 \begin{example}
-  Le lambda terme représentant l'identité que l'on écrivait \(\lambda x.x\) s'écrirat donc maintenant \(\lambda.0\)
+  Voici deux termes alpha equivalents 
+  \begin{align*}
+    & \lambda x.x \leadsto \lambda y.y \\
+  \end{align*}
 \end{example}
-
   
 \subsection{Calculer dans le lambda calcul}
 
@@ -145,45 +143,25 @@ La substitution est un mécanisme central dans le lambda calcul. Cela consiste
 à remplacer l'occurrence d'une variable liée par un \(\lambda\)terme.
 On note généralement la substitution de la variable x dans le terme t par le 
 terme u avec la notation suivante. 
-%ici j'aimerais bien mettre une présentation plus sympas que celle ci
 \[ 
-t[0:=u]
+t[x:=u]
 \]
 
 \begin{example}
-  Soit le terme \(\lambda\).0[x:=\(\lambda\).0], après avoir effectuer la
-  substitution nous obtenons le terme \(\lambda\).\(\lambda\).0
+  Soit le terme \(\lambda\)x.x[x:=\(\lambda\)y.y], après avoir effectuer la
+  substitution nous obtenons le terme \(\lambda\)x.\(\lambda\)y.y
 \end{example}
+Dans cet exemple il n'y a pas eu de problème quand au nom des variables mais il faut 
+faire attention 
 
 Nous avons analyser un cas de substitution cependant on peut etre confronté 
 à devoir substituer dans une application ou une abstraction, voici donc 
 les règles pour la substitution 
 %changer la fleche aussi
 \begin{align*}
-&(x y)[0 := x] ------->(x[0 := x] y[0 := x]) \\
-&(\lambda .t)[0 := x]---->\lambda .t[0 := x] \\
+&(u v)[x := z]\leadsto(u[x := z] v[x := z]) \\
+&(\lambda .t)[x := z]\leadsto\lambda .t[x := z] \\
 \end{align*}
-
-
-On découvre ici un nouvel avantage de notre représentation avec les indices de
-de Bruijn, car il n'est pas nécéssaire de prendre des précautions quand au
-nom des variables de notre terme substituant %a changer
-qui rendrait liée une variable qui était libre. Cela nous permet de ne pas 
-avoir besoin d'introduire l'\(\alpha\) convertion.
-%Mettre une nouvelle fleche dans l'exemple
-\begin{example}
-  Avec la représentation classique: 
-  \[ 
-  \lambda x.x[x := \lambda y.x] ---> \lambda x.\lambda y.x
-  \]
-  Avec les indices de de bruijn
-  \[ 
-  \lambda.0[0 := \lambda.x] -----> \lambda.\lambda.x
-  \]
-  On constate bien que dans la première représentation on pense que la variable
-  x est liée alors que celle ci devrait en réalité etre libre comme dans la 
-  seconde représentation.
-\end{example}
 
 %je ne sais pas exactement quel titre donné a cette partie normalisation 
 %ou reduction 
@@ -191,17 +169,25 @@ avoir besoin d'introduire l'\(\alpha\) convertion.
 
 Seul les applications dont le membre de gauche est une abstraction
 peuvent etre réduite on appel cela une \emph{redex} . 
-C'est à dire que l'application (t u) ne peut pas etre réduite (nous verrons
-dans la section normalisation que si l'on arrive a normaliser t pour obtenir 
-une abstraction on pourra alors reduire ce terme)
-Voici le principe de base de la réduction, soit le terme ((\(\lambda\).\(\lambda\).0 1) y), ici
-le terme a bien sous la forme d'une application ayant une abstraction comme 
-membre de gauche. La reduction va consister a substituer l'ensemble des 
-variables liée a la première application par le membre de droite de 
-l'application. Ce qui va donc nous donner \(\lambda\).\(\lambda\).0 y
+C'est à dire que l'application (t u) ne peut pas etre réduite a moins 
+que le terme t ne s'évalue en une abstraction, (nous verrons ceci plus
+en détail dans la section suivante).
 
-%trouver des exemples en plus peut etre ? 
+\begin{example}
+  Soit le terme ((\(\lambda\)x.\(\lambda\)y.y x) z), ici
+  le terme a bien sous la forme d'une application ayant une abstraction comme 
+  membre de gauche. La reduction va consister a substituer l'ensemble des 
+  variables liée a la première application par le membre de droite de 
+  l'application. Ce qui va donc nous donner \(\lambda\)x.\(\lambda\)y.z x
+\end{example}
 
+\begin{example}
+  Voici un autre exemple de réduction
+  \begin{align*}
+    & ((\lambda x .\lambda y. z) w) \leadsto \lambda x.\lambda y.z \\
+  \end{align*}
+  Ici z étant une variable libre il n'y a rien à réduire.
+\end{example}
 
 
 \subsubsection{normalisation}
@@ -211,7 +197,7 @@ de réduction. La normalisation consiste donc a reduire autant que possible
 notre terme.
 %changer les fleches 
 \begin{example}
-  le terme (((\(\lambda\).0) (\(\lambda\).0)) y) \(\leadsto\) ((\(\lambda\).0) y) 
+  le terme (((\(\lambda\)x.x) (\(\lambda\)y.y)) z) \(\leadsto\) ((\(\lambda\)y.y) y) 
 \(\leadsto\) y %saut de ligne
   Ici y n'est plus réductible c'est donc la forme normale du terme.
 \end{example}
@@ -256,8 +242,8 @@ Nous allons ici voir une représentation des booléens accompagné de la
 structure if then else.
 Voici les termes correspondants au constructeurs True et False
 \begin{align*}
-  &\lambda .\lambda . 0 \mbox{(true)} \\
-  &\lambda .\lambda . 1 \mbox{(false)} 
+  &\lambda x.\lambda y. y \mbox{(true)} \\
+  &\lambda x.\lambda y. x \mbox{(false)} 
 \end{align*}
 
 On assimile ces deux termes aux booléens True et False car leur calcul au sein
@@ -265,14 +251,14 @@ de l'application d'un Ifte reproduit le comportement attendu.
 Nous pouvons désormais introduire le terme correspondant à la structure de 
 controle IfThenElse 
 \begin{align*}
-  &\lambda .\lambda .\lambda . 2\: 1\: 0 \mbox{(Ifte)} \\
+  &\lambda x.\lambda y.\lambda z. x\: y\: z \mbox{(Ifte)} \\
 \end{align*}
 
 \begin{example}
   Voici un exemple de reduction du terme Ifte
   \begin{align*}
     &(\lambda .\lambda .\lambda . 2\: 1\: 0) \: (\lambda . \lambda . 0) \: x \: y  \\
-    & mettre les etapes intermediaires \\
+    & TODO:mettre les etapes intermediaires \\
     & x 
   \end{align*}
 \end{example}
@@ -322,10 +308,22 @@ Nous nous attarderons ici sur les choix d'implémentations et il sera question
 d'analyser certaines parties du code mais pas l'ensemble du code.
 
 \subsubsection{Représentation des lambda termes}
-Pour représenter les types en Ocaml les types sommes sont très intéressant car 
-ils offrent une manipulation souple à l'aide du pattern matching
+%ici j'ai enlever la partie indices de de bruijn je la met ici mais je ne sais pas si le titre est bien 
+ 
+Pour palier au problème que nous énoncions précédement, il existe une 
+représentation pour les variables liées, les indides de de Bruijn.
+Nous allons donc maintenant représenté les variables liées non pas par un 
+nom mais par un entier naturel. 
 
-%mettre avec nos web le type somme des lambda termes
+\begin{example}
+  Le lambda terme représentant l'identité que l'on écrivait \(\lambda x.x\) s'écrirat donc maintenant \(\lambda.0\)
+\end{example}
+Pour représenter les types en Ocaml les types sommes sont très intéressant car 
+ils offrent une manipulation souple à l'aide du pattern matching.
+
+METTRE LES CODE OCAML
+
+
 
 
 \subsubsection{Parsing}
@@ -339,7 +337,7 @@ de S-expression)
   Voici un exemple de correspondance entre les termes avant et après parsing
   \begin{align*}
     (lambda\: x \: x) & \leadsto Abs(BoundVar\: 0) \\
-    (x\: y) & \leadsto Appl(FreeVar\: ``x'',FreeVar\: ``y'')       
+    (x\: y) & \leadsto Appl(FreeVar\: 'x',FreeVar\: 'y')       
   \end{align*}
 \end{example}
 
@@ -347,21 +345,37 @@ de S-expression)
 
 \subsubsection{substitution}
 %pas de grande difficulté a implémenter la fonction de substitution 
+On découvre ici un nouvel avantage de notre représentation avec les indices de
+de Bruijn, car il n'est pas nécéssaire de prendre des précautions quand au
+nom des variables de notre terme substituant %a changer
+qui rendrait liée une variable qui était libre. Cela nous permet de ne pas 
+avoir besoin d'introduire l'\(\alpha\) convertion.
 
-\subsubsection{evaluation et reduction forte}
-Nous avons vu dans la section sur l'évaluation du lambda calcul qu'il existait
-plusieurs stratégies d'évaluation. 
-La première fonction implémenté ``a été'' une fonction d'évaluation 
-correspondant a %je ne sais pas encore laquel
-Avec cette fonction on ne peut pas évaluer certains termes jusqu'a 
-leur forme normale iter par exemple
-C'est pour ça que c'était intérressant d'en implémenter une autre.
+\begin{example}
+  Avec la représentation classique: 
+  \[ 
+  \lambda x.x[x := \lambda y.x]\leadsto\lambda x.\lambda y.x
+  \]
+  Avec les indices de de bruijn
+  \[ 
+  \lambda.0[0 := \lambda.x]\leadsto\lambda.\lambda.x
+  \]
+  On constate bien que dans la première représentation on pense que la variable
+  x est liée alors que celle ci devrait en réalité etre libre comme dans la 
+  représentation avec les indices de de Bruijn.
+\end{example}
+
+METTRE LE CODE OCAML DE NOTRE SUBSTITUTION
 
 
-La seconde fonction est une fonction de réduction forte qui avant d'évaluer une
-application évalue d'abord le membre de gauche et le membre de droite de 
-l'application jusqu'a qu'ils ne soient plus normalisables. 
-%normalement cela correspond a la reduction forte, a vérifier
+\subsubsection{Reduction et évaluation}
+La fonction de réduction est très proche de la définition, si l'on trouve
+une redex il faut alors substitutier le membre de gauche dans le membre de 
+droite. 
+
+METTRE LE CODE DE LA REDUCTION
+
+Il nous faut donc maintenant évaluer 
  
 
 
@@ -379,7 +393,8 @@ l'application jusqu'a qu'ils ne soient plus normalisables.
 % c'est le type checker et le fait que on 
 
 
-
+%pour le simplement typé quand on introduit la première réduction on peut faire l'analogie avec le compilateur qui une fois que les
+%termes on été type checker on peut maintenant oublier les types et maintenant réduire 
 
 
 
