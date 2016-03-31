@@ -219,13 +219,29 @@ de forme normale.
 %je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
 %introduire un peu la suite du rapport 
 Nous verrons que dans les sections suivantes que lorsque nous introduirons 
-les système de type, nous n'aurons plus de terme qui ne réduisent pas vers 
+les système de type, nous n'aurons plus de termes qui ne réduisent pas vers 
 une forme normale (c'est une des propriété très intérressante offerte par 
 les systèmes de type)
 
 Il existe de nombreuses stratégies de normalisation des termes dans le lambda 
-calcul non typé %contrairement au lambda calcul typé?
-par contre
+calcul non typé, pour les plus connus: \emph{full Beta-reduction}, \emph{normal order}, 
+\emph{call by name}, \emph{call by value}.
+Pour le lambda calcul non typé la stratégie la plus sure est la call by value.
+En effet elle consite à réduire seulement le terme de gauche des redex, et où l'on 
+ne reduit pas a l'intérieur des abstractions.
+Pour certains termes on ne peut pas atteindre 
+une forme normale, cependant celle ci a moins de risque de rentrer dans une boucle
+de réduction infinie. Nous n'avons pas encore les propritées offertent par les
+systèmes de types tel que un terme correctement typé se réduit toujours.
+
+\begin{example}
+  Voici un exemple d'évaluation avec la stratégie call bu value
+  \begin{align*}
+    & ((\lambda x.\lambda y. x\: y)\: \lambda w.w)  \\
+    \leadsto & (\lambda y. (\lambda w.w)\: y) 
+  \end{align*}
+\end{example}
+
 
 %toute les citer et expliquer d'après le livre de pierce 
 
@@ -375,7 +391,9 @@ droite.
 
 METTRE LE CODE DE LA REDUCTION
 
-Il nous faut donc maintenant évaluer 
+Il nous faut donc maintenant évaluer avec la stratégie call by value.
+JE NE VOIS PAS TROP QUOI DIRE DE PLUS, JE PENSE QUE LE CODE PARLE DE LUI MEME
+
  
 
 
