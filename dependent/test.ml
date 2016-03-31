@@ -6,7 +6,8 @@ let suite =
             ; "Nat test" >::: NatT.tests
 	    ; "test unit" >::: TestUnit.eval
 	    ; "test check" >::: TestCheck.eval
-	    ; "test pretty" >::: TestPretty.tests]
+	    ; "test pretty" >::: TestPretty.tests
+	    ; "test sub" >::: TestSub.tests]
 
 let () =
   run_test_tt_main suite
