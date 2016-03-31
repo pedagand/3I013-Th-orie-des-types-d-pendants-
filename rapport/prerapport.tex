@@ -1,0 +1,570 @@
+%% * Header
+
+\documentclass{article}
+
+%% ** Packages
+
+\usepackage{natbib}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{amsthm, amssymb, amsmath}
+\usepackage{hyperref}
+
+%% ** Shorthands
+
+\newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\ie}{\textit{i.e.}\ }
+\newcommand{\vs}{\textit{vs.}\ }
+\newcommand{\eg}{\textit{e.g.}\ }
+
+\newcommand{\TODO}[1]{$\langle$ \textbf{TODO:} #1 $\rangle$}
+%\newcommand{\TODO}[1]{}
+
+%% ** Theorem styles
+
+\newtheorem{theorem}{Théorème}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemme}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}
+\newtheorem{example}{Exemple}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remarque}
+\newtheorem{para}{} 
+
+%% ** Title
+
+\title{Implémentation de la \\
+       théorie des types dépendants}
+\author{Roman Delgado}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+%% ** Abstract
+
+\begin{abstract}
+Ce document représente la synthèse de mes premières lectures ainsi que
+de ma compréhension du sujet.  Ce projet consiste en l'implémentation
+d'un système de type.  Il sera donc question de définir les principaux
+concepts que j'ai pu aborder lors de mes lectures.  La seconde partie
+se concentre sur les questions liées à l'implémentation du lambda
+calcul et fait office de travail préliminaire au projet.
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+%% * Main
+
+\section{Théorie}
+
+
+\subsection{Lambda calcul non typé}
+
+Alonzo Church introduit le lambda calcul non
+typé~\citep{church:lambda-calcul} en 1936. Le lambda calcul est un
+modèle de calcul universel au même titre que les machines de Turing.
+A l'aide d'une syntaxe simple, il permet d'étudier les propriétés du
+calcul de façon formelle.  Les fonctions ne portent pas de nom et ne
+sont applicables qu'à un seul argument. Ce système est très souple car
+tout est fonction, on se concentre donc uniquement sur la partie
+calculatoire.  Le lambda calcul non typé a connu un formidable succès,
+donnant lieu à de multiples variantes dont on trouvera une
+présentation moderne et synthétique dans l'ouvrage
+de~\citet{pierce:tapl}.
+
+\subsubsection{Syntaxe}
+
+
+On peut définir le lambda calcul non typé de la façon suivante :
+%
+\begin{align*}
+t &::= & \mbox{(lambda terme)} \\
+  &|\quad x & \mbox{(variable)} \\
+  &|\quad \lambda x. t & \mbox{(abstraction)} \\
+  &|\quad t\: t          & \mbox{(application)}
+\end{align*}
+
+Pour faire une analogie avec les languages de programmation, on peut
+dire qu'une abstraction est une définition de fonction et que
+l'application consiste à appliquer une fonction à un argument (qui
+peut également être une fonction, on parle alors de fonction d'ordre
+supérieur).
+
+\begin{example}
+ On peut donc définir un lambda terme représentant la fonction identité
+ de la façon suivante :
+%
+\[ 
+  \lambda x. x
+\]
+\end{example}
+
+\subsubsection{Sémantique}
+
+Avant de parler de la réduction, il faut pouvoir déterminer si une
+variable est liée ou libre. Une variable est \emph{liée} lorsque celle
+ci apparait à l'intérieur d'une abstraction. Inversement, une variable
+non déclarée par une abstraction sera dite \emph{libre}.
+
+\begin{example}
+
+ Dans le lambda terme \(\lambda x. x\: y\), la variable \(x\) est liée
+ tandis que la variable \(y\) est libre.
+\end{example}
+
+\begin{example}
+  Dans le lambda terme \((\lambda x. \lambda y. x\: y)\: y\), la
+  variable \(x\) est liée ainsi que la première occurence de la
+  variable \(y\). Cependant, la variable \(y\) à l'exterieur des
+  parenthèse est libre.
+\end{example}
+
+Un terme toutes les variables sont liées est dit \emph{clos}.
+
+La règle de \(\beta\)-réduction consiste à appliquer la transformation
+suivante dans un terme
+%
+\[
+(\lambda x. t)\: u \leadsto t[x \mapsto u]
+\]
+
+On ne peut donc effectuer une réduction que sur les applications dont
+le membre de gauche est une abstraction : on nomme \emph{redex} les
+sous-termes de cette forme. Réduire un terme consiste à substituer
+dans le membre de gauche la variable liée par le terme de droite.  Le
+``calcul'' d'un terme correspond alors à une série de réductions de ce
+terme.
+
+
+\begin{example}
+
+  La fonction identité appliquée à un terme \(t\) réduit vers ce même
+  terme \(t\) :
+  %
+  \[
+  (\lambda x. x) t \leadsto t
+  \]
+\end{example}
+
+Un lambda terme en \emph{forme normale} est un terme pour lequel
+aucune réduction n'est possible. Le lambda calcul étant un modèle de
+calcul universel, il permet de décrire des termes/programmes qui ne
+terminent pas : ceux-ci n'ont pas de forme normale.
+
+\begin{example}
+ 
+  Le terme suivant n'admet pas de forme normale :
+  %
+  \begin{align*}
+  (\lambda x. x\: x) (\lambda x. x\: x) &\leadsto (x x)[x \mapsto \lambda x. x\: x] \\
+                                        &\leadsto (\lambda x. x\: x) (\lambda x. x\: x) \\
+                                        &\leadsto \ldots \\
+  \end{align*}
+\end{example}
+
+\subsubsection{Les entiers de Church}
+
+Malgré son apparente simplicité, le lambda calcul permet de définir
+énormément de concepts intéressants. Ici, nous allons voir comment créer
+les entiers naturels \textit{ex nihilo} en utilisant un \emph{codage à
+  la Church}.
+
+L'idée consiste à représenter le nombre \(n\) par une fonction d'ordre
+supérieur prenant en argument une fonction \(f\) et l'appliquant \(n\)
+fois. On définira donc 
+%
+\begin{align*}
+\mathsf{zero} &= \lambda f. \lambda x. x \\
+\mathsf{un}   &= \lambda f. \lambda x. f\: x \\
+\mathsf{deux} &= \lambda f. \lambda x. f\: (f\: x)
+\end{align*}
+
+Afin de construire tous les entiers naturels, on s'inspire alors de la
+définition des entiers de Peano et définit le successeur d'un nombre \(n\)
+comme
+%
+\[
+\mathsf{successeur} = \lambda n. \lambda f. \lambda x. n\: f\: (f\: x)
+\]
+%
+c'est-à-dire \(n\) applications de \(f\) précédées d'une première
+application de \(f\), soit \(n+1\) applications.
+
+De la même manière, on construit l'addition de deux nombres \(m\) et
+\(n\) en faisant \(m\) applications répétées de \(f\) précédée par
+\(n\) applications :
+%
+\[
+\mathsf{plus} = \lambda m. \lambda n. \lambda f. \lambda x. m f (n f x)
+\]
+
+
+\subsection{Lambda calcul simplement typé}
+
+
+Le lambda calcul simplement typé~\citep{church:simple-type} est une
+extension du lambda calcul. Celui ci perd en dynamisme et permet
+d'effectuer moins de calcul mais possède l'avantage de soulever les
+problèmes liés à la classification des données.
+
+
+\subsubsection{Règles de typage}
+
+Le lambda calcul non typé permet de formaliser une infinité de termes
+mais l'absence de type ne lui permet pas de vérifier la validité de ses
+calculs.
+Pour tout programmeur il parait logique que l'expression
+%
+\[
+ \mathsf{if}\: 2\: \mathsf{then}\: \mathsf{true}\: \mathsf{else}\: \mathsf{false}
+\]
+%
+n'a pas de sens car il faudrait que le résultat de l'expression de la
+condition soit un booléen et non un entier. Les types permettent de
+palier à ce type d'erreur en les détectant à la compilation.
+
+
+Les \emph{types} sont décrits par la grammaire suivante :
+%
+\begin{align*}
+  T &::=             & \mbox{(type)} \\
+    &|\quad \mathsf{bool} & \mbox{(booléens)} \\
+    &|\quad T \rightarrow T   &  \mbox{(fonction)} 
+\end{align*}
+
+La vérification de type s'effectue dans un \emph{contexte} qui assigne
+à chaque variable d'un programme son type. Le contexte est donc une
+liste ordonnée de paires variable/type :
+%
+\begin{align*}
+  \Gamma &::= &\mbox{(contexte)} \\
+         &\quad . & \mbox{(contexte vide)} \\
+         &\quad \Gamma, x : T & \mbox{(type de variable)} 
+\end{align*}
+
+Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
+
+\begin{figure}
+
+\begin{align*}
+&  \cfrac{x:T\,\in\Gamma}
+         {\Gamma\vdash x:T}\mbox{(Var)} 
+  \\
+&  \cfrac{\Gamma, x:A \vdash t:B}
+         {\Gamma \vdash \lambda x. t \,:\, A\rightarrow B}\mbox{(Abs)} \\
+&  \cfrac{\Gamma \vdash f : A\rightarrow B \quad
+          \Gamma \vdash s : A}
+         {\Gamma\vdash f\: s : B}\mbox{(App)} \\
+&  \mathsf{bool}:\mathsf{true}|\mathsf{false}\mbox{(Bool)} \\
+&  \cfrac{t1:\mathsf{bool}\,t2:T\,t3:T}
+         {\Gamma\vdash if t1 then t2 else t3}\mbox{(If-else)} \\
+\end{align*}
+
+\caption{Typage (lambda calcul simplement typé)}
+\label{fig:typage-simple}
+\end{figure}
+
+La règle (Var) spécifie le typage des variables. Cette expression se
+lit en partant du numérateur pour déduire le dénumérateur : supposons
+que la variable x de type T est présente dans le contexte, alors on
+conclut que le type de la variable x est T.
+
+La règle (Abs) spécifie le typage des lambda
+abstractions. L'abstraction construit un type de la forme \(A
+\Rightarrow B\) : il faut donc que la variable associée au lambda
+terme soit de type \(A\) et le résultat de type \(B\).
+
+La règle (App) sécifie le typage de l'application. Une application pour etre 
+considérée comme une redex doit avoir un membre de gauche une abstraction, 
+donc un type A \(A\rightarrow B\) et pour le membre de droite un terme 
+de type A. 
+               
+
+\subsubsection{Sémantique statique}
+
+Le typage permet d'obtenir, à la compilation, des garanties quant à la
+bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés essentielles d'un système de type :
+\begin{description}
+\item[``Progress'':] soit \(t\) un terme correctement typé alors \(t\) est une valeur ou il
+ existe une réduction telle que \(t \leadsto t'\)
+\item[``Preservation'':] si un terme est correctement typé alors il existe une règle
+ de dérivation pour ce terme, le terme obtenu est lui aussi correctement
+ typé.
+\end{description}
+
+La conjonction de ces deux propriétés donne le slogan ``un programme
+bien typé ne plante jamais''\citep{milner:no-wrong} : tout programme
+bien typé réduit vers une valeur générant, à chaque étape de
+réduction, un terme bien typé.
+
+
+\subsection{Types dépendants}
+
+Afin d'introduire les types dépendants prenons l'exemple suivant: soit
+la fonction ayant pour but d'effectuer un ``et logique'' entre deux
+vecteurs de bits de même taille.
+
+Dans un système de type statique on ne peut pas faire de restriction
+quant à la taille que feront les deux vecteurs.  
+Pour illustrer la différence entre les deux systèmes de type, voici une 
+implémentation en Ocaml:
+
+\begin{verbatim}
+let rec andvector v1 v2 = 
+match (v1,v2) with 
+| ([],[]) -> []
+| (x::y,[]) -> x::(andvector y [])
+| ([],x::y) -> x::(andvector y [])
+| (x::y,z::t) -> if x = z then x::(andvector y t) else false::(andvector y t);;
+\end{verbatim}
+
+Grâce à la théorie des types dépendants il est possible de demander
+explicitement deux vecteurs de taille \(n\) et donc d'effectuer le
+``et logique'' sans problème. 
+En voici une implémentation avec le language Agda qui premet d'implémenter 
+les types dépendants.
+
+\begin{verbatim}
+ data Vec : n -> Set where
+  nil : Vec 0
+  cons : V {n} -> (b : Bool)(xs : Vec n) -> Vec (1 + n)
+
+and : V {n} -> Vec n -> Vec n -> Vec n
+and nil nil = nil
+and (cons true xs) (cons b2 ys) = cons b2 (and xs ys)
+and (cons false xs) (cons b2 ys) = cons false (and xs ys)
+\end{verbatim}
+
+
+Les types dépendants permettent donc de caractériser un objet non
+seulement par son type mais aussi par sa valeur et ainsi de créer des
+règles de typage plus complexes et offrant plus de souplesse que le
+typage simple.
+
+\subsubsection{Règles de typage}
+
+
+
+Dans cette partie, il sera question de présenter un système de type
+dépendant comprenant quelques types de base simple \citep{hottbook,thompson:types-fp}ainsi que leurs règles d'introduction et d'élimination. 
+
+Nous considérons les types de base suivant: le type booléen
+(\textsf{bool}), l'ensemble vide (\textsf{void}) ainsi que l'ensemble
+unitaire (\textsf{unit}). Ces règles étant
+similaires, nous concentrons notre attention sur le type booléen. Les
+règles d'introduction (BoolI1) et (BoolI2) sont assez simples puisque
+peu importe le contexte \textsf{true} et \textsf{false} sont des
+booléens.  La règle d'élimination des booléens correspond au
+branchement condition \textsf{if} \ldots \textsf{then} \ldots
+\textsf{else} \ldots puisque cette règle permet d'utiliser nos
+booléens précédement définis.
+
+\begin{figure}
+  \[\begin{array}{ccc}
+  \cfrac{}
+        {\Gamma\vdash \mathsf{bool} \in \mathsf{Type}}\mbox{(BoolF)}
+  & 
+  \begin{array}{c}
+  \cfrac{}
+        {\Gamma \vdash \mathsf{true} \in \mathsf{bool}}\mbox{(BoolI1)}
+  \\
+  \cfrac{}
+        {\Gamma \vdash \mathsf{false} \in \mathsf{bool}}\mbox{(BoolI2)}
+  \end{array}
+  &
+  \cfrac{\Gamma \vdash t \in \mathsf{bool} \quad 
+         \begin{array}{l}
+          \Gamma \vdash u \in A \\
+          \Gamma \vdash v \in A 
+         \end{array}}
+        {\Gamma \vdash \mathsf{if}\: t\: \mathsf{then}\: u\: \mathsf{else} v \in A}
+  \\
+  \cfrac{}
+        {\Gamma\vdash \mathsf{unit} \in \mathsf{Type}}\mbox{(UnitF)}
+  & 
+  \cfrac{}
+        {\Gamma\vdash () \in \mathsf{unit}}\mbox{(UnitI)}
+  \\
+  \cfrac{}
+        {\Gamma\vdash \mathsf{void} \in \mathsf{Type}}\mbox{(VoidF)}
+  &
+  &
+  \cfrac{\Gamma\vdash t \in \mathsf{void}}
+        {\Gamma\vdash t \in A}\mbox{(VoidE)}
+  \\
+  \cfrac{\begin{array}{c}
+          \Gamma\vdash A \in \mathsf{Type} \\
+          \Gamma, x : A \vdash B \in \mathsf{Type}
+         \end{array}}
+        {\Gamma \vdash (x:A) \rightarrow B \in \mathsf{Type}} 
+        \mbox{(ImplF)}
+  &
+  \cfrac{\Gamma, x:A \vdash b\in B}
+        {\Gamma \vdash \lambda x. b \in (x:A) \Rightarrow B}
+        \mbox{(ImplI)}
+  & 
+  \cfrac{\begin{array}{c}
+          \Gamma f \in (x:A)\Rightarrow B \\
+          \Gamma \vdash s \in A
+         \end{array}}
+        {f\: s \in B[x \mapsto s]}
+        \mbox{(ImplE)}
+  \end{array}\]
+  \caption{Typage (lambda calcul dépendant)}
+  \label{fig:typage-dependant}
+\end{figure}
+
+
+\section{Implémentation}
+
+Dans cette partie il est question de l'implémentation du lambda calcul
+non typé en précisant les choix de réalisation.  Le language choisi
+pour cette implémentation et qui le restera pour l'ensemble de ce
+projet est Ocaml, un language fonctionnel dont la syntaxe permet de se
+rapprocher au plus des définitions mathématiques, ce qui rend le
+passage des définitions théoriques aux implémentations plus aisées.
+
+
+\subsection{Lieurs}
+
+Le premier problème auquel j'ai été confronté fut la représentation
+qu'il fallait donner des variables libres ainsi que des variables
+liées.  D'un point de vue algorithmique lors du parcours d'un terme
+determiné si une variable est liée peut s'avérer complexe et
+nécéssiterait de nombreuses opérations supplémentaires.  Une solution
+classique~\citep{pierce:tapl} consiste à ne pas définir les variables
+par des charactères mais avec des entiers. C'est ce que l'on appel les
+\emph{indices de de Bruijn}.
+
+Considérons le terme \(\lambda x. \lambda y. x\: y\) peut se
+représenter comme \(\lambda. \lambda. 1\: 0\).  Dans cette
+représentation les variables sont représentées en fonction du nombre
+de lieurs les précédant.  Ici, la variable \(y\) est représentée par
+l'entier 0 car elle est liée au premier lieur à sa gauche. Même
+raisonnement pour la première occurence de \(x\).
+
+Cependant, on souhaiterait également pouvoir représenter des termes
+ayant des variables libres. Nous adoptons pour cela la convention
+\emph{localement
+  anonyme}~\citep{mcbride:not-a-variable,chargueraud:locally-nameless}
+(``locally nameless''). Considérons le terme \((\lambda x. x) y\) : la
+variable \(y\) est une variable libre que l'on représentera de façon
+nommée, sous la forme de caractère. Ce terme s'écrit donc
+\((\lambda. 0)\: y\).
+
+Voici donc l'implémentation que nous avons choisi des lambda terme en Ocaml :
+%
+\begin{verbatim}
+type lambda_term =   
+   | FreeVar of string    
+   | BoundVar of int    
+   | Abs of lambda_term   
+   | Appl of (lambda_term * lambda_term)
+\end{verbatim}
+
+Afin de s'implifier la lecture des lambda terme voici une fonction permettant
+ de convertir un lambda terme en chaîne de caractère.
+%
+\begin{verbatim}
+let rec lambda_term_to_string t = 
+   match t with 
+   | FreeVar v -> v 
+   | BoundVar v -> string_of_int v 
+   | Abs x -> "[]." ^ lambda_term_to_string x 
+   | Appl (x,y) -> "(" ^ lambda_term_to_string x ^ " " ^ lambda_term_to_string
+ y ^ ")"
+\end{verbatim}
+
+\subsection{Substitution et réduction}
+
+Il faut maintenant définir l'opération de réduction. Comme expliqué
+précédemment, cela équivaut à substituer les occurrences des variables
+liées dans l'abstraction de gauche par les termes de droite.  J'ai
+donc choisi de définir tout d'abord une fonction récursive de
+substitution afin de pouvoir l'utiliser plus tard dans la fonction de
+réduction.  
+% 
+\begin{verbatim}
+let rec substitution t indice tsub = 
+   match t with 
+   | FreeVar v -> FreeVar v 
+   | BoundVar v -> if v = indice then tsub else BoundVar v 
+   | Abs x -> Abs(substitution x (indice+1) tsub) 
+   | Appl (x,y) -> Appl(substitution x indice tsub,substitution y indice tsub)
+\end{verbatim}
+
+La subtilité de cette fonction réside dans le fait que à
+chaque fois que l'on rencontre un lieur il faut appeler la fonction
+substitution mais cette fois ci avec l'indice de la variable liée
+incrémenté de un.
+
+On ne peut appliquer une réduction qu'à un terme dont le membre de
+gauche est une abstraction.  Cette fonction de réduction se contente
+simplement d'appeler la fonction substitution seulement sur les redex.
+ 
+\begin{verbatim}
+let reduction t = 
+   match t with 
+   | FreeVar v -> FreeVar v 
+   | BoundVar v -> BoundVar v 
+   | Abs x -> Abs(x) 
+   | Appl(Abs(x),y) -> substitution x 0 y 
+   | Appl(x,y) -> failwith "erreur"
+\end{verbatim}
+
+Ici les applications n'étant pas considérées comme réductibles on
+renvoie une erreur.  Ce choix d'implémentation sera expliqué par la
+suite lorsque nous aurons défini la fonction d'évaluation.  Afin de
+réduire un terme jusqu'à sa forme normale si elle existe peut être
+considérée comme une opération de normalisation, mais étant donné que
+certains termes ne peuvent pas se réduire nous avons décidé d'appeler
+cette fonction évaluation. 
+
+Il existe de nombreuses stratégies pour calculer les lambda termes,
+nous avons choisis la stratégie de reduction
+normale~\citep{pierce:tapl}, aussi appelée ``appel par nom''.  Cette
+stratégie consite à réduire le redex le plus à gauche. Voici donc une
+implémentation de cette stratégie :
+
+\begin{verbatim}
+let rec evaluation t =
+   match t with  
+   | FreeVar v -> FreeVar v  
+   | BoundVar v -> BoundVar v  
+   | Abs x -> Abs(x) 
+   | Appl(Abs(x),y) -> evaluation(reduction t) 
+   | Appl(BoundVar x,y) -> Appl(BoundVar x,y)  
+   | Appl(FreeVar x,y) -> Appl(FreeVar x,y)  
+   | Appl(x,y) -> evaluation(Appl(evaluation x, y))
+\end{verbatim}
+
+Avec l'ensemble de ces fonctions nous avons donc implémenté le lambda
+calcul non typé.
+
+
+\subsection{Types dépendants}
+
+
+La suite du projet consistera donc comme le sujet l'indique en une
+implémentation d'un système de type dépendant en Ocaml. En effet dans 
+ce rapport il est question d'une déclaration des types dépendants
+mais pour en faire une application concrète il va falloir modéliser ces 
+définitions au sein d'un algorithme. \citep{loeh:tuto-dependant,coquand:mini-tt}
+
+
+%% * Outro
+
+\clearpage
+
+\bibliographystyle{abbrvnat}
+\bibliography{prerapport.bib}  
+
+
+\end{document}

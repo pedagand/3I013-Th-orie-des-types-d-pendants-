@@ -1,0 +1,6 @@
+PKG sexplib
+PKG oUnit
+S .
+S test
+B _build
+B _build/test

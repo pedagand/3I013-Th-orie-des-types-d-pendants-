@@ -1,0 +1,386 @@
+\documentclass {article}
+
+%% ** Packages
+
+\usepackage{natbib}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{amsthm, amssymb, amsmath}
+\usepackage{hyperref}
+\usepackage{noweb}
+
+%% ** Theorem styles 
+
+
+\newtheorem{theorem}{Théorème}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemme}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}
+\newtheorem{example}{Exemple}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remarque}
+\newtheorem{para}{} 
+
+
+%% ** Title
+
+\title{Implémentation de la théorie des types dépendants}
+\author{Roman Delgado}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+
+%% ** Abstract 
+
+
+\begin{abstract} 
+  Ce document représente l'ensemble du travail effectué durant l'unité d'enseignement 3I013 de l'upmc,
+\end{abstract}
+
+\tableofcontents
+
+\clearpage
+
+%% ** Main
+
+\section{Introduction}
+
+blablawsdsdfsdf
+
+\section{lambda calcul non typé}
+
+En 1936 que Alonzo Church introduit le lambda calcul non typé
+(citation de church), c'est
+un modèle de calcul universel tout comme les machines de Turing. Celui ci repose
+sur une syntaxe minimaliste et permet de formaliser le concept d'application 
+de fonctions. Il est au coeur de nombreuses recherches dans le domaine de la 
+programmation fonctionnelle. Le lambda calcul non typé a connu un formidable 
+succès, donnant lieu à de multiples variantes dont on trouvera une présentation
+ moderne et synthétique dans l'ouvrage de (citation pierce).
+
+\subsection{Présentation formelle}
+
+\subsubsection{Syntaxe}
+Le lambda calcul est composé uniquement de \(\lambda\) termes dont voici la syntaxe
+
+\begin{align*}
+  t &::= & \mbox{(lambda terme)} \\
+  &|\quad x & \mbox{(variable)} \\
+  &|\quad \lambda x. t & \mbox{(abstraction)} \\
+  &|\quad t\: t          & \mbox{(application)}
+\end{align*}
+
+Pour faire une analogie avec le modèle mathématique, une abstraction peut 
+etre vue comme une fonction,
+
+\begin{example}
+  L'abstraction nous permet de construire des fonctions anonymes, par exemple la
+  fonction identitée peut etre définie par le lambda terme suivant :
+  %
+  \[ 
+  \lambda x. x
+  \]
+\end{example}
+
+On peut constater que avec cette syntaxe que les abstractions ne prennent qu'un
+seul argument, mais d'après la théorie de Haskell Curry (la curryfication), 
+l'ensemble des fonctions à plusieurs arguments peuvent etres représentées 
+par une succession de fonctions à un seul argument.
+\begin{example}
+Le \(\lambda\)terme  \(\lambda xy.t\) peut etre représentée par le terme suivant
+\(\lambda x.\lambda y.t\)   
+\end{example} 
+Dans la suite de cet article nous utiliserons des fonctions à un unique 
+argument. 
+
+\subsubsection{Variables libres et variables liées}
+
+Une variable est liée lorsque celle ci est déclarée dans le corp d'un lambda, 
+dans l'exemple précédent x était une variable liée. 
+Si la variable n'a pas été déclarée elle sera dite libre. 
+
+\begin{example}
+  Dans le terme suivant \(\lambda x.\lambda y.x\:y\:z\) , les variables x et 
+  y sont liées tandis que la variable z est libre 
+\end{example}
+
+Un terme ne contenant aucune occurrence de variable libre est dit `clos'.
+\begin{example}
+  Dans le lambda terme \((\lambda x. \lambda y. x\: y)\: y\), la
+  variable \(x\) est liée ainsi que la première occurence de la
+  variable \(y\). Cependant, la variable \(y\) à l'exterieur des
+  parenthèse est libre.
+\end{example}
+
+Un des problème introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci dessus(exemple 3).  
+
+\subsubsection{Les indices de de Bruijn}
+
+Pour palier au problème que nous énoncions précédement, il existe une 
+représentation pour les variables liées, les indides de de Bruijn.
+Nous allons donc maintenant représenté les variables liées non pas par un 
+nom mais par un entier naturel. 
+\begin{example}
+  Le lambda terme représentant l'identité que l'on écrivait \(\lambda x.x\) s'écrirat donc maintenant \(\lambda.0\)
+\end{example}
+
+  
+\subsection{Calculer dans le lambda calcul}
+
+Dans le lambda calcul pure il n'existe pas de primitive pour effectuer des 
+calculs. Le seul moyen de calculer de nouveaux termes est de les appliquer 
+entre eux. Mais il nous faut d'abord étudier le mécanisme de substitution pour 
+pouvoir effectuer nos calculs.
+
+\subsubsection{Substitution}
+
+La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
+à remplacer l'occurrence d'une variable liée par un \(\lambda\)terme.
+On note généralement la substitution de la variable x dans le terme t par le 
+terme u avec la notation suivante. 
+%ici j'aimerais bien mettre une présentation plus sympas que celle ci
+\[ 
+t[0:=u]
+\]
+
+\begin{example}
+  Soit le terme \(\lambda\).0[x:=\(\lambda\).0], après avoir effectuer la
+  substitution nous obtenons le terme \(\lambda\).\(\lambda\).0
+\end{example}
+
+Nous avons analyser un cas de substitution cependant on peut etre confronté 
+à devoir substituer dans une application ou une abstraction, voici donc 
+les règles pour la substitution 
+%changer la fleche aussi
+\begin{align*}
+&(x y)[0 := x] ------->(x[0 := x] y[0 := x]) \\
+&(\lambda .t)[0 := x]---->\lambda .t[0 := x] \\
+\end{align*}
+
+
+On découvre ici un nouvel avantage de notre représentation avec les indices de
+de Bruijn, car il n'est pas nécéssaire de prendre des précautions quand au
+nom des variables de notre terme substituant %a changer
+qui rendrait liée une variable qui était libre. Cela nous permet de ne pas 
+avoir besoin d'introduire l'\(\alpha\) convertion.
+%Mettre une nouvelle fleche dans l'exemple
+\begin{example}
+  Avec la représentation classique: 
+  \[ 
+  \lambda x.x[x := \lambda y.x] ---> \lambda x.\lambda y.x
+  \]
+  Avec les indices de de bruijn
+  \[ 
+  \lambda.0[0 := \lambda.x] -----> \lambda.\lambda.x
+  \]
+  On constate bien que dans la première représentation on pense que la variable
+  x est liée alors que celle ci devrait en réalité etre libre comme dans la 
+  seconde représentation.
+\end{example}
+
+%je ne sais pas exactement quel titre donné a cette partie normalisation 
+%ou reduction 
+\subsubsection{Reduction}
+
+Seul les applications dont le membre de gauche est une abstraction
+peuvent etre réduite on appel cela une \emph{redex} . 
+C'est à dire que l'application (t u) ne peut pas etre réduite (nous verrons
+dans la section normalisation que si l'on arrive a normaliser t pour obtenir 
+une abstraction on pourra alors reduire ce terme)
+Voici le principe de base de la réduction, soit le terme ((\(\lambda\).\(\lambda\).0 1) y), ici
+le terme a bien sous la forme d'une application ayant une abstraction comme 
+membre de gauche. La reduction va consister a substituer l'ensemble des 
+variables liée a la première application par le membre de droite de 
+l'application. Ce qui va donc nous donner \(\lambda\).\(\lambda\).0 y
+
+%trouver des exemples en plus peut etre ? 
+
+
+
+\subsubsection{normalisation}
+
+Un terme est dit sous forme normale si on ne peut plus lui appliquer 
+de réduction. La normalisation consiste donc a reduire autant que possible
+notre terme.
+%changer les fleches 
+\begin{example}
+  le terme (((\(\lambda\).0) (\(\lambda\).0)) y) \(\leadsto\) ((\(\lambda\).0) y) 
+\(\leadsto\) y %saut de ligne
+  Ici y n'est plus réductible c'est donc la forme normale du terme.
+\end{example}
+
+Le lambda calcul étant un modèle de calcul universel, il permet de 
+décrire des termes/programmes qui ne terminent pas : ceux-ci n'ont pas 
+de forme normale.
+
+\begin{example}
+ 
+  Le terme suivant n'admet pas de forme normale :
+  %
+  \begin{align*}
+  (\lambda x. x\: x) (\lambda x. x\: x) &\leadsto (x x)[x \mapsto \lambda x. x\: x] \\
+                                        &\leadsto (\lambda x. x\: x) (\lambda x. x\: x) \\
+                                        &\leadsto \ldots \\
+  \end{align*}
+\end{example}
+%je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
+%introduire un peut la suite du rapport 
+Nous verrons que dans les sections suivantes que lorsque nous introduiront 
+les système de type, nous n'auront plus de terme qui ne réduisent pas vers 
+une forme normale (c'est une des propriété très intérressante offerte par 
+les systèmes de type)
+
+Il existe de nombreuses stratégies de normalisation des termes dans le lambda 
+calcul non typé %contrairement au lambda calcul typé?
+par contre
+
+%toute les cités et expliquer d'après le livre de pierce 
+
+
+\subsection{Enrichire le lambda calcul}
+
+Maintenant que le noyeau de notre language a été définis nous pouvons introduire
+de nouvelles constructions qui vont nous permettre d'exprimer des 'choses' %changer ça
+tel que les entiers, les booléens ect...
+
+\subsubsection{Les booléens de Church}
+
+Nous allons ici voir une représentation des booléens accompagné de la 
+structure if then else.
+Voici les termes correspondants au constructeurs True et False
+\begin{align*}
+  &\lambda .\lambda . 0 \mbox{(true)} \\
+  &\lambda .\lambda . 1 \mbox{(false)} 
+\end{align*}
+
+On assimile ces deux termes aux booléens True et False car leur calcul au sein
+de l'application d'un Ifte reproduit le comportement attendu.
+Nous pouvons désormais introduire le terme correspondant à la structure de 
+controle IfThenElse 
+\begin{align*}
+  &\lambda .\lambda .\lambda . 2\: 1\: 0 \mbox{(Ifte)} \\
+\end{align*}
+
+\begin{example}
+  Voici un exemple de reduction du terme Ifte
+  \begin{align*}
+    &(\lambda .\lambda .\lambda . 2\: 1\: 0) \: (\lambda . \lambda . 0) \: x \: y  \\
+    & mettre les etapes intermediaires \\
+    & x 
+  \end{align*}
+\end{example}
+
+Ici nous n'avons aucun moyen de vérifier avant normalisation que le premier
+argument de Ifte est un booléen. %broder un peu plus ?
+
+\subsubsection{Les entiers de Church}
+
+Ici, nous allons voir comment créer
+les entiers naturels \textit{ex nihilo} en utilisant un \emph{codage à
+  la Church}.
+
+L'idée consiste à représenter le nombre \(n\) par une fonction d'ordre
+supérieur prenant en argument une fonction \(f\) et l'appliquant \(n\)
+fois. On définira donc 
+%
+\begin{align*}
+\mathsf{zero} &= \lambda f. \lambda x. x \\
+\mathsf{un}   &= \lambda f. \lambda x. f\: x \\
+\mathsf{deux} &= \lambda f. \lambda x. f\: (f\: x)
+\end{align*}
+
+Afin de construire tous les entiers naturels, on s'inspire alors de la
+définition des entiers de Peano et définit le successeur d'un nombre \(n\)
+comme
+%
+\[
+\mathsf{successeur} = \lambda n. \lambda f. \lambda x. n\: f\: (f\: x)
+\]
+%
+c'est-à-dire \(n\) applications de \(f\) précédées d'une première
+application de \(f\), soit \(n+1\) applications.
+
+De la même manière, on construit l'addition de deux nombres \(m\) et
+\(n\) en faisant \(m\) applications répétées de \(f\) précédée par
+\(n\) applications :
+%
+\[
+\mathsf{plus} = \lambda m. \lambda n. \lambda f. \lambda x. m f (n f x)
+\]
+
+
+\subsection{Implementation}
+
+Nous nous attarderons ici sur les choix d'implémentations et il sera question
+d'analyser certaines parties du code mais pas l'ensemble du code.
+
+\subsubsection{Représentation des lambda termes}
+Pour représenter les types en Ocaml les types sommes sont très intéressant car 
+ils offrent une manipulation souple à l'aide du pattern matching
+
+%mettre avec nos web le type somme des lambda termes
+
+
+\subsubsection{Parsing}
+Afin de permettre de construire des termes rapidement et le plus lisible 
+possible la création d'un parseur s'imposait.
+La notation choisis à été la notation prefixe (notation polonaise inversé),
+une syntaxe très proche du langage lisp qui en plus d'etre simple a comprendre
+est assez facile à parser (grace à l'aide de la puissance des bibliothèque
+de S-expression)
+\begin{example}
+  Voici un exemple de correspondance entre les termes avant et après parsing
+  \begin{align*}
+    (lambda\: x \: x) & \leadsto Abs(BoundVar\: 0) \\
+    (x\: y) & \leadsto Appl(FreeVar\: ``x'',FreeVar\: ``y'')       
+  \end{align*}
+\end{example}
+
+
+
+\subsubsection{substitution}
+%pas de grande difficulté a implémenter la fonction de substitution 
+
+\subsubsection{evaluation et reduction forte}
+Nous avons vu dans la section sur l'évaluation du lambda calcul qu'il existait
+plusieurs stratégies d'évaluation. 
+La première fonction implémenté ``a été'' une fonction d'évaluation 
+correspondant a %je ne sais pas encore laquel
+Avec cette fonction on ne peut pas évaluer certains termes jusqu'a 
+leur forme normale iter par exemple
+C'est pour ça que c'était intérressant d'en implémenter une autre.
+
+
+La seconde fonction est une fonction de réduction forte qui avant d'évaluer une
+application évalue d'abord le membre de gauche et le membre de droite de 
+l'application jusqu'a qu'ils ne soient plus normalisables. 
+%normalement cela correspond a la reduction forte, a vérifier
+ 
+
+
+\subsubsection{Les booléens}
+\subsubsection{Les entiers}
+
+\section{Le lambda calcul simplement typé}
+
+\section{Les types dépendants}
+
+% pour l'implémentation quand je parle du parser ne pas montrer le code 
+% mais expliquer la syntaxe lisp
+
+% pour la prochaine introduction d'implémentation dire que la grosse nouveauté
+% c'est le type checker et le fait que on 
+
+
+
+
+
+
+\end{document}
