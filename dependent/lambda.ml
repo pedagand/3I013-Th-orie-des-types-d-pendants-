@@ -30,6 +30,33 @@ and neutral =
   | NFree of string 
   | NApp of neutral * value 
 
+type debug = 
+  | Report of debug * debug * debug * debug
+  | Success of bool
+  | Contexte of string
+  | Steps of string
+  | Error of string
+
+(* fonction pour les rapports d'erreurs *)
+let create_report s c e er= 
+  Report(Success(s),Contexte(c),Steps(e),Error(er))
+
+let print_report r = 
+  match r with 
+  | Report(Success(s),Contexte(c),Steps(e),Error(er)) -> 
+     "Report : \n -Success : " ^ string_of_bool s ^ "\n" ^
+       "-Contexte : " ^ c ^ "\n" ^
+	 "-Steps : " ^ e ^ "\n" ^
+	   "-Error : " ^ er ^ "\n" 
+  | _ -> failwith "can't print something which is not a report" 
+
+let res_debug d = 
+  match d with 
+  | Report(Success(s),Contexte(c),Steps(e),Error(er)) -> 
+     s
+  | _ -> failwith "report don't have the good Shape" 
+
+
 
 (* ici on va crée le parseur lisp avec le pretty printing *)
 let rec parse_term env t = 
@@ -253,63 +280,86 @@ and synth contexte exT debug ldebug =
        | _ -> failwith ("Mauvais annotation" ^ debug)
      end
  *)
-										(* alors soit je remplace les FVar des le debut lorsque je les mets dans le contexte ou alor a la sortie *)
-let rec check contexte inT ty debug ldebug= 
+
+
+(* alors soit je remplace les FVar des le debut lorsque je les mets dans le contexte ou alor a la sortie *)
+let rec check contexte inT ty steps = 
   match inT with 
   | Abs(x,y) -> 
      begin 
      match ty with      
      | Pi(v,s,t) -> let freshVar = gensym () in
-		    check ((freshVar,s)::contexte) (substitution_inTm y (FVar(freshVar)) 0) t ""  (freshVar :: ldebug)
-     | _ -> failwith ("Abs must be of type " ^ debug  )
+		    check ((freshVar,s)::contexte) (substitution_inTm y (FVar(freshVar)) 0) t (steps ^ (pretty_print_inTm inT [])) 
+     | _ -> create_report false (contexte_to_string contexte []) steps "Abs type must be a Pi"
      end 
   | Inv(t) -> 
-     let tyT = (synth contexte t "" ldebug) in
+     let tyT = (synth contexte t (steps ^ (pretty_print_inTm inT []))) in
      begin       
-       (big_step_eval_inTm (relie_free_context_inTm contexte tyT) []) = (big_step_eval_inTm (relie_free_context_inTm contexte ty) []) 
+       if (big_step_eval_inTm tyT []) = (big_step_eval_inTm ty []) 
+       then create_report true (contexte_to_string contexte []) steps "NO"
+       else create_report false (contexte_to_string contexte []) steps "eval of tyt and eval of ty not equal"
      end
-  | Pi(v,s,t) ->
-     (* nouveau problème dans le type checker si s est une variable libre et que on veut tester si c'est une star ça ne vas pas marcher si c'est un pi *)
-     let freshVar = gensym () in 
+  | Pi(v,s,t) ->     
      begin 
-       if  (check contexte s Star "" ldebug) then 
-	 check ((freshVar,s)::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star "" (freshVar :: ldebug)
-       else failwith ("Pi S must be of type star !!"^ pretty_print_inTm s [] ^ "!! contexte !!"  ^ contexte_to_string contexte  [] )
+       match ty with 
+	 | Star -> let freshVar = gensym () in 
+		   begin 
+		     let rep = (check contexte s Star (steps ^ (pretty_print_inTm inT []))) in 
+		     begin 
+		       match rep with 
+		     | Report(Success(true),c,e,er) -> 
+			check ((freshVar,s)::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star (steps ^ (pretty_print_inTm inT []))
+		     | Report(Success(false),c,e,er) -> 
+			create_report false (contexte_to_string contexte []) steps "Pi (x S T) S is not of type star"
+		     | _ -> failwith "Pi : It is not possible to get a report without a Success in first arg"
+		     end 
+		   end
+	 | _ -> create_report false (contexte_to_string contexte []) steps "Pi : Ty must be of type star"
      end
   | Star -> 
      begin 
       match ty with 
-	| Star -> true
-	| _ -> failwith ("ty must be a Star" ^ debug)
+	| Star -> create_report true (contexte_to_string contexte []) steps "No"
+	| _ -> create_report false (contexte_to_string contexte []) steps "Star : ty must be of type Star"
      end
-  | Zero -> if ty = Nat then true else failwith "Zero is a Nat" 
-  | Succ(n) -> if ty = Nat 
-	       then check contexte n Nat "" ldebug 
-	       else failwith "Succ is a Nat" 
-  | Nat -> if ty = Nat then true else failwith "Nat is a Nat :)" 
-and synth contexte exT debug ldebug =
+  | Zero -> 
+     begin 
+       match ty with 
+       | Nat -> create_report true (contexte_to_string contexte []) steps "No"
+       | _ -> create_report false (contexte_to_string contexte []) steps "Zero : ty must be of type Nat"
+     end 
+  | Succ(n) -> 
+     begin 
+       match ty with 
+       | Nat -> check contexte n Nat (steps ^ (pretty_print_inTm inT []))
+       | _ -> create_report false (contexte_to_string contexte []) steps "Succ : ty must be of type Nat"
+     end 
+  | Nat -> 
+     begin
+       match ty with 
+       | Star -> create_report true (contexte_to_string contexte []) steps "No"
+       | _ -> create_report false (contexte_to_string contexte []) steps "Nat : ty must be of type *"
+     end 
+and synth contexte exT steps =
   match exT with 
   | BVar x -> failwith ("Pas possible de trouver une boundVar a synthétiser " ^ "!! contexte: " ^ contexte_to_string contexte [])
-  | FVar x -> read(pretty_print_inTm(List.assoc x contexte) [] )
+  | FVar x -> (List.assoc x contexte)
   | Ann(tm, ty) ->
-       if check contexte ty Star "" ldebug 
-	  &&  check contexte tm ty "" ldebug then 
-         ty 
+       if res_debug (check contexte ty Star (steps ^ (pretty_print_exTm exT [])))
+	  &&  res_debug(check contexte tm ty (steps ^ (pretty_print_exTm exT []))) 
+       then ty 
        else
-         failwith ("Wrong annotation" ^ debug)
+         failwith ("Wrong annotation")
   | Appl(x,y) -> 
-     let pTy = synth contexte x "" ldebug in 
+     let pTy = synth contexte x (steps ^ (pretty_print_exTm exT [])) in 
      begin 
        match pTy with 
-       | Pi(v,s,t) -> if (check contexte y s "" ldebug)
+       | Pi(v,s,t) -> if res_debug(check contexte y s (steps ^ (pretty_print_exTm exT [])))
 		    then (substitution_inTm t (Ann(y,s)) 0)
 		    else failwith ("mauvais type d'argument pour l'application" ^ "Appl" ^ pretty_print_exTm (Appl(x,y)) [] ^ " pty :  " ^     pretty_print_inTm pTy [] ^ "contexte !!!" ^  contexte_to_string contexte [])
-       | _ -> failwith ("Mauvais annotation" ^ debug)
+       | _ -> failwith ("Mauvais annotation")
      end
+  | _ -> failwith "pas encore fait" 
 (*   | Iter (p,n,f,z) -> if check contexte () (read ("(-> (pi ) ())")) "" ldebug
 		      then
-		      else *)
-
-
-
-
+		      else *) 

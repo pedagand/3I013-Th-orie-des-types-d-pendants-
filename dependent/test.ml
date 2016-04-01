@@ -5,9 +5,10 @@ let suite =
             (* ; "Boolean test" >::: BooleanT.tests *)
             ; "Nat test" >::: NatT.tests
 	    ; "test unit" >::: TestUnit.eval
-	    ; "test check" >::: TestCheck.eval
+	    ; "test check" >::: TestCheck.tests
 	    ; "test pretty" >::: TestPretty.tests
-	    ; "test sub" >::: TestSub.tests]
+	    ; "test sub" >::: TestSub.tests
+	    ]
 
 let () =
   run_test_tt_main suite
