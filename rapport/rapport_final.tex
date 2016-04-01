@@ -7,7 +7,47 @@
 \usepackage[francais]{babel}
 \usepackage{amsthm, amssymb, amsmath}
 \usepackage{hyperref}
-\usepackage{noweb}
+
+%% ** OCaml listings
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+  language=[Objective]Caml,
+  %% emph={[2]Nil,Cons,FZe,FSu,ze,su,Ze,Su},
+  %% emphstyle={[2]\Constructor},
+  %% emph={[3]lookup,failwith},
+  %% emphstyle={[3]\Function},
+  %% emph={[4]vec,fin,nat,list,tree,completeTree},
+  %% emphstyle={[4]\Canonical},
+  morecomment=[s]{(*}{*)},
+  rangeprefix=\(\*\=,
+  rangesuffix=\ \*\),
+  includerangemarker=false,
+  extendedchars=\true,
+  inputencoding=utf8,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  basicstyle=\ttfamily\small,
+  framesep=4mm,
+  moredelim=*[s][\itshape]{(*}{*)},
+  moredelim=[is][\textcolor{darkgray}]{§}{§},
+  escapechar=°,
+  keywordstyle=\color[rgb]{0.627451, 0.125490, 0.941176},
+  stringstyle=\color[rgb]{0.545098, 0.278431, 0.364706},
+  commentstyle=\color[rgb]{0.698039, 0.133333, 0.133333},
+  numberstyle=\color[rgb]{0.372549, 0.619608, 0.627451},
+  boxpos=t,
+  literate= {'a}{{$\alpha$}}1%
+    {->}{{${\to}$}}2
+    {*}{{${\times}$}}1
+    {::}{{${:\::}$}}1
+}
+
+\newcommand{\codefrom}[3]
+           {\lstinputlisting[linerange={#3}-End]{../#1/#2.ml}}
+
 
 %% ** Theorem styles 
 
@@ -53,6 +93,15 @@
 \section{Introduction}
 
 blablawsdsdfsdf
+
+
+Voici du code :
+
+%% \codefrom{dossier}{fichier}{tag}
+%%   où 'dossier' est "no_type", ou "typed", ou "dependent"
+%%      'fichier' est le chemin vers un fichier dans le dossier
+%%      'tag' est une déclaration de la forme (*=tag *) (code) (*=End *) dans le source
+\codefrom{no_type}{lambda}{untyped_term}
 
 \section{lambda calcul non typé}
 

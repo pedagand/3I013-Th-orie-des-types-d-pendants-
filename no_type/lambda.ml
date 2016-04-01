@@ -7,12 +7,15 @@ open Sexplib
   #require "sexplib";;
  
 *)
+
+(*=untyped_term *)
 type lambda_term =
   | FreeVar of string 
   | BoundVar of int 
   | Abs of lambda_term
   | Appl of (lambda_term * lambda_term)
   | True | False | IfThenElse of lambda_term * lambda_term * lambda_term
+(*=End *)
 
 (* TODO: remember the name of the abstractions, for pretty-printing *)
 (* TODO: rajouter constructeur des vrais ect... *)
