@@ -1,7 +1,7 @@
 open OUnit2
 open Sexplib
 open Lambda
-
+ 
 
 (* We compare pretty-printed strings based on the tokens (ignoring spacing) *)
 let compare_term a b = 

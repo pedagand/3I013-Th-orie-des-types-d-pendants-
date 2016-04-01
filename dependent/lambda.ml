@@ -164,12 +164,20 @@ let rec big_step_eval_exTm t envi =
     | Ann(x,_) -> big_step_eval_inTm x envi
     | FVar v -> vfree v 
     | BVar v -> List.nth envi v
-    | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))
+    | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
+    | Iter(p,n,f,a) -> viter(big_step_eval_inTm n envi, 
+                             big_step_eval_inTm f envi,
+                             big_step_eval_inTm a envi)
 and vapp v = 
   match v with 
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "TBD"
+and viter (v, f,a) = 
+  match v with
+  | VZero ->  a
+  | VSucc v -> vapp (f, (viter (v, f, a)))
+  | _ -> failwith "Impossible (viter)"
 and big_step_eval_inTm t envi = 
   match t with 
   | Inv(i) -> big_step_eval_exTm i envi
@@ -181,10 +189,10 @@ and big_step_eval_inTm t envi =
   | Nat -> VNat
 
 
-
 (* il me semble qu'il me faut une fonction de relie libre avant de lancer big step eval dans le check pour que celui ci puisse faire le travail 
 le contexte que l'on va utiliser est de la forme ("nom var",inTm)*)
 (* rajouter iter *)
+(* Cette fonction ne sert a rien du moins pour le moment
 let rec relie_free_context_inTm  contexte t = 
   match t with 
   | Abs(x,y) -> Abs(x,relie_free_context_inTm contexte y)
@@ -196,7 +204,7 @@ let rec relie_free_context_inTm  contexte t =
   | Inv(Appl (x,y)) -> Inv(Appl(Ann((relie_free_context_inTm contexte (Inv(x))),Star),relie_free_context_inTm contexte y))
   | Zero -> Zero
   | Succ(n) -> Succ(relie_free_context_inTm contexte n)
-  | Nat -> Nat 
+  | Nat -> Nat *)
 
 
 let read t = parse_term [] (Sexp.of_string t)
@@ -224,62 +232,33 @@ and neutral_to_exTm i v =
 	       else FVar x
   | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
 
+
+(*fonction d'égalité pour les termes *)
+let rec equal_inTm t1 t2 = 
+  match (t1,t2) with 
+  | (Abs(_,x1),Abs(_,x2)) -> equal_inTm x1 x2
+  | (Pi(_,x1,y1),Pi(_,x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Star,Star) -> true 
+  | (Zero,Zero) -> true 
+  | (Succ(n1),Succ(n2)) -> equal_inTm n1 n2
+  | (Nat,Nat) -> true
+  | (Inv(x1),Inv(x2)) -> equal_exTm x1 x2
+  | _ -> false
+and equal_exTm t1 t2 = 
+  match (t1,t2) with 
+  | (Ann(x1,y1),Ann(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (BVar(x1),BVar(x2)) -> x1 = x2
+  | (FVar(x1),FVar(x2)) -> x1 = x2
+  | (Appl(x1,y1),Appl(x2,y2)) -> equal_exTm x1 x2 = equal_inTm y1 y2 
+  | (Iter(w1,x1,y1,z1),Iter(w2,x2,y2,z2)) -> 
+     equal_inTm w1 w2 = equal_inTm x1 x2 = equal_inTm y1 y2 = equal_inTm z1 z2
+  | _ -> false
 	
 (* fonctions pour le debug *)
 let rec contexte_to_string contexte l= 
   match contexte with 
   | [] -> "|" 	    
   | (s,w) :: tail -> "(" ^ s ^ "," ^ pretty_print_inTm w l ^ ");" ^ contexte_to_string tail l  
-
-
-(* ^ idée faire un moyen de backtraquer avec une liste en argument ou a chaque fois que on effectue une opération il faut la mettre dans cette liste *) 
-(* let rec check contexte inT ty debug ldebug= 
-  match inT with 
-  | Abs(x,y) -> 
-     begin 
-     match ty with      
-     | Pi(v,s,t) -> let freshVar = gensym () in
-		    check ((freshVar,s)::contexte) (substitution_inTm y (FVar(freshVar)) 0) t ((pretty_print_inTm (Abs(x,y)) (freshVar :: ldebug )) ^ ";" ^ debug)  (freshVar :: ldebug )
-     | _ -> failwith ("Abs must be of type " ^ debug  )
-     end 
-  | Inv(t) -> 
-     let tyT = synth contexte t ((pretty_print_inTm (Inv(t)) ldebug) ^ ";" ^ debug) ldebug in
-     begin 	
-       (big_step_eval_inTm tyT []) = (big_step_eval_inTm ty [])
-     end
-  | Pi(v,s,t) when (check contexte s Star ((pretty_print_inTm (Pi(v,s,t)) ldebug) ^ ";" ^ debug) ldebug) ->
-     let freshVar = gensym () in 
-     begin 
-     check ((freshVar,s)::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star ((pretty_print_inTm (Pi(v,s,(substitution_inTm t (FVar(freshVar)) 0))) (freshVar :: ldebug)) ^ ";" ^ debug) (freshVar :: ldebug)
-     end
-  | Pi(v,s,t) -> failwith ("Pi s must be of type star !!" ^ pretty_print_inTm inT ldebug ^ "!! contexte: " ^ contexte_to_string contexte "" [])
-  | Star -> 
-     begin 
-      match ty with 
-	| Star -> true 
-	| _ -> failwith ("ty must be a Star" ^ debug)
-     end
- (*  | _ -> failwith ("term not typable !!" ^ pretty_print_inTm inT ldebug ^ "!!"  ^ debug ) *)
-and synth contexte exT debug ldebug =
-  match exT with 
-  | BVar x -> failwith ("Pas possible de trouver une boundVar a synthétiser " ^ debug) 
-  | FVar x -> List.assoc x contexte
-  | Ann(tm, ty) ->
-       if check contexte ty Star ((pretty_print_exTm (Ann(tm,ty)) ldebug) ^ ";" ^ debug) ldebug 
-	  &&  check contexte tm ty ((pretty_print_exTm (Ann(tm,ty)) ldebug) ^ ";" ^ debug) ldebug then 
-         ty 
-       else
-         failwith ("Wrong annotation" ^ debug)
-  | Appl(x,y) -> 
-     let pTy = synth contexte x ((pretty_print_exTm (Appl(x,y)) ldebug) ^ ";" ^ debug) ldebug in 
-     begin 
-       match pTy with 
-       | Pi(v,s,t) -> if check contexte y s ((pretty_print_exTm (Appl(x,y)) ldebug) ^ ";" ^ debug) ldebug
-		    then (substitution_inTm t (Ann(y,s)) 0)
-		    else failwith ("mauvais type d'argument pour l'application" ^ debug)
-       | _ -> failwith ("Mauvais annotation" ^ debug)
-     end
- *)
 
 
 (* alors soit je remplace les FVar des le debut lorsque je les mets dans le contexte ou alor a la sortie *)

@@ -18,8 +18,11 @@ let testcheckNegative inputTerm inputType =
   assert_bool "Unexpectedly type correct" (not (check [] (read inputTerm) inputType "" [])) *)
 
 
-let inputs = 
-  [    
+
+let inputs =   
+  [
+    ("(lambda x x)","(-> * *)",true);  
+    ("(lambda x x)","(-> (-> * *) *)",false);
     ("(pi x * *)","*",true);
     ("(-> * *)","*",true);
     ("(pi A * (pi B (pi x A *) *))","*",true);
@@ -28,5 +31,5 @@ let inputs =
     (testcheck4x,"*",true)
   ]
     
-let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (read chek) "")) res) inputs
+let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (read chek) "")) res) inputs 
 
