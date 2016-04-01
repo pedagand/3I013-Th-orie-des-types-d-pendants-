@@ -17,19 +17,24 @@ let testcheck4x = "(pi F (-> * *) (pi X * (-> (F X) *)))"
 let testcheckNegative inputTerm inputType =
   assert_bool "Unexpectedly type correct" (not (check [] (read inputTerm) inputType "" [])) *)
 
-
-
 let inputs =   
   [
+    
     ("(lambda x x)","(-> * *)",true);  
     ("(lambda x x)","(-> (-> * *) *)",false);
     ("(pi x * *)","*",true);
+    ("(pi x * *)","N",false);
+    ("((: (lambda x x) (-> (-> * (-> * *)) (-> * (-> * *)))) (lambda (x y) x))","(-> * (-> * *))",true);
+    ("(:(lambda x (succ x)) (-> N N))","(-> N N)",true);
+    ("((: (lambda x (succ x)) (-> N N)) zero)","N",true); 
+  (*  ("((: (lambda x (succ x)) (-> * *)) zero)","N",false); *) 
     ("(-> * *)","*",true);
     ("(pi A * (pi B (pi x A *) *))","*",true);
     (test1y,"*",true);
     ("(succ zero)","N",true);
     (testcheck4x,"*",true)
   ]
+
     
 let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (read chek) "")) res) inputs 
 
