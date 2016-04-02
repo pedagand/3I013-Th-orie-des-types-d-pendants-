@@ -93,7 +93,7 @@ let rec parse_term env t =
            vars
            (parse_term (List.append (List.rev vars) env) body)      
       | Sexp.List [Sexp.Atom "->"; s ; t ] -> 
-	 Pi("NO",(parse_term env s),(parse_term env t))
+	 Pi("NO",(parse_term env s),(parse_term ("NO" :: env) t))
       | Sexp.List [Sexp.Atom "pi"; Sexp.Atom var ; s ; t] -> 
 	 Pi(var,(parse_term env s),(parse_term (var::env) t))        
       | Sexp.List [Sexp.Atom "pi";Sexp.List vars; s; t] -> 
@@ -138,7 +138,11 @@ let rec pretty_print_inTm t l =
 and pretty_print_exTm t l =
   match t with 
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
-  | BVar(x) -> List.nth l x 
+  | BVar(x) -> begin 
+      try List.nth l x with 
+	| Failure("nth") -> failwith ("Pretty_print_exTm BVar: something goes wrong ")
+	| _ -> List.nth l x
+    end
   | FVar (x) -> x
   | Appl(x,y) -> "(" ^ pretty_print_exTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
   | Iter(p,n,f,z) -> "(iter " ^ pretty_print_inTm p l ^ " " ^ pretty_print_inTm n l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm z l ^ ")"
@@ -178,7 +182,10 @@ let rec big_step_eval_exTm t envi =
   match t with
     | Ann(x,_) -> big_step_eval_inTm x envi
     | FVar v -> vfree v 
-    | BVar v -> List.nth envi v
+    | BVar v -> begin try List.nth envi v with 
+		| Failure("nth") -> failwith ("Big_step_eval_exTm BVar it's not possible :" ^ pretty_print_exTm t [])
+		| _ -> List.nth envi v
+		end 
     | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
     | Iter(p,n,f,a) -> viter(big_step_eval_inTm n envi, 
                              big_step_eval_inTm f envi,
@@ -291,12 +298,15 @@ let rec check contexte inT ty steps =
      | _ -> create_report false (contexte_to_string contexte []) steps "Abs type must be a Pi"
      end 
   | Inv(t) -> 
-     let tyT = ret_debug_synth (synth contexte t (steps ^";" ^(pretty_print_inTm inT []))) in
-     begin       
-       if equal_inTm (value_to_inTm 0 (big_step_eval_inTm tyT [])) (value_to_inTm 0 (big_step_eval_inTm ty []))
-       then create_report true (contexte_to_string contexte []) steps "NO"
-       else create_report false (contexte_to_string contexte []) steps "eval of tyt and eval of ty not equal"
-     end
+     if res_debug_synth (synth contexte t (steps ^";" ^(pretty_print_inTm inT [])))
+     then 
+       let tyT = ret_debug_synth (synth contexte t (steps ^";" ^(pretty_print_inTm inT []))) in
+       begin       
+	 if equal_inTm (value_to_inTm 0 (big_step_eval_inTm tyT [])) (value_to_inTm 0 (big_step_eval_inTm ty []))
+	 then create_report true (contexte_to_string contexte []) steps "NO"
+	 else create_report false (contexte_to_string contexte []) steps "eval of tyt and eval of ty not equal"
+       end
+     else create_report false (contexte_to_string contexte []) steps "Synth of tyT goes wrong"
   | Pi(v,s,t) ->     
      begin 
        match ty with 
@@ -340,14 +350,14 @@ let rec check contexte inT ty steps =
      end 
 and synth contexte exT steps =
   match exT with 
-  | BVar x -> failwith ("Pas possible de trouver une boundVar a synthétiser " ^ "!! contexte: " ^ contexte_to_string contexte [])
+  | BVar x -> create_retSynth (create_report false (contexte_to_string contexte []) steps "BVar : not possible during type checking") Star
   | FVar x -> create_retSynth (create_report true (contexte_to_string contexte []) steps "NO") (List.assoc x contexte)
   | Ann(tm, ty) ->
        if res_debug (check contexte ty Star (steps ^ ";" ^(pretty_print_exTm exT [])))
 	  &&  res_debug(check contexte tm ty (steps ^ ";" ^(pretty_print_exTm exT []))) 
-       then create_retSynth (create_report true (contexte_to_string contexte []) steps "NO") ty 
+       then create_retSynth (create_report true (contexte_to_string contexte []) steps "NO") ty    
        else
-         failwith ("Wrong annotation")
+	 create_retSynth (create_report false (contexte_to_string contexte []) steps "Ann: Wrong annotation") Star
   | Appl(x,y) -> 
      let pTy = ret_debug_synth (synth contexte x (steps ^ ";" ^(pretty_print_exTm exT []))) in 
      begin 
@@ -355,7 +365,7 @@ and synth contexte exT steps =
        | Pi(v,s,t) -> if res_debug(check contexte y s (steps ^ ";" ^(pretty_print_exTm exT [])))
 		    then create_retSynth (create_report true (contexte_to_string contexte []) steps "NO") (substitution_inTm t (Ann(y,s)) 0)
 		    else  create_retSynth (create_report false (contexte_to_string contexte []) steps "Y don't have the type of S") Star
-       | _ -> failwith "Must not append" 
+       | _ -> create_retSynth (create_report false (contexte_to_string contexte []) steps "Appl: pTy must be of type Pi ") Star
      end
   | _ -> failwith "il faut que fasse iter" 
 (*   | Iter (p,n,f,z) -> if check contexte () (read ("(-> (pi ) ())")) "" ldebug

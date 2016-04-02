@@ -21,6 +21,8 @@ let inputs
       ("(succ (succ zero))",Succ(Succ(Zero)));
       ("(: (succ zero) N)",Inv(Ann(Succ(Zero),Nat)));
       ("(iter N N N N)",Inv(Iter(Nat,Nat,Nat,Nat)));
+      ("(pi P (-> A *) (-> (P a) (P b)))",
+       Pi("P",Pi("NO",Inv(FVar "A"),Star),Pi("NO",Inv(Appl(BVar 0,Inv(FVar "a"))),Inv(Appl(BVar 1,Inv(FVar "b"))))));
       (* ( (pretty_print_inTm test1x []),(test1x)); *)
       (* (test1y),(test1x) ;*)]
 
