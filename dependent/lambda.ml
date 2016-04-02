@@ -140,7 +140,7 @@ and pretty_print_exTm t l =
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
   | BVar(x) -> begin 
       try List.nth l x with 
-	| Failure("nth") -> failwith ("Pretty_print_exTm BVar: something goes wrong ")
+	| Failure("nth") ->  failwith ("Pretty_print_exTm BVar: something goes wrong list is to short BVar de " ^ string_of_int x)
 	| _ -> List.nth l x
     end
   | FVar (x) -> x
@@ -183,7 +183,7 @@ let rec big_step_eval_exTm t envi =
     | Ann(x,_) -> big_step_eval_inTm x envi
     | FVar v -> vfree v 
     | BVar v -> begin try List.nth envi v with 
-		| Failure("nth") -> failwith ("Big_step_eval_exTm BVar it's not possible :" ^ pretty_print_exTm t [])
+		| Failure("nth") -> failwith ("Big_step_eval_exTm BVar it's not possible :" ^ pretty_print_exTm t []) 
 		| _ -> List.nth envi v
 		end 
     | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
@@ -214,7 +214,7 @@ and big_step_eval_inTm t envi =
 (* il me semble qu'il me faut une fonction de relie libre avant de lancer big step eval dans le check pour que celui ci puisse faire le travail 
 le contexte que l'on va utiliser est de la forme ("nom var",inTm)*)
 (* rajouter iter *)
-(* Cette fonction ne sert a rien du moins pour le moment
+(* Cette fonction ne sert a rien du moins pour le moment *)
 let rec relie_free_context_inTm  contexte t = 
   match t with 
   | Abs(x,y) -> Abs(x,relie_free_context_inTm contexte y)
@@ -226,7 +226,8 @@ let rec relie_free_context_inTm  contexte t =
   | Inv(Appl (x,y)) -> Inv(Appl(Ann((relie_free_context_inTm contexte (Inv(x))),Star),relie_free_context_inTm contexte y))
   | Zero -> Zero
   | Succ(n) -> Succ(relie_free_context_inTm contexte n)
-  | Nat -> Nat *)
+  | Nat -> Nat 
+  | _ -> failwith "il faut la finir"
 
 
 let read t = parse_term [] (Sexp.of_string t)
@@ -294,7 +295,8 @@ let rec check contexte inT ty steps =
      begin 
      match ty with      
      | Pi(v,s,t) -> let freshVar = gensym () in
-		    check ((freshVar,s)::contexte) (substitution_inTm y (FVar(freshVar)) 0) t (steps ^ ";" ^ (pretty_print_inTm inT [])) 
+		    let freshVar2 = gensym () in
+		    check ((freshVar,(relie_free_context_inTm contexte s)):: (freshVar2,(relie_free_context_inTm contexte s))::contexte) (substitution_inTm y (FVar(freshVar)) 0) (substitution_inTm t (FVar(freshVar2)) 0) (steps ^ ";" ^ (pretty_print_inTm inT [])) 
      | _ -> create_report false (contexte_to_string contexte []) steps "Abs type must be a Pi"
      end 
   | Inv(t) -> 
@@ -316,9 +318,9 @@ let rec check contexte inT ty steps =
 		     begin 
 		       match rep with 
 		     | Report(Success(true),c,e,er) -> 
-			check ((freshVar,s)::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star (steps ^";" ^ (pretty_print_inTm inT []))
+			check ((freshVar,(relie_free_context_inTm contexte s))::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star (steps ^";" ^ (pretty_print_inTm inT []))
 		     | Report(Success(false),c,e,er) -> 
-			create_report false (contexte_to_string contexte []) steps "Pi (x S T) S is not of type star"
+			create_report false (contexte_to_string contexte []) steps ("Pi (x S T) S is not of type star" ^ (pretty_print_inTm inT []))
 		     | _ -> failwith "Pi : It is not possible to get a report without a Success in first arg"
 		     end 
 		   end

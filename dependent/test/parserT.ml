@@ -23,6 +23,8 @@ let inputs
       ("(iter N N N N)",Inv(Iter(Nat,Nat,Nat,Nat)));
       ("(pi P (-> A *) (-> (P a) (P b)))",
        Pi("P",Pi("NO",Inv(FVar "A"),Star),Pi("NO",Inv(Appl(BVar 0,Inv(FVar "a"))),Inv(Appl(BVar 1,Inv(FVar "b"))))));
+      ("(lambda A (lambda a (lambda b (pi P (-> A *) (-> (P a) (P b))))))",
+       Abs("A",Abs("a",Abs("b",(Pi("P",Pi("NO",Inv(BVar 2),Star),Pi("NO",Inv(Appl(BVar 0,Inv(BVar 2))),Inv(Appl(BVar 1,Inv(BVar 2))))))))));
       (* ( (pretty_print_inTm test1x []),(test1x)); *)
       (* (test1y),(test1x) ;*)]
 
