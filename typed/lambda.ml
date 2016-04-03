@@ -109,7 +109,7 @@ and parse_exTm env t =
   | Sexp.List [Sexp.Atom "p0";x] ->
      P0(parse_exTm env x)
   | Sexp.List [Sexp.Atom "p1";x] ->
-     P0(parse_exTm env x)
+     P1(parse_exTm env x)
   | Sexp.List [Sexp.Atom "ifte"; b ; thens ; elses ] -> 
      Ifte((parse_term env b),(parse_exTm env thens),(parse_exTm env elses))
   | Sexp.List [Sexp.Atom ":" ;x; t] -> 

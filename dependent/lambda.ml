@@ -11,12 +11,16 @@ type inTm =
   | Zero
   | Succ of inTm
   | Nat
+  | Pair of inTm * inTm 
+  | Cross of inTm * inTm
 and exTm = 
   | Ann of inTm * inTm 
   | BVar of int 
   | FVar of string 
   | Appl of exTm * inTm
   | Iter of inTm * inTm * inTm * inTm  
+  | P0 of exTm
+  | P1 of exTm 
 (* d'apres les regles c'est bien tout du inTm *)
 type value = 
   | VLam of (value -> value)
@@ -105,6 +109,10 @@ let rec parse_term env t =
 	   (fun var b -> Pi(var,(parse_term (List.append (List.rev vars) env) s),b))
 	   vars 
 	   (parse_term (List.append (List.rev vars) env) t)
+      | Sexp.List [a;Sexp.Atom ",";b] -> 
+	 Pair((parse_term env a),(parse_term env b))
+      | Sexp.List [a;Sexp.Atom "X";b] -> 
+	 Cross((parse_term env a),(parse_term env b))
       | _ -> Inv(parse_exTm env t)
 and parse_exTm env t = 
   let rec lookup_var env n v
@@ -114,6 +122,10 @@ and parse_exTm env t =
     | _ :: env -> lookup_var env (n+1) v 
   in
   match t with 
+  | Sexp.List [Sexp.Atom "p0";x] ->
+     P0(parse_exTm env x)
+  | Sexp.List [Sexp.Atom "p1";x] ->
+     P1(parse_exTm env x)
   | Sexp.List [Sexp.Atom "iter"; p ; n ; f ; z] ->
      Iter((parse_term env p),(parse_term env n),(parse_term env f),(parse_term env z))
   | Sexp.List [Sexp.Atom ":" ;x; t] -> 
@@ -135,6 +147,8 @@ let rec pretty_print_inTm t l =
   | Succ n -> "(succ " ^ pretty_print_inTm n l ^ ")"
   | Zero -> "zero"
   | Nat -> "N" 
+  | Pair(a,b) -> "(" ^ pretty_print_inTm a l ^ " , " ^ pretty_print_inTm b l ^ ")"
+  | Cross(a,b) -> "(" ^ pretty_print_inTm a l ^ " X " ^ pretty_print_inTm b l ^ ")"
 and pretty_print_exTm t l =
   match t with 
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
@@ -146,6 +160,8 @@ and pretty_print_exTm t l =
   | FVar (x) -> x
   | Appl(x,y) -> "(" ^ pretty_print_exTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
   | Iter(p,n,f,z) -> "(iter " ^ pretty_print_inTm p l ^ " " ^ pretty_print_inTm n l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm z l ^ ")"
+  | P0(x) -> "(p0 " ^ pretty_print_exTm x l ^ ")"
+  | P1(x) -> "(p1 " ^ pretty_print_exTm x l ^ ")"
     
       
 
@@ -294,9 +310,8 @@ let rec check contexte inT ty steps =
   | Abs(x,y) -> 
      begin 
      match ty with      
-     | Pi(v,s,t) -> let freshVar = gensym () in
-		    let freshVar2 = gensym () in
-		    check ((freshVar,(relie_free_context_inTm contexte s)):: (freshVar2,(relie_free_context_inTm contexte s))::contexte) (substitution_inTm y (FVar(freshVar)) 0) (substitution_inTm t (FVar(freshVar2)) 0) (steps ^ ";" ^ (pretty_print_inTm inT [])) 
+     | Pi(v,s,t) -> let freshVar = gensym () in 
+		    check ((freshVar,s)::contexte) (substitution_inTm y (FVar(freshVar)) 0) (substitution_inTm t (FVar(freshVar)) 0) (steps ^ ";" ^ (pretty_print_inTm inT [])) 
      | _ -> create_report false (contexte_to_string contexte []) steps "Abs type must be a Pi"
      end 
   | Inv(t) -> 
@@ -350,6 +365,7 @@ let rec check contexte inT ty steps =
        | Star -> create_report true (contexte_to_string contexte []) steps "No"
        | _ -> create_report false (contexte_to_string contexte []) steps "Nat : ty must be of type *"
      end 
+  | _ -> failwith "a faire"
 and synth contexte exT steps =
   match exT with 
   | BVar x -> create_retSynth (create_report false (contexte_to_string contexte []) steps "BVar : not possible during type checking") Star
