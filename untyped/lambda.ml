@@ -14,8 +14,16 @@ type lambda_term =
   | BoundVar of int 
   | Abs of lambda_term
   | Appl of (lambda_term * lambda_term)
-  | True | False | IfThenElse of lambda_term * lambda_term * lambda_term
 (*=End *)
+(*=bool_term *)
+  | True | False 
+  | IfThenElse of lambda_term * lambda_term * lambda_term
+(*=End *)
+(*=nat_term *)
+  | Zero | Succ of lambda_term 
+  | Iter of lambda_term * lambda_term * lambda_term
+(*=End *)
+
 
 (* TODO: remember the name of the abstractions, for pretty-printing *)
 (* TODO: rajouter constructeur des vrais ect... *)
@@ -34,6 +42,10 @@ let rec parse env t
 	 IfThenElse((parse env cond),(parse env thens),(parse env elses))
       | Sexp.Atom "true" -> True 
       | Sexp.Atom "false" -> False
+      | Sexp.Atom "zero" -> Zero
+      | Sexp.List [Sexp.Atom "succ";n] -> Succ(parse env n)
+      | Sexp.List [Sexp.Atom "iter";n;f;a] -> 
+	 Iter((parse env n),(parse env f),(parse env a))
       | Sexp.List [Sexp.Atom "lambda"; Sexp.Atom var; body] -> 
          Abs (parse (var :: env) body)
       | Sexp.List [Sexp.Atom "lambda"; Sexp.List vars; body] -> 
@@ -78,7 +90,11 @@ let rec lambda_term_to_Sexpr t i =
     | True -> "true"
     | False -> "false" 
     | IfThenElse (x,y,z) -> 
-       "( if " ^ lambda_term_to_Sexpr x i ^ lambda_term_to_Sexpr x i ^ lambda_term_to_Sexpr x i ^ ")"
+       "(if " ^ lambda_term_to_Sexpr x i ^ lambda_term_to_Sexpr x i ^ lambda_term_to_Sexpr x i ^ ")"
+    | Zero -> "zero"
+    | Succ n-> "(succ " ^ lambda_term_to_Sexpr n i ^ ")"
+    | Iter(n,f,a) -> 
+       "(iter " ^ lambda_term_to_Sexpr n i ^ lambda_term_to_Sexpr f i ^ lambda_term_to_Sexpr a i ^ ")"
 
 
 
@@ -91,19 +107,32 @@ let rec lambda_term_to_string t =
   | True -> "True"
   | False -> "False"
   | IfThenElse (x,y,z) -> "if " ^ lambda_term_to_string x ^ " then " ^ lambda_term_to_string y ^ " else " ^ lambda_term_to_string z 
+  |_ ->  failwith "ne sert plus a rien de mettre cette fonction a jour" 
 
 (** * Reduction *)
 
-let rec substitution t var tsub 
-    = match t with 
+(*=substitution *)
+let rec substitution term var tsub 
+    = match term with 
     | FreeVar v -> FreeVar v 
     | BoundVar v when v = var -> tsub
     | BoundVar v -> BoundVar v
     | Abs x -> Abs(substitution x (var+1) tsub)
     | Appl (x,y) -> Appl(substitution x var tsub,substitution y var tsub)
-    | True -> Abs(tsub)
+(*=End *)
+(*=bool_substitution *)
+    | True -> True
     | False -> False
-    | IfThenElse (x,y,z) -> Abs(Abs(Appl(Appl(tsub,BoundVar 1),BoundVar 0)))
+    | IfThenElse (x,y,z) -> 
+       IfThenElse((substitution x var tsub),
+		  (substitution y var tsub),
+		  (substitution z var tsub))
+(*=End *)
+(*=nat_substitution *)
+    | Zero -> Zero
+    | Succ(n) -> Succ(substitution n var tsub)
+    | Iter(n,f,a) -> Iter((substitution n var tsub),(substitution f var tsub),(substitution a var tsub))
+(*=End *)
 
 
 
@@ -111,18 +140,28 @@ let rec substitution t var tsub
 let alpha_equiv terme1 terme2 = 
   lambda_term_to_string terme1 = lambda_term_to_string terme2
 
+(*=reduction *)
 let rec reduction t 
     = match t with
     | FreeVar v -> FreeVar v
     | BoundVar v -> BoundVar v
     | Abs x -> Abs(x)
     | Appl(Abs(x),y) -> substitution x 0 y
-    | Appl(x,y) -> failwith "erreur reduction"
+    | Appl(x,y) -> Appl(x,y)    
+(*=End *)
+(*=bool_reduction *)
     | True -> True
     | False -> False
     | IfThenElse(x,y,z) -> IfThenElse(x,y,z)
+(*=End *)
+(*=nat_reduction *)
+    | Zero -> Zero 
+    | Succ(n) -> Succ(n)
+    | Iter(n,f,a) -> Iter(n,f,a)
+(*=End *)
 
 
+(*=evaluation *)
 let rec evaluation t 
     = match t with 
     | FreeVar v -> FreeVar v 
@@ -132,14 +171,29 @@ let rec evaluation t
     | Appl(BoundVar x,y) -> Appl(BoundVar x,y)
     | Appl(FreeVar x,y) -> Appl(FreeVar x,y)
     | Appl(x,y) -> evaluation(Appl(evaluation x, y))
+(*=End *)
+(*=bool_evaluation *)
     | True -> True
     | False -> False
     | IfThenElse (x,y,z) when x = True -> y
     | IfThenElse (x,y,z) when x = False -> z
-    | IfThenElse (x,y,z) -> reduction((IfThenElse ((reduction x), y, z)))
+    | IfThenElse (x,y,z) -> 
+       evaluation((IfThenElse ((reduction x), y, z)))
+(*=End *)
+(*=nat_evaluation *)
+    | Zero -> Zero 
+    | Succ(n) -> Succ(n) 
+    | Iter(n,f,a) -> 
+       begin 
+	 match n with 
+	 | Zero -> a
+	 | Succ(num) -> evaluation (Iter(num,f,evaluation(Appl(f,a))))
+	 | _ -> Iter(n,f,a)
+       end 
+(*=End *)
 
 
-(* i:numero de la variable a delié bv:compteur pour la fonction t:lambda_terme *) 		       
+
 let rec relie_libre i bv t =
   match t with 
   | BoundVar v -> BoundVar v
@@ -150,7 +204,12 @@ let rec relie_libre i bv t =
   | True -> True
   | False -> False
   | IfThenElse(x,y,z) -> IfThenElse(x,y,z)
+  | Zero -> Zero 
+  | Succ(n) -> Succ(relie_libre i bv n)
+  | Iter(n,f,a) -> Iter((relie_libre i bv n),(relie_libre i bv f),(relie_libre i bv a))
 				   
+
+(* on va pouvoir supprimer cette fonction normallement *)
 let rec reduction_forte t i  = 
   match t with 
     | FreeVar v -> FreeVar v
@@ -175,11 +234,11 @@ let rec reduction_forte t i  =
 	 | False -> reduction_forte z i
 	 | _ -> IfThenElse(x,y,z)
        end 
+    | _ -> failwith "on va la supprimer" 
 
 
 
-(* | Appl(Abs(x),Appl(y,z)) -> Appl(Abs(x),(Appl(y,z))) *)
-(* | Appl(Abs(x),Appl(y,z)) -> reduction_forte (Appl(Abs(x),(reduction_forte(Appl(y,z)) i))) i *)
+
 	       
 
 

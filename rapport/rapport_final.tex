@@ -101,7 +101,6 @@ Voici du code :
 %%   où 'dossier' est "no_type", ou "typed", ou "dependent"
 %%      'fichier' est le chemin vers un fichier dans le dossier
 %%      'tag' est une déclaration de la forme (*=tag *) (code) (*=End *) dans le source
-\codefrom{untyped}{lambda}{untyped_term}
 
 \section{lambda calcul non typé}
 
@@ -167,7 +166,7 @@ Un terme ne contenant aucune occurrence de variable libre est dit `clos'.
   parenthèse est libre.
 \end{example}
 
-Un des problème introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci dessus(exemple 3). Il faut donc introduire la notion d'\(\alpha\) équivalence
+Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci dessus(exemple 3). Il faut donc introduire la notion d'\(\alpha\) équivalence.
 
 \subsubsection{Alpha equivalence}
 On considère que deux termes sont alpha équivalents si et seulement si ils sont 
@@ -197,16 +196,15 @@ t[x:=u]
 \]
 
 \begin{example}
-  Soit le terme \(\lambda\)x.x[x:=\(\lambda\)y.y], après avoir effectuer la
+  Soit le terme \(\lambda\)x.x[x:=\(\lambda\)y.y], après avoir effectué la
   substitution nous obtenons le terme \(\lambda\)x.\(\lambda\)y.y
 \end{example}
-Dans cet exemple il n'y a pas eu de problème quant au nom des variables mais il faut 
-faire attention. 
+
 
 Nous avons analysé un cas de substitution cependant on peut etre confronté 
 à devoir substituer dans une application ou une abstraction, voici donc 
 les règles pour la substitution 
-%changer la fleche aussi
+
 \begin{align*}
 &(u v)[x := z]\leadsto(u[x := z] v[x := z]) \\
 &(\lambda .t)[x := z]\leadsto\lambda .t[x := z] \\
@@ -217,7 +215,7 @@ les règles pour la substitution
 \subsubsection{Reduction}
 
 Seules les applications dont le membre de gauche est une abstraction
-peuvent etre réduites, on appel cela une \emph{redex} . 
+peuvent etre réduites, on appelle cela une \emph{redex} . 
 C'est à dire que l'application (t u) ne peut pas etre réduite à moins 
 que le terme t ne s'évalue en une abstraction, (nous verrons ceci plus
 en détail dans la section suivante).
@@ -268,19 +266,19 @@ de forme normale.
 %je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
 %introduire un peu la suite du rapport 
 Nous verrons que dans les sections suivantes que lorsque nous introduirons 
-les système de type, nous n'aurons plus de termes qui ne réduisent pas vers 
-une forme normale (c'est une des propriété très intérressante offerte par 
+les systèmes de type, nous n'aurons plus de termes qui ne réduisent pas vers 
+une forme normale (c'est une des propriétés très intérressante offerte par 
 les systèmes de type)
 
 Il existe de nombreuses stratégies de normalisation des termes dans le lambda 
 calcul non typé, pour les plus connus: \emph{full Beta-reduction}, \emph{normal order}, 
 \emph{call by name}, \emph{call by value}.
 Pour le lambda calcul non typé la stratégie la plus sure est la call by value.
-En effet elle consite à réduire seulement le terme de gauche des redex, et où l'on 
-ne reduit pas a l'intérieur des abstractions.
+En effet, elle consiste à réduire seulement le terme de gauche des redex, et où l'on 
+ne reduit pas à l'intérieur des abstractions.
 Pour certains termes on ne peut pas atteindre 
 une forme normale, cependant celle ci a moins de risque de rentrer dans une boucle
-de réduction infinie. Nous n'avons pas encore les propritées offertent par les
+d'évaluation infinie. Nous n'avons pas encore les proprités offertes par les
 systèmes de types tel que un terme correctement typé se réduit toujours.
 
 \begin{example}
@@ -292,12 +290,12 @@ systèmes de types tel que un terme correctement typé se réduit toujours.
 \end{example}
 
 
-%toute les citer et expliquer d'après le livre de pierce 
+
 
 
 \subsection{Enrichire le lambda calcul}
 
-Maintenant que le noyeau de notre language a été défini nous pouvons introduire
+Maintenant que le noyau de notre language a été défini nous pouvons introduire
 de nouvelles constructions qui vont nous permettre d'exprimer des 'choses' %changer ça
 telles que les entiers, les booléens ect...
 
@@ -314,7 +312,7 @@ Voici les termes correspondants aux constructeurs True et False
 On assimile ces deux termes aux booléens True et False car leur calcul au sein
 de l'application d'un Ifte reproduit le comportement attendu.
 Nous pouvons désormais introduire le terme correspondant à la structure de 
-controle IfThenElse 
+controle IfThenElse.
 \begin{align*}
   &\lambda x.\lambda y.\lambda z. x\: y\: z \mbox{(Ifte)} \\
 \end{align*}
@@ -323,7 +321,7 @@ controle IfThenElse
   Voici un exemple de réduction du terme Ifte
   \begin{align*}
     &(\lambda .\lambda .\lambda . 2\: 1\: 0) \: (\lambda . \lambda . 0) \: x \: y  \\
-    & TODO:mettre les etapes intermediaires \\
+    & TODO:mettre les étapes intermediaires \\
     & x 
   \end{align*}
 \end{example}
@@ -359,7 +357,7 @@ c'est-à-dire \(n\) applications de \(f\) précédées d'une première
 application de \(f\), soit \(n+1\) applications.
 
 De la même manière, on construit l'addition de deux nombres \(m\) et
-\(n\) en faisant \(m\) applications répétées de \(f\) précédée par
+\(n\) en faisant \(m\) applications répétées de \(f\) précédées par
 \(n\) applications :
 %
 \[
@@ -370,12 +368,12 @@ De la même manière, on construit l'addition de deux nombres \(m\) et
 \subsection{Implementation}
 
 Nous nous attarderons ici sur les choix d'implémentations et il sera question
-d'analyser certaines parties du code mais pas l'ensemble du code.
+d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Représentation des lambda termes}
 %ici j'ai enlever la partie indices de de bruijn je la met ici mais je ne sais pas si le titre est bien 
  
-Pour palier au problème que nous énoncions précédement, il existe une 
+Pour pallier au problème que nous énoncions précédement, il existe une 
 représentation pour les variables liées, les indices de de Bruijn.
 Nous allons donc maintenant représenter les variables liées non pas par un 
 nom mais par un entier naturel. 
@@ -386,18 +384,19 @@ nom mais par un entier naturel.
 Pour représenter les types en Ocaml les types sommes sont très intéressants car 
 ils offrent une manipulation souple à l'aide du pattern matching.
 
-METTRE LES CODE OCAML
+\codefrom{untyped}{lambda}{untyped_term}
+
+Cette représentation se rapproche au plus de la spécification formelle, seule la distinction entre les
+variables liées (BoundVar) et les variables libres (FreeVar) diffère du fait que l'on utilise désormais 
+la représentation avec les indices de de Bruijn.
 
 
-
-
-\subsubsection{Parsing}
+\subsubsection{Parsing et pretty printing}
 Afin de permettre de construire des termes rapidement et le plus lisible 
 possible la création d'un parseur s'imposait.
-La notation choisie à été la notation préfixe (notation polonaise inversée),
+La notation choisie a été la notation préfixe (notation polonaise inversée),
 une syntaxe très proche du langage lisp qui en plus d'etre simple à comprendre
-est assez facile à parser (grace à l'aide de la puissance des bibliothèques
-de S-expression)
+est assez facile à parser (à l'aide des bibliothèques de S-expression)
 \begin{example}
   Voici un exemple de correspondance entre les termes avant et après parsing
   \begin{align*}
@@ -406,10 +405,18 @@ de S-expression)
   \end{align*}
 \end{example}
 
+Comme on peut le constater dans l'exemple pour alléger la redaction des termes,
+on utilise une représentation des variables classiques, c'est dans le parseur que 
+l'on determine la valeur de l'indice d'une variable si celle ci est liée et son 
+nom si celle ci est libre.
+%Changer la derniere formulation
+Pour l'affichage de nos termes on effectue l'opération inverse, c'est à dire que
+les chaines de caractères en sortie seront elle memes des S-expressions.
+
 
 
 \subsubsection{substitution}
-%pas de grande difficulté à implémenter la fonction de substitution 
+
 On découvre ici un nouvel avantage de notre représentation avec les indices de
 de Bruijn, car il n'est pas nécessaire de prendre des précautions quant au
 nom des variables de notre terme substituant % à changer
@@ -430,20 +437,34 @@ avoir besoin d'introduire l'\(\alpha\) convertion.
   représentation avec les indices de de Bruijn.
 \end{example}
 
-METTRE LE CODE OCAML DE NOTRE SUBSTITUTION
+
+\codefrom{untyped}{lambda}{substitution}
+
+L'argument \emph{term} correspond au terme dans lequel on va substituer le terme \emph{tsub} et 
+l'argument \emph{var} est un entier qui va nous permettre de compter le nombre de binder \(\lambda\)
+traversés. Si l'on recontre une BoundVar avec comme indice var on retourne donc \emph{tsub} à la 
+place de celle ci.
 
 
 \subsubsection{Reduction et évaluation}
-La fonction de réduction est très proche de la définition, si l'on trouve
-une redex il faut alors substituer le membre de gauche dans le membre de 
-droite. 
+La fonction de réduction consiste donc à trouver des redex afin de substituer le 
+membre de droite de l'application dans le membre de gauche. Nous appelons la fonction
+de réduction avec la valeur 0 car on souhaite substituer l'ensemble des variables
+du binder \(\lambda\) en cour.
 
-METTRE LE CODE DE LA REDUCTION
+\codefrom{untyped}{lambda}{reduction}
 
-Il nous faut donc maintenant évaluer avec la stratégie call by value.
-JE NE VOIS PAS TROP QUOI DIRE DE PLUS, JE PENSE QUE LE CODE PARLE DE LUI MEME
+Nous disposons de l'ensemble des fonctions nécéssaires afin de faire une évaluation 
+correspondant à la stratégie d'évaluation call bu value. En voici une implémentation
+possible:
 
- 
+\codefrom{untyped}{lambda}{evaluation}
+
+Si l'on trouve une redex on reduit puis l'on evalue le resultat de la reduction,
+et si le membre de gauche n'est pas une variable on evalue celui ci pour determiner
+si celui ci peut nous donner une abstraction afin de pouvoir effectuer une réduction.
+Conformément à la stratégie on n'évalue jamais le membre de gauche d'une application
+pour les raisons énoncées dans la section d'évaluation.
 
 
 \subsubsection{Les booléens}
@@ -454,15 +475,58 @@ d'enrichir le noyau de notre language en créant trois nouveaux constructeurs.
 Cela permet de ne pas alourdir l'écriture de certains termes ainsi que 
 d'améliorer la représentation et d'automatiser des opérations d'évaluation.
 
-METTRE LE CODE QUI CORRESPOND AUX DIFFERENTES PARTIE DES FONCTIONS 
+\codefrom{untyped}{lambda}{bool_term}
+
+Pour la substitution des termes \emph{True} et \emph{False} les règles 
+sont triviales. Pour le terme \emph{IfThenElse} il faut rappeler la 
+fonction de substitution sur l'ensemble des arguments du constructeur.
+Il n'est pas nécéssaire d'incrémenter la valeur de \emph{var} étant donné
+que ce constructeur ne lie aucune variables.
+
+\codefrom{untyped}{lambda}{bool_substitution}
+
+Pour la réduction il n'y à pas de réduction possible pour nos termes
+ce qui reviens donc a retourner le terme sans aucunes modifications.
+
+
+Voici enfin la section correspondant à l'évaluation des booléens.
+Encore une fois True et False s'évaluant simplement en True et False ils
+ne représentent aucune difficulté d'implémentation. En ce qui concerne
+le terme \emph{IfThenElse} si le premier argument est \emph{True}
+on retourne alors le second argument et on retourne le troisième argument 
+dans le cas où la condition serait un \emph{False}. Dans le cas 
+où le premier argument ne sera pas un booléens on evalue celui ci pour 
+essayer d'obtenir un booléens qui nous permettrait d'évaluer notre 
+terme.
+
+\codefrom{untyped}{lambda}{bool_evaluation}
 
 
 \subsubsection{Les entiers}
 
-D'après la meme démarche que pour les booléens nous avons crée deux nouveaux 
-constructeurs Zero et Succ, 
+Tout comme pour les booléens nous allons ajouté les trois constructeurs 
+\emph{Zero},\emph{Succ} et \emph{Iter} à notre language.
 
-IL FAUT QUE JE LES IMPLEMENTE EN VITE FAIT DANS LE LAMBDA CALCUL NON TYPE
+\codefrom{untyped}{lambda}{nat_term}
+
+Pour ce qui est de la substitution et la réduction le comportement est très
+similaire à celui des boléens et ne nécessite pas d'explications supplémentaires.
+%mettre un petit saut a la ligne 
+Substitution:
+
+\codefrom{untyped}{lambda}{nat_substitution}
+
+Reduction:
+
+\codefrom{untyped}{lambda}{nat_reduction}
+
+En revanche l'évaluation du terme \emph{Iter(n,f,a)} est déja plus intéressante.
+Si le premier argument est \emph{Zero} alors il faut retourner le terme \emph{a}.
+Si \emph{n} est un \emph{Succ(num)} alors il faut d'abord evaluer l'application 
+\emph{(f a)}. puis rappeler la fonction d'évaluation avec le terme 
+\emph{Iter} avec ces nouveaux arguments.
+
+\codefrom{untyped}{lambda}{nat_evaluation}
 
 \section{Le lambda calcul simplement typé}
 
@@ -479,5 +543,7 @@ IL FAUT QUE JE LES IMPLEMENTE EN VITE FAIT DANS LE LAMBDA CALCUL NON TYPE
 %termes on été type checker on peut maintenant oublier les types et maintenant réduire 
 
 
+
+%Il faudrait que pour les booléens et tout ce genre de choses je fasse dans la partie formelle des spec correspondants aux evaluations ect..
 
 \end{document}
