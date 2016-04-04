@@ -249,6 +249,11 @@ substitution \attention{Il y a 2 cas pour le lambda : on substitue
   \Var{x} et le binder est \Var{y} avec $\Var{x} \neq \Var{y}$, ou on
   substitue \Var{x} et le binder est \Var{x}}
 
+\attention{$\leadsto$ n'est pas le bon symbole : on utilisera ce
+  symbole pour définir la relation de réduction. Ici, on veut utiliser
+  le même symbole que l'on utilise habituellement lorsque l'on définit
+  un prédicat mathématique, comme $\IsFree$ plus tôt}
+
 \begin{align*}
 &(u v)[x := z]\leadsto(u[x := z] v[x := z]) \\
 &(\lambda .t)[x := z]\leadsto\lambda .t[x := z] \\
@@ -256,13 +261,15 @@ substitution \attention{Il y a 2 cas pour le lambda : on substitue
 
 %je ne sais pas exactement quel titre donner a cette partie normalisation 
 %ou reduction 
-\subsubsection{Réduction}
+\subsubsection{$\beta$-réduction}
 
 Seules les applications dont le membre de gauche est une abstraction
-peuvent être réduites, on appelle cela une \emph{redex}. 
-C'est à dire que l'application (t u) ne peut pas etre réduite à moins 
-que le terme t ne s'évalue en une abstraction, (nous verrons ceci plus
-en détail dans la section suivante).
+peuvent être réduites, on appelle cela une \emph{redex}.
+\attention{Pas clair :} C'est à dire que l'application (t u) ne peut
+pas etre réduite à moins que le terme t ne s'évalue en une
+abstraction, (nous verrons ceci plus en détail dans la section
+suivante). \todo{Au lieu d'une vague définition, donner la définition
+  formelle de la $\beta$-réduction.}
 
 \begin{example}
   Soit le terme ((\(\lambda\)x.\(\lambda\)y.y x) z).  Ce terme est
@@ -281,11 +288,16 @@ en détail dans la section suivante).
 \end{example}
 
 
-\subsubsection{normalisation}
+\subsubsection{Stratégie de réduction : appel par nom}
 
-Un terme est dit sous forme normale si on ne peut plus lui appliquer 
-de réduction. La normalisation consiste donc à reduire autant que possible
-notre terme.
+Un terme est dit en \emph{forme normale} si on ne peut plus lui
+appliquer de réduction. La normalisation consiste donc à reduire
+autant que possible notre terme. \todo{Expliquer que l'on a le choix
+  des rédex : il faut donc choisir une stratégie de
+  réduction. Préciser que l'on ne s'intéresse qu'à une stratégie :
+  l'appel par nom, qui est garantie de trouver la forme normale si
+  elle existe}
+
 %changer les fleches 
 \begin{example}
   le terme (((\(\lambda\)x.x) (\(\lambda\)y.y)) z) \(\leadsto\) ((\(\lambda\)y.y) y) 
@@ -295,7 +307,7 @@ notre terme.
 
 Le lambda calcul étant un modèle de calcul universel, il permet de 
 décrire des termes/programmes qui ne terminent pas : ceux-ci n'ont pas 
-de forme normale.
+de forme normale. 
 
 \begin{example}
  
