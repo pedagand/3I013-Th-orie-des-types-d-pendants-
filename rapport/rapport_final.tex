@@ -321,8 +321,8 @@ controle IfThenElse.
   Voici un exemple de réduction du terme Ifte
   \begin{align*}
     &(\lambda .\lambda .\lambda . 2\: 1\: 0) \: (\lambda . \lambda . 0) \: x \: y  \\
-    & TODO:mettre les étapes intermediaires \\
-    & x 
+    & TODO mettre les etapes intermediaires \\
+    & x \\
   \end{align*}
 \end{example}
 
@@ -529,6 +529,212 @@ Si \emph{n} est un \emph{Succ(num)} alors il faut d'abord evaluer l'application
 \codefrom{untyped}{lambda}{nat_evaluation}
 
 \section{Le lambda calcul simplement typé}
+
+Introduire la notion de type en règle générale.
+
+\subsection{Les types}
+
+Il est important avant tout de définir ce qu'est un type.
+Considérons \emph{P} l'ensemble des types de base comme par exemple 
+(\emph{int}) l'ensemble des entiers.
+Et soit \emph{T} l'ensemble des types, on peut alors définir de façon inductive
+ce qu'est un type.
+\begin{align*}
+  &\emph{int} \in T \\
+  &\forall x,y \in T, x \rightarrow y \in T \\
+  &\forall x,y \in T, (x * y) \in T   
+\end{align*}
+
+Le type \(\rightarrow\) correpond au type des fonctions et le type (a*b)
+correspond au type des couples que nous allons désormais introduire dans notre language.
+
+\begin{example}
+  Voici des exemples de type:
+  \begin{align*}
+  & int \rightarrow int & \mbox{1} \\
+  & (int * int) &\mbox{2} \\
+  \end{align*}
+  Le type (1) est celui d'une fonction prenant un argument de type \emph{int} et 
+  retournant un résultat de type \emph{int}.
+  Le second type correspond a une pair donc le membre de gauche est un \emph{int}
+  et le membre de droit un \emph{int}
+\end{example}
+
+Comme nous l'avons vu précédement avec la curryfication qui consistait à exprimer une 
+fonction avec plusieurs arguments en une succession de fonctions à un argument, cela 
+se répercute aussi sur les types.
+
+\begin{example}
+  Soit la fonction \(\lambda\)x\:y.(x y) peut s'exprimer 
+  \(\lambda\)x.\(\lambda\)y.(x y) qui pourrait donc avoir 
+  le type int \(\rightarrow\) int \(\rightarrow\) int  
+\end{example}
+
+\subsection{Système de type}
+
+Introduire le système de type en une ligne
+\subsubsection{Système de type mono-directionnel}
+
+Afin de faciliter la lecture et la compréhension nous allons nous intérésser dans 
+un premier temps aux règles de typage pour les termes appartenants au noyau 
+du language. Nous donnerons les autres règles dans les sections suivantes.
+
+La vérification de type s'effectue dans un \emph{contexte} qui assigne
+à chaque variable d'un programme son type. Le contexte est donc une
+liste ordonnée de paires variable/type :
+%
+\begin{align*}
+  \Gamma &::= &\mbox{(contexte)} \\
+         &\quad . & \mbox{(contexte vide)} \\
+         &\quad \Gamma, x : T & \mbox{(type de variable)} 
+\end{align*}
+
+Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
+
+\begin{figure}
+
+\begin{align*}
+&  \cfrac{x:T\,\in\Gamma}
+         {\Gamma\vdash x:T}\mbox{(Var)} 
+  \\
+&  \cfrac{\Gamma, x:A \vdash t:B}
+         {\Gamma \vdash \lambda x. t \,:\, A\rightarrow B}\mbox{(Abs)} \\
+&  \cfrac{\Gamma \vdash f : A\rightarrow B \quad
+          \Gamma \vdash s : A}
+         {\Gamma\vdash f\: s : B}\mbox{(App)} \\
+&  \mathsf{bool}:\mathsf{true}|\mathsf{false}\mbox{(Bool)} \\
+&  \cfrac{t1:\mathsf{bool}\,t2:T\,t3:T}
+         {\Gamma\vdash if t1 then t2 else t3}\mbox{(If-else)} \\
+\end{align*}
+
+\caption{Typage (lambda calcul simplement typé)}
+\label{fig:typage-simple}
+\end{figure}   
+
+La règle (Var) spécifie le typage des variables. Cette expression se
+lit en partant du numérateur pour déduire le dénumérateur : supposons
+que la variable x de type T est présente dans le contexte, alors on
+conclut que le type de la variable x est T.
+
+La règle (Abs) spécifie le typage des lambda
+abstractions. L'abstraction construit un type de la forme \(A
+\Rightarrow B\) : il faut donc que la variable associée au lambda
+terme soit de type \(A\) et le résultat de type \(B\).
+
+La règle (App) sécifie le typage de l'application. Une application pour etre 
+considérée comme une redex doit avoir un membre de gauche une abstraction, 
+donc un type A \(A\rightarrow B\) et pour le membre de droite un terme 
+de type A. 
+
+\begin{example}
+  Voici donc quelques exemples de dérivations de type.
+  Ces dérivations se lisent du bas vers le haut.
+  
+  
+  JE PENSE QUE JE VAIS DEVOIR FAIRE DES CFRACS DE CFRACS ECT MAIS SI
+  IL EXISTE UNE MEILLEUR SOLUTION JE PREFERE ATTENDRE
+  %faire une application basique avec le lambda terme de l'identité a gauche appliqué a un truc nul et le tout de type entier cela 
+  % va nous permettre de montrer que l'on doit faire de la magie sur le type de A
+\end{example}
+
+%ici je pourrais dire que l'on doit annoter tous les termes mais que c'est trop lourd
+%syntaxiquement donc que on préfère introduire le bi-directionnel
+Comme nous avons pu le constater dans le dernière exemple il nous manque des informations
+afin de pouvoir type-checker une application dont le membre de gauche est une rédex.
+Nous allons donc introduire une nouvelle représentation de nos termes afin de résoudre ce 
+problème.
+
+\subsubsection{Système de type bi-directionnel}
+
+Les applications dont le membre de gauche est une abstractions posent problème 1
+nous allons donc séparer nos \(\lambda\) termes en deux.
+D'un coté les termes pouvant se trouver à gauche dans une application et les autres.
+
+\begin{align*}
+  ex &::= & \mbox{exTermes} \\
+  &| (ex\: in) &\mbox{Appl}\\
+  &| x &\mbox{Var} \\
+  in &::= & \mbox{inTermes}\\
+  &|\lambda x.in &\mbox{Abs}\\
+  &|inv(ex) &\mbox{Inv}\\
+\end{align*}
+
+On constate tout d'abord qu'un nouveau terme à fait son apparition, \emph{inv}.
+Celui ci permet de passer des inTermes aux exTermes. Pour l'instant on ne peut pas
+encore faire le chemin inverse, c'est à dire passer des exTermes aux inTermes nous 
+l'introduiront par la suite.
+On a maintenant résolu notre problème d'avoir une application dont le membre de gauche
+est une abstraction, cependant si l'on ne peut plus écrire des termes sous cette forme
+cela retire tous les calculs de celui ci.
+La principale raison pour laquel nous ne pouvions pas typechecker les abstractions 
+dans le membre gauche de l'application était du au manque d'information quand au type 
+de celle ci.
+On va donc introduire un nouveau terme permettant de passer des exTermes aux inTermes 
+mais en demandant de l'information quand à son type, l'annotation.
+
+Voici donc notre nouvelle représentation des termes:
+
+\begin{align*}
+  ex &::= & \mbox{exTermes} \\
+  &| (ex\: in) &\mbox{Appl} \\
+  &| x &\mbox{Var} \\
+  &| (in:Type)&\mbox{Ann} \\
+  in &::= & \mbox{inTermes} \\
+  &|\lambda x.in &\mbox{Abs} \\ 
+  &|inv(ex) &\mbox{Inv} \\
+\end{align*}
+
+\begin{example}
+Voici maintenant la dérivation qui nous possait problème précédement.
+FAIRE LA DERIVATION ET CA MARCHE !!
+\end{example}
+
+Voici donc nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
+
+\begin{figure}
+
+\center\(\Gamma\vdash T \ni t\)  
+
+\begin{align*}
+  &\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
+  {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}&\: \\
+  &\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+  {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} \\
+\end{align*}
+
+\center\(\Gamma\vdash t \in T\) 
+
+\begin{align*}
+  &\cfrac{x:T \in \Gamma}
+  {\Gamma \vdash x \in T }\mbox{(Var)}&\: \\
+  &\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
+  {\Gamma\vdash f\:s\in B}\mbox{(App)} \\
+  &\cfrac{\Gamma\vdash T \ni t}
+    {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} \\
+\end{align*}
+
+\caption{Typage (lambda calcul simplement typé Bi-directionnel)}
+\label{fig:typage-simple-bi-direct} 
+\end{figure}   
+
+Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de vérification (check),
+celles de la forme \(\Gamma\vdash t \in T\) des règles de synthèse.
+Pour la vérification on connait le type \emph{T} et l'on souhaite déterminer si le terme \emph{t}
+est bien de ce type. Pour la synthèse, on ne connait pas le type de \emph{t} et l'on souhaite le
+determiner.
+
+\begin{example}
+EXEMPLE DE DERIVATION AVEC LES NOUVELLES REGLES
+\end{example}
+
+\subsection{Safety and security anouncement}
+
+\subsection{Operations sur les termes}
+
+Nous avons désormais une nouvelle représentation de nos termes, il nous faut donc 
+redéfinir les règles de substitution, de réduction et d'évaluation.
+Certaines seront triviales mais 
+
 
 \section{Les types dépendants}
 
