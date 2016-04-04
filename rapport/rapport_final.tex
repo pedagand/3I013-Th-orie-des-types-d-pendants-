@@ -488,8 +488,10 @@ Cette représentation se rapproche au plus de la spécification
 formelle, seule la distinction entre les variables liées (BoundVar
 \todo{comme pour les specs formels, ne pas écrire du code en mode
   normal. Écrire \lstinline!BoundVar! au lieu de BoundVar.}) et les
-variables libres (FreeVar) diffère du fait que l'on utilise désormais
-la représentation avec les indices de de Bruijn.
+variables libres (FreeVar) diffère du fait que l'\attention{on utilise
+  désormais la représentation avec les indices de de
+  Bruijn}. \todo{C'est plus que ça : avoir \lstinline!FreeVar!
+  signifie que tu es locally nameless, ce qui est plus que de Bruijn}.
 
 
 \subsubsection{Parsing et pretty printing}
