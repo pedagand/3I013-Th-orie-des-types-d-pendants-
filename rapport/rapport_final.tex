@@ -140,12 +140,13 @@ Pour faire une analogie avec les mathématiques, une abstraction peut
   \]
 \end{example}
 
-On peut constater avec cette syntaxe que les abstractions ne prennent qu'un
-seul argument, mais d'après la théorie de Haskell Curry (la curryfication), 
-l'ensemble des fonctions à plusieurs arguments peuvent etre représentées 
-par une succession de fonctions à un seul argument.
+On peut constater avec cette syntaxe que les abstractions ne prennent
+qu'un seul argument. Cependant, l'ensemble des fonctions à plusieurs
+arguments peut etre représenté, par curryfication, à l'aide une
+succession de fonctions à un seul argument.
+
 \begin{example}
-Le \(\lambda\)terme  \(\lambda xy.t\) peut etre représentée par le terme suivant
+Le \(\lambda\)-terme  \(\lambda xy.t\) peut etre représentée par le terme suivant
 \(\lambda x.\lambda y.t\)   
 \end{example} 
 Dans la suite de cet article nous utiliserons des fonctions à un unique 
