@@ -232,7 +232,7 @@ terme u avec la notation suivante.
 \subst{t}{x}{u}
 \]
 
-\todo{Donner la définition formelle de la substitution.}
+\todo{Donner la définition formelle de la substitution ici.}
 
 \begin{example}
   \attention{Cet exemple est étrange. La substitution se fait \emph{sous} le lambda?!}
@@ -242,9 +242,12 @@ terme u avec la notation suivante.
 \end{example}
 
 
-Nous avons analysé un cas de substitution cependant on peut etre confronté 
-à devoir substituer dans une application ou une abstraction, voici donc 
-les règles pour la substitution 
+\todo{Cf. remarque au-dessus.} Nous avons analysé un cas de
+substitution cependant on peut etre confronté à devoir substituer dans
+une application ou une abstraction, voici donc les règles pour la
+substitution \attention{Il y a 2 cas pour le lambda : on substitue
+  \Var{x} et le binder est \Var{y} avec $\Var{x} \neq \Var{y}$, ou on
+  substitue \Var{x} et le binder est \Var{x}}
 
 \begin{align*}
 &(u v)[x := z]\leadsto(u[x := z] v[x := z]) \\
@@ -253,10 +256,10 @@ les règles pour la substitution
 
 %je ne sais pas exactement quel titre donner a cette partie normalisation 
 %ou reduction 
-\subsubsection{Reduction}
+\subsubsection{Réduction}
 
 Seules les applications dont le membre de gauche est une abstraction
-peuvent etre réduites, on appelle cela une \emph{redex} . 
+peuvent être réduites, on appelle cela une \emph{redex}. 
 C'est à dire que l'application (t u) ne peut pas etre réduite à moins 
 que le terme t ne s'évalue en une abstraction, (nous verrons ceci plus
 en détail dans la section suivante).
