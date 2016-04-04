@@ -180,19 +180,19 @@ Si la variable n'a pas été déclarée, elle est dite libre.
 
 \begin{example}
   Dans le terme suivant \(\lambda x.\lambda y.x\:y\:z\) , les variables \Var{x} et 
-  \Var{y} sont liées tandis que la variable z est libre 
+  \Var{y} sont liées tandis que la variable \Var{z} est libre 
 \end{example}
 
 
-Un terme ne contenant aucune occurrence de variable libre est dit `clos'.
+Un terme ne contenant aucune occurrence de variable libre est dit ``clos''.
 \begin{example}
   Dans le lambda terme \((\lambda x. \lambda y. x\: y)\: y\), la
   variable \(x\) est liée ainsi que la première occurence de la
-  variable \(y\). Cependant, la variable \(y\) à l'exterieur des
+  variable \(y\). Cependant, la variable \(y\) à l'extérieur des
   parenthèse est libre.
 \end{example}
 
-Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci dessus(exemple 3). Il faut donc introduire la notion d'\(\alpha\) équivalence.
+Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple 3). Il faut donc introduire la notion d'\(\alpha\) équivalence.
 
 \subsubsection{Alpha equivalence}
 On considère que deux termes sont alpha équivalents si et seulement si ils sont 
