@@ -534,14 +534,16 @@ les chaines de caractères en sortie seront elle memes des S-expressions.
 On découvre ici un nouvel avantage de notre représentation avec les indices de
 de Bruijn, car il n'est pas nécessaire de prendre des précautions quant au
 nom des variables de notre terme substituant % à changer
-qui rendrait liée une variable qui était libre. Cela nous permet de ne pas 
-avoir besoin d'introduire l'\(\alpha\) conversion
+qui rendrait liée une variable qui était libre. \attention{Cela nous permet de ne pas 
+avoir besoin d'introduire l'\(\alpha\) conversion} \todo{c'est encore autre chose ça.}
 
 \begin{example}
-  Avec la représentation classique: 
+  Avec la représentation classique: \todo{Je pense que cet exemple est incorrect}
   \[ 
   \lambda x.x[x := \lambda y.x]\leadsto\lambda x.\lambda y.x
   \]
+  \todo{Expliquer en détail le problème quand on effectue la substitution.}
+
   Avec les indices de de bruijn
   \[ 
   \lambda.0[0 := \lambda.x]\leadsto\lambda.\lambda.x
