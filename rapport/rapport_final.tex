@@ -323,8 +323,8 @@ de forme normale.
 %je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
 %introduire un peu la suite du rapport 
 Dans les sections suivantes, nous verrons lorsque nous introduirons
-les systèmes de type que nous n'aurons plus de termes qui ne réduisent
-pas vers une forme normale (c'est une des propriétés très
+les systèmes de type que l'on peut ne considérer que des termes qui
+réduisent vers une forme normale (c'est une des propriétés
 intéressante offerte par les systèmes de type)
 
 \attention{Question classique : si tu ne peux plus écrire de
@@ -332,16 +332,19 @@ intéressante offerte par les systèmes de type)
   es strictement moins expressif que tous les langages de
   programmation existants. Est-ce gênant ?}
 
-Il existe de nombreuses stratégies de normalisation des termes dans le lambda 
-calcul non typé, pour les plus connus: \emph{full Beta-reduction}, \emph{normal order}, 
-\emph{call by name}, \emph{call by value}.
-Pour le lambda calcul non typé la stratégie la plus sure est la call by value.
-En effet, elle consiste à réduire seulement le terme de gauche des redex, et où l'on 
-ne reduit pas à l'intérieur des abstractions.
-Pour certains termes on ne peut pas atteindre 
-une forme normale, cependant celle ci a moins de risque de rentrer dans une boucle
-d'évaluation infinie. Nous n'avons pas encore les proprités offertes par les
-systèmes de types tel que un terme correctement typé se réduit toujours.
+\todo{Cf. ma remarque plus haut : faire remonter cette explication.}
+Il existe de nombreuses stratégies de normalisation des termes dans le
+lambda calcul non typé, les plus connues étant l'\emph{appel par nom}
+et l'\emph{appel par valeur}.  Pour le lambda calcul non typé la
+stratégie la plus sûre \todo{``sûr'' n'est pas le mot le plus
+  adapté. Sois plus précis.} est la call by value \todo{utiliser le
+  terme français : appel par valeur}.  En effet, elle consiste à
+réduire seulement le terme de gauche des redex, et où l'on ne reduit
+pas à l'intérieur des abstractions.  Pour certains termes on ne peut
+pas atteindre une forme normale, cependant celle ci a moins de risque
+de rentrer dans une boucle d'évaluation infinie. Nous n'avons pas
+encore les proprités offertes par les systèmes de types tel que un
+terme correctement typé se réduit toujours.
 
 \begin{example}
   Voici un exemple d'évaluation avec la stratégie call bu value
