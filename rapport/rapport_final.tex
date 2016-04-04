@@ -564,10 +564,12 @@ place de celle-ci.
 
 
 \subsubsection{Reduction et évaluation}
-La fonction de réduction consiste donc à trouver des redex afin de substituer le 
-membre de droite de l'application dans le membre de gauche. Nous appelons la fonction
-de réduction avec la valeur 0 car on souhaite substituer l'ensemble des variables
-du binder \(\lambda\) en cour.
+La fonction de réduction consiste donc à trouver des redex \todo{par
+  n'importe quel redex : l'appel par nom contracte le redex le plus à
+  gauche} afin de substituer le membre de droite de l'application dans
+le membre de gauche. Nous appelons la fonction de réduction avec la
+valeur 0 car on souhaite substituer l'ensemble des variables du binder
+\(\lambda\) en cour.
 
 \codefrom{untyped}{lambda}{reduction}
 
