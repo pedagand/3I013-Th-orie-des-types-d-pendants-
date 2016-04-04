@@ -549,7 +549,7 @@ avoir besoin d'introduire l'\(\alpha\) conversion} \todo{c'est encore autre chos
   \lambda.0[0 := \lambda.x]\leadsto\lambda.\lambda.x
   \]
   On constate bien que dans la première représentation on pense que la variable
-  x est liée alors que celle ci devrait en réalité etre libre comme dans la 
+  x est liée alors que celle-ci \todo{attention, ``celle-ci'', pas ``celle ci''. Pareil pour les variantes.} devrait en réalité etre libre comme dans la 
   représentation avec les indices de de Bruijn.
 \end{example}
 
@@ -559,7 +559,7 @@ avoir besoin d'introduire l'\(\alpha\) conversion} \todo{c'est encore autre chos
 L'argument \emph{term} correspond au terme dans lequel on va substituer le terme \emph{tsub} et 
 l'argument \emph{var} est un entier qui va nous permettre de compter le nombre de binder \(\lambda\)
 traversés. Si l'on recontre une BoundVar avec comme indice var on retourne donc \emph{tsub} à la 
-place de celle ci.
+place de celle-ci.
 
 
 \subsubsection{Reduction et évaluation}
@@ -577,7 +577,7 @@ possible:
 \codefrom{untyped}{lambda}{evaluation}
 
 Si l'on trouve une redex on reduit puis l'on evalue le resultat de la reduction,
-et si le membre de gauche n'est pas une variable on evalue celui ci pour determiner
+et si le membre de gauche n'est pas une variable on evalue celui-ci pour determiner
 si celui ci peut nous donner une abstraction afin de pouvoir effectuer une réduction.
 Conformément à la stratégie on n'évalue jamais le membre de gauche d'une application
 pour les raisons énoncées dans la section d'évaluation.
