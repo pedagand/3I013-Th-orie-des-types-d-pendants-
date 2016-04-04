@@ -333,9 +333,21 @@ let rec check contexte inT ty steps =
 		     begin 
 		       match rep with 
 		     | Report(Success(true),c,e,er) -> 
-			check ((freshVar,(relie_free_context_inTm contexte s))::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star (steps ^";" ^ (pretty_print_inTm inT []))
+			check ((freshVar,s)::contexte) (substitution_inTm t (FVar(freshVar)) 0) Star (steps ^";" ^ (pretty_print_inTm inT []))
 		     | Report(Success(false),c,e,er) -> 
-			create_report false (contexte_to_string contexte []) steps ("Pi (x S T) S is not of type star" ^ (pretty_print_inTm inT []))
+			create_report false (contexte_to_string contexte []) steps ("Pi (x S T) S is not of type Star" ^ (pretty_print_inTm inT []))
+		     | _ -> failwith "Pi : It is not possible to get a report without a Success in first arg"
+		     end 
+		   end
+	 | Inv(FVar(v)) -> let freshVar = gensym () in 
+		   begin 
+		     let rep = (check contexte s ty (steps ^ (pretty_print_inTm inT []))) in 
+		     begin 
+		       match rep with 
+		     | Report(Success(true),c,e,er) -> 
+			check ((freshVar,s)::contexte) (substitution_inTm t (FVar(freshVar)) 0) ty (steps ^";" ^ (pretty_print_inTm inT []))
+		     | Report(Success(false),c,e,er) -> 
+			create_report false (contexte_to_string contexte []) steps ("Pi (x S T) S is not of type:" ^ (pretty_print_inTm ty []) ^ "!!!!" ^ (pretty_print_inTm inT []))
 		     | _ -> failwith "Pi : It is not possible to get a report without a Success in first arg"
 		     end 
 		   end
