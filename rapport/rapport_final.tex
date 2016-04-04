@@ -307,7 +307,7 @@ autant que possible notre terme. \todo{Expliquer que l'on a le choix
 \end{example}
 
 Le lambda calcul étant un modèle de calcul universel, il permet de 
-décrire des termes/programmes qui ne terminent pas : ceux-ci n'ont pas 
+d'écrire des termes/programmes qui ne terminent pas : ceux-ci n'ont pas 
 de forme normale. 
 
 \begin{example}
@@ -322,10 +322,15 @@ de forme normale.
 \end{example}
 %je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
 %introduire un peu la suite du rapport 
-Nous verrons que dans les sections suivantes que lorsque nous introduirons 
-les systèmes de type, nous n'aurons plus de termes qui ne réduisent pas vers 
-une forme normale (c'est une des propriétés très intérressante offerte par 
-les systèmes de type)
+Dans les sections suivantes, nous verrons lorsque nous introduirons
+les systèmes de type que nous n'aurons plus de termes qui ne réduisent
+pas vers une forme normale (c'est une des propriétés très
+intéressante offerte par les systèmes de type)
+
+\attention{Question classique : si tu ne peux plus écrire de
+  programmes qui ne terminent pas, tu n'es plus Turing complet donc tu
+  es strictement moins expressif que tous les langages de
+  programmation existants. Est-ce gênant ?}
 
 Il existe de nombreuses stratégies de normalisation des termes dans le lambda 
 calcul non typé, pour les plus connus: \emph{full Beta-reduction}, \emph{normal order}, 
