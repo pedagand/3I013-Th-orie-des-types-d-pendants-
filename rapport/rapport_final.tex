@@ -122,11 +122,20 @@ succès pratique, donnant lieu à de multiples variantes dont on trouvera une pr
 \subsubsection{Syntaxe}
 Le lambda calcul \todo{écrire $\lambda$-calcul} est composé uniquement de \(\lambda\)-termes dont voici la syntaxe
 
+\newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
+\newcommand{\App}[2]{\ensuremath{#1\:#2}}
+\newcommand{\Var}[1]{\ensuremath{#1}}
+
+\todo{Utiliser les commandes \verb!Lam!, \verb!App! et \verb!Var!
+  pour construire des $\lambda$-termes. Cela permet de changer
+  rapidement la mise en forme par la suite, si besoin. Penser HTML \&
+  CSS : il faut découpler au maximum le contenu de la présentation.}
+
 \begin{align*}
   t &::= & \mbox{(lambda terme)} \\
-  &|\quad x & \mbox{(variable)} \\
-  &|\quad \lambda x. t & \mbox{(abstraction)} \\
-  &|\quad t\: t          & \mbox{(application)}
+  &|\quad \Var{x} & \mbox{(variable)} \\
+  &|\quad \Lam{x}{t} & \mbox{(abstraction)} \\
+  &|\quad \App{t}{t}          & \mbox{(application)}
 \end{align*}
 
 Pour faire une analogie avec les mathématiques, une abstraction peut
@@ -146,22 +155,34 @@ arguments peut etre représenté, par curryfication, à l'aide une
 succession de fonctions à un seul argument.
 
 \begin{example}
-Le \(\lambda\)-terme  \(\lambda xy.t\) peut etre représentée par le terme suivant
+Le \(\lambda\)-terme  \(\lambda x y. t\) correspond au terme
 \(\lambda x.\lambda y.t\)   
 \end{example} 
-Dans la suite de cet article nous utiliserons des fonctions à un unique 
-argument. 
+Dans la suite de cet article nous utiliserons des fonctions à un seul
+argument.
 
 \subsubsection{Variables libres et variables liées}
 
+\newcommand{\IsFree}{\mathrm{isFree}}
+
 Une variable est liée lorsque celle ci est déclarée dans le corps d'un lambda, 
 dans l'exemple précédent x était une variable liée. 
-Si la variable n'a pas été déclarée elle sera dite libre. 
+Si la variable n'a pas été déclarée, elle est dite libre. 
+
+\todo{Définir formellement un prédicat \(\IsFree\) qui calcule (récursivement)
+  l'ensemble des variables libres d'un \(\lambda\)-terme.}
+  \begin{align*}
+    \IsFree(x) &= ? \\
+    \IsFree(\lambda x. t) &= ? \\
+    \IsFree(f s) &= ? \\
+  \end{align*}
+
 
 \begin{example}
-  Dans le terme suivant \(\lambda x.\lambda y.x\:y\:z\) , les variables x et 
-  y sont liées tandis que la variable z est libre 
+  Dans le terme suivant \(\lambda x.\lambda y.x\:y\:z\) , les variables \Var{x} et 
+  \Var{y} sont liées tandis que la variable z est libre 
 \end{example}
+
 
 Un terme ne contenant aucune occurrence de variable libre est dit `clos'.
 \begin{example}
