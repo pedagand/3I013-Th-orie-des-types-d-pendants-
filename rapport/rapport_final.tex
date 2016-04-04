@@ -67,6 +67,7 @@
 %% ** commands
 
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
+\newcommand{\attention}[1]{\textcolor{orange}{#1}}
 
 %% ** Title
 
@@ -186,13 +187,17 @@ Si la variable n'a pas été déclarée, elle est dite libre.
 
 Un terme ne contenant aucune occurrence de variable libre est dit ``clos''.
 \begin{example}
+  \label{example:ouvert-clos}
   Dans le lambda terme \((\lambda x. \lambda y. x\: y)\: y\), la
   variable \(x\) est liée ainsi que la première occurence de la
   variable \(y\). Cependant, la variable \(y\) à l'extérieur des
   parenthèse est libre.
 \end{example}
 
-Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple 3). Il faut donc introduire la notion d'\(\alpha\) équivalence.
+\todo{Utilise \texttt{label} et \texttt{ref} pour faire des références
+  en LaTex. Cf. \texttt{example:ouvert-clos} ci-dessous.}
+
+Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). \attention{Il faut donc introduire la notion d'\(\alpha\)-équivalence}.
 
 \subsubsection{Alpha equivalence}
 On considère que deux termes sont alpha équivalents si et seulement si ils sont 
