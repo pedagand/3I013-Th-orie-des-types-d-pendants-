@@ -494,19 +494,29 @@ variables libres (FreeVar) diffère du fait que l'\attention{on utilise
   signifie que tu es locally nameless, ce qui est plus que de Bruijn}.
 
 
-\subsubsection{Parsing et pretty printing}
+\subsubsection{Analyse syntaxique}
+
+\todo{Je ne vois pas trop l'intérêt de cette section. Soit tu définis
+  formellement le parser (sans donner le code), soit tu dis juste dans
+  une phrase, quelque part que ta syntaxe de haut niveau est celle de
+  Lisp, sans en dire plus (parce que c'est assez commun)}
+
 \todo{Phrase très longue :}
 Afin de permettre de construire des termes rapidement et le plus lisible 
 possible la création d'un parseur s'imposait.
 La notation choisie a été la notation préfixe (notation polonaise inversée),
 une syntaxe très proche du langage lisp qui en plus d'etre simple à comprendre
 est assez facile à parser (à l'aide des bibliothèques de S-expression)
+
+\todo{Ne pas utiliser $\leadsto$, qui devrait être réservé pour la réduction}
+\todo{Ne pas écrire de texte dans le math mode : l'espacement n'est pas bon. Utiliser lstinline}
 \begin{example}
   Voici un exemple de correspondance entre les termes avant et après parsing
-  \begin{align*}
-    (lambda\: x \: x) & \leadsto Abs(BoundVar\: 0) \\
-    (x\: y) & \leadsto Appl(FreeVar\: 'x',FreeVar\: 'y')       
-  \end{align*}
+
+  \begin{tabular}{ll}
+    \lstinline!(lambda x x)! & \lstinline!Abs(BoundVar 0)! \\
+    \lstinline!(x y)! & \lstinline!Appl(FreeVar "x", FreeVar "y")!
+  \end{tabular}
 \end{example}
 
 Comme on peut le constater dans l'exemple pour alléger la redaction des termes,
@@ -519,7 +529,7 @@ les chaines de caractères en sortie seront elle memes des S-expressions.
 
 
 
-\subsubsection{substitution}
+\subsubsection{Substitution}
 
 On découvre ici un nouvel avantage de notre représentation avec les indices de
 de Bruijn, car il n'est pas nécessaire de prendre des précautions quant au
