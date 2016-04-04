@@ -265,11 +265,11 @@ que le terme t ne s'évalue en une abstraction, (nous verrons ceci plus
 en détail dans la section suivante).
 
 \begin{example}
-  Soit le terme ((\(\lambda\)x.\(\lambda\)y.y x) z), ici
-  le terme est bien sous la forme d'une application ayant une abstraction comme 
-  membre de gauche. La reduction va consister à substituer l'ensemble des 
-  variables liées à la première application par le membre de droite de 
-  l'application. Ce qui va donc nous donner \(\lambda\)x.\(\lambda\)y.z x
+  Soit le terme ((\(\lambda\)x.\(\lambda\)y.y x) z).  Ce terme est
+  sous la forme d'une application ayant une abstraction comme membre
+  de gauche. La réduction consiste à substituer la variable liée par
+  l'abstraction par le membre droit de l'application. On obtient donc \(\lambda\)x.\(\lambda\)y.z x
+  \todo{Écrire \emph{tous} les termes dans le math mode, par exemple le dernier terme devrait être \(\Lam{x}{\Lam{y}{\App{z}{x}}}\)}
 \end{example}
 
 \begin{example}
