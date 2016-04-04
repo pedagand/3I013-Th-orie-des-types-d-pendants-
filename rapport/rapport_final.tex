@@ -220,15 +220,23 @@ entre eux. Mais il nous faut tout d'abord définir le mécanisme de substitution
 
 \subsubsection{Substitution}
 
+\newcommand{\subst}[3]{#1[#2 := #3]}
+
+\todo{Utiliser la ``command'' substitution.}
+
 La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
-à remplacer l'occurrence d'une variable liée par un \(\lambda\)terme.
-On note généralement la substitution de la variable x dans le terme t par le 
+à remplacer l'occurrence d'une variable liée par un \(\lambda\)-terme.
+On note généralement la substitution de la variable x \todo{attention à ne pas mettre de variables ``mathématiques'' dans le corps du texte, sans l'entourer du mode math. Ici on écrira \Var{x}, pas x.} dans le terme t par le 
 terme u avec la notation suivante. 
 \[ 
-t[x:=u]
+\subst{t}{x}{u}
 \]
 
+\todo{Donner la définition formelle de la substitution.}
+
 \begin{example}
+  \attention{Cet exemple est étrange. La substitution se fait \emph{sous} le lambda?!}
+
   Soit le terme \(\lambda\)x.x[x:=\(\lambda\)y.y], après avoir effectué la
   substitution nous obtenons le terme \(\lambda\)x.\(\lambda\)y.y
 \end{example}
