@@ -68,6 +68,7 @@
 
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 \newcommand{\attention}[1]{\textcolor{orange}{#1}}
+\newcommand{\etc}{\textit{etc.}}
 
 %% ** Title
 
@@ -173,9 +174,9 @@ Si la variable n'a pas été déclarée, elle est dite libre.
 \todo{Définir formellement un prédicat \(\IsFree\) qui calcule (récursivement)
   l'ensemble des variables libres d'un \(\lambda\)-terme.}
   \begin{align*}
-    \IsFree(x) &= ? \\
-    \IsFree(\lambda x. t) &= ? \\
-    \IsFree(f s) &= ? \\
+    \IsFree(x) &\triangleq ? \\
+    \IsFree(\lambda x. t) &\triangleq ? \\
+    \IsFree(f s) &\triangleq ? \\
   \end{align*}
 
 
@@ -340,14 +341,17 @@ stratégie la plus sûre \todo{``sûr'' n'est pas le mot le plus
   adapté. Sois plus précis.} est la call by value \todo{utiliser le
   terme français : appel par valeur}.  En effet, elle consiste à
 réduire seulement le terme de gauche des redex, et où l'on ne reduit
-pas à l'intérieur des abstractions.  Pour certains termes on ne peut
-pas atteindre une forme normale, cependant celle ci a moins de risque
-de rentrer dans une boucle d'évaluation infinie. Nous n'avons pas
-encore les proprités offertes par les systèmes de types tel que un
-terme correctement typé se réduit toujours.
+pas à l'intérieur des abstractions. \todo{Donner la définition
+  formelle de la réduction appel par valeur} Pour certains termes, on
+ne peut pas atteindre une forme normale, cependant celle ci a moins de
+risque \todo{``moins de risque'' n'est pas une définition
+  formelle. Donner une explication plus précise.} de rentrer dans une
+boucle d'évaluation infinie. Nous n'avons pas encore les propriétés
+offertes par les systèmes de types qui garantirait qu'un terme bien
+typé admet toujours une forme normale.
 
 \begin{example}
-  Voici un exemple d'évaluation avec la stratégie call bu value
+  Voici un exemple d'évaluation avec la stratégie call by value
   \begin{align*}
     & ((\lambda x.\lambda y. x\: y)\: \lambda w.w)  \\
     \leadsto & (\lambda y. (\lambda w.w)\: y) 
@@ -358,32 +362,43 @@ terme correctement typé se réduit toujours.
 
 
 
-\subsection{Enrichire le lambda calcul}
+\subsection{Enrichir le lambda calcul}
 
-Maintenant que le noyau de notre language a été défini nous pouvons introduire
-de nouvelles constructions qui vont nous permettre d'exprimer des 'choses' %changer ça
-telles que les entiers, les booléens ect...
+\attention{Ce n'est pas vraiment un ``enrichissement'' : toutes ces
+  fonctionnalités existent déjà dans le calcul. Ce sont plutôt des
+  ``encodages'' d'objets familiers dans le lambda calcul.}
+
+Maintenant que le noyau de notre language a été défini, nous pouvons
+introduire de nouvelles \todo{``nouvelles'' n'est pas le bon terme}
+constructions qui vont nous permettre d'exprimer des concepts
+familiers aux développeurs, tels que les entiers, les booléens, \etc
 
 \subsubsection{Les booléens de Church}
 
+\newcommand{\True}{\ensuremath{\mathrm{true}}}
+\newcommand{\False}{\ensuremath{\mathrm{false}}}
+\newcommand{\Ifte}{\ensuremath{\mathrm{ifte}}}
+
 Nous allons ici voir une représentation des booléens accompagnée de la 
-structure if then else.
+structure de contrôle \texttt{if ... then ... else ...}.
 Voici les termes correspondants aux constructeurs True et False
 \begin{align*}
-  &\lambda x.\lambda y. y \mbox{(true)} \\
-  &\lambda x.\lambda y. x \mbox{(false)} 
+  \True &\triangleq \lambda x.\lambda y. y  \\
+  \False &\triangleq \lambda x.\lambda y. x
 \end{align*}
 
-On assimile ces deux termes aux booléens True et False car leur calcul au sein
+\todo{Définir \Ifte immédiatement, histoire de rendre le paragraphe suivant compréhensible.}
+
+On assimile ces deux termes aux booléens True \todo{comme toujours, écrire ces termes dans le math mode} et False car leur calcul au sein
 de l'application d'un Ifte reproduit le comportement attendu.
 Nous pouvons désormais introduire le terme correspondant à la structure de 
 controle IfThenElse.
 \begin{align*}
-  &\lambda x.\lambda y.\lambda z. x\: y\: z \mbox{(Ifte)} \\
+  \Ifte &\triangleq \lambda x.\lambda y.\lambda z. x\: y\: z  \\
 \end{align*}
 
 \begin{example}
-  Voici un exemple de réduction du terme Ifte
+  Voici un exemple de réduction du terme Ifte \todo{Mettre des variables nommées (et les étapes intermédiaires)}
   \begin{align*}
     &(\lambda .\lambda .\lambda . 2\: 1\: 0) \: (\lambda . \lambda . 0) \: x \: y  \\
     & %TODO:mettre les étapes intermediaires \\
@@ -392,7 +407,7 @@ controle IfThenElse.
 \end{example}
 
 Ici nous n'avons aucun moyen de vérifier avant normalisation que le premier
-argument de Ifte est un booléen. %broder un peu plus ?
+argument de Ifte est un booléen. \todo{Bof, je ne sais pas ce que cette remarque apporte} %broder un peu plus ?
 
 \subsubsection{Les entiers de Church}
 
