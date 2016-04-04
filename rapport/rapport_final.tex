@@ -461,10 +461,12 @@ Pour pallier au problème que nous énoncions précédement \todo{faire
   une référence explicite avec un \verb!label!/\verb!ref!}, nous
 utilisons une représentation particulière pour les variables liées:
 les indices de de Bruijn.  Nous allons ainsi représenter les variables
-liées non pas par un nom mais par un entier naturel.
+liées non pas par un nom mais par un entier naturel. \todo{Expliquer à
+  quoi correspond l'entier naturel, sinon on ne comprend pas ton
+  exemple.}
 
 \begin{example}
-  Le lambda terme représentant l'identité que l'on écrivait \(\lambda x.x\) s'écrira donc maintenant \(\lambda.0\)
+  Le lambda terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
 \end{example}
 Pour représenter les types en Ocaml les types sommes sont très intéressants car 
 ils offrent une manipulation souple à l'aide du pattern matching.
