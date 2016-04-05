@@ -9,6 +9,7 @@ let suite =
 	    ; "test pretty" >::: TestPretty.tests
 	    ; "test sub" >::: TestSub.tests
 	    ; "test equal" >::: TestEqual.tests
+	    ; "test big_step">::: TestBig_step.tests
 	    ]
 
 let () =

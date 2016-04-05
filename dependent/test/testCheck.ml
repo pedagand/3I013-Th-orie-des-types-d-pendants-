@@ -17,7 +17,8 @@ let testcheck4x = "(pi F (-> * *) (pi X * (-> (F X) *)))"
 let testcheckNegative inputTerm inputType =
   assert_bool "Unexpectedly type correct" (not (check [] (read inputTerm) inputType "" [])) *)
 
-let () = Printf.printf "%s" (print_report (check [] (read "(lambda A (lambda a (lambda b (pi P (-> A *) (-> (P a) (P b))))))") (read "(pi A * (-> A (-> A *)))") ""))
+let eq = "(lambda A (lambda a (lambda b (pi P (-> A *) (-> (P a) (P b))))))"
+
 
 let inputs =   
   [
@@ -32,8 +33,7 @@ let inputs =
     ("((: (lambda x (succ x)) (-> * *)) zero)","N",false); 
     ("(-> * *)","*",true);
     ("(pi A * (pi B (pi x A *) *))","*",true);
-    ("(lambda A (lambda a (lambda b (pi P (-> A *) (-> (P a) (P b))))))",
-     "(pi A * (-> A (-> A *)))",true); 
+    (eq, "(pi A * (-> A (-> A *)))",true); 
     (test1y,"*",true);
     ("(succ zero)","N",true);
     (testcheck4x,"*",true)

@@ -30,6 +30,8 @@ type value =
   | VSucc of value
   | VZero 
   | VNat
+  | VPair of value * value
+  | VCross of value * value
 and neutral = 
   | NFree of string 
   | NApp of neutral * value 
@@ -180,6 +182,8 @@ let rec substitution_inTm t tsub var =
   | Zero -> Zero 
   | Succ n -> Succ(substitution_inTm n tsub var)
   | Nat -> Nat
+  | Pair(x,y) -> Pair((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  | Cross(x,y) -> Cross((substitution_inTm x tsub var),(substitution_inTm y tsub var))
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -188,6 +192,8 @@ and substitution_exTm  t tsub var =
   | Appl(x,y) -> Appl((substitution_exTm x tsub var),(substitution_inTm y tsub var))
   | Ann(x,y) -> Ann((substitution_inTm x tsub var),(substitution_inTm y tsub var))
   | Iter(p,n,f,a) -> Iter((substitution_inTm p tsub var),(substitution_inTm n tsub var),(substitution_inTm f tsub var),(substitution_inTm a tsub var))
+  | P0(x) -> P0(substitution_exTm x tsub var)
+  | P1(x) -> P1(substitution_exTm x tsub var)
 
 
 
@@ -206,6 +212,18 @@ let rec big_step_eval_exTm t envi =
     | Iter(p,n,f,a) -> viter(big_step_eval_inTm n envi, 
                              big_step_eval_inTm f envi,
                              big_step_eval_inTm a envi)
+    | P0(x) ->
+       begin 
+	 match big_step_eval_exTm x envi with  
+	 | VPair(a,b) -> a
+	 | _ -> failwith "Impossibl: P0 can't be applied to something else then a pair"
+       end 
+    | P1(x) ->
+       begin 
+	 match big_step_eval_exTm x envi with  
+	 | VPair(a,b) -> a
+	 | _ -> failwith "Imposibl: P1 can't be applied to something else then a pair"
+       end
 and vapp v = 
   match v with 
   | ((VLam f),v) -> f v
@@ -225,13 +243,15 @@ and big_step_eval_inTm t envi =
   | Succ (n) -> VSucc(big_step_eval_inTm n envi)
   | Zero -> VZero
   | Nat -> VNat
+  | Pair(x,y) -> VPair((big_step_eval_inTm x envi),(big_step_eval_inTm y envi))
+  | Cross(x,y) -> VCross((big_step_eval_inTm x envi),(big_step_eval_inTm y envi))
 
 
 (* il me semble qu'il me faut une fonction de relie libre avant de lancer big step eval dans le check pour que celui ci puisse faire le travail 
 le contexte que l'on va utiliser est de la forme ("nom var",inTm)*)
 (* rajouter iter *)
 (* Cette fonction ne sert a rien du moins pour le moment *)
-let rec relie_free_context_inTm  contexte t = 
+(*  rec relie_free_context_inTm  contexte t = 
   match t with 
   | Abs(x,y) -> Abs(x,relie_free_context_inTm contexte y)
   | Pi (v,s,z) -> Pi(v,relie_free_context_inTm contexte s,relie_free_context_inTm contexte z)
@@ -243,7 +263,7 @@ let rec relie_free_context_inTm  contexte t =
   | Zero -> Zero
   | Succ(n) -> Succ(relie_free_context_inTm contexte n)
   | Nat -> Nat 
-  | _ -> failwith "il faut la finir"
+  | _ -> failwith "il ne faut pas la finir" *)
 
 
 let read t = parse_term [] (Sexp.of_string t)
@@ -262,8 +282,10 @@ let rec value_to_inTm i v =
 		Pi(var,(value_to_inTm i x),(value_to_inTm (i+1) (f(vfree(string_of_int (-i))))))
 		end
   | VZero -> Zero
-  | VSucc(n) -> Succ(value_to_inTm i v)
+  | VSucc(n) -> Succ(value_to_inTm i n)
   | VNat -> Nat 
+  | VPair(x,y) -> Pair((value_to_inTm i x),(value_to_inTm i y))
+  | VCross(x,y) -> Cross((value_to_inTm i x),(value_to_inTm i y))
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> let k = begin 
@@ -286,6 +308,8 @@ let rec equal_inTm t1 t2 =
   | (Succ(n1),Succ(n2)) -> equal_inTm n1 n2
   | (Nat,Nat) -> true
   | (Inv(x1),Inv(x2)) -> equal_exTm x1 x2
+  | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Cross(x1,y1),Cross(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
   | _ -> false
 and equal_exTm t1 t2 = 
   match (t1,t2) with 
@@ -295,7 +319,10 @@ and equal_exTm t1 t2 =
   | (Appl(x1,y1),Appl(x2,y2)) -> equal_exTm x1 x2 = equal_inTm y1 y2 
   | (Iter(w1,x1,y1,z1),Iter(w2,x2,y2,z2)) -> 
      equal_inTm w1 w2 = equal_inTm x1 x2 = equal_inTm y1 y2 = equal_inTm z1 z2
+  | (P0(x1),P0(x2)) -> equal_exTm x1 x2
+  | (P1(x1),P1(x2)) -> equal_exTm x1 x2
   | _ -> false
+
 	
 (* fonctions pour le debug *)
 let rec contexte_to_string contexte l= 
@@ -377,7 +404,24 @@ let rec check contexte inT ty steps =
        | Star -> create_report true (contexte_to_string contexte []) steps "No"
        | _ -> create_report false (contexte_to_string contexte []) steps "Nat : ty must be of type *"
      end 
-  | _ -> failwith "a faire"
+  (* je sais que ça ne vas pas marcher tout le temps je veux juste discuter d'abord de la gestion des FVar avant de le faire *)
+  | Pair(x,y) -> 
+     begin 
+       match ty with 
+       | Cross(a,b) -> if res_debug(check contexte x a (steps ^ ";" ^(pretty_print_inTm inT [])))
+		       then check contexte y b (steps ^ ";" ^(pretty_print_inTm inT []))
+		       else create_report false (contexte_to_string contexte []) steps "Pair : x is not of type of a in Cross(a,b)"     
+       | _ -> failwith "A changer pour la meme raison que l'autre fois mais on va trouver une solution durable"
+     end 
+ (* je sais que ça ne vas pas marcher tout le temps je veux juste discuter d'abord de la gestion des FVar avant de le faire *)
+  | Cross(a,b) -> 
+     begin 
+       match ty with 
+	 | Star -> if res_debug(check contexte a Star (steps ^ ";" ^(pretty_print_inTm inT [])))
+		   then check contexte b Star (steps ^ ";" ^(pretty_print_inTm inT []))
+		   else create_report false (contexte_to_string contexte []) steps "Cross : b is not of type Star"     
+	 | _ -> failwith "A changer aussi toutes les étoiles ne se valent pas"
+     end
 and synth contexte exT steps =
   match exT with 
   | BVar x -> create_retSynth (create_report false (contexte_to_string contexte []) steps "BVar : not possible during type checking") Star
@@ -392,14 +436,29 @@ and synth contexte exT steps =
      let pTy = ret_debug_synth (synth contexte x (steps ^ ";" ^(pretty_print_exTm exT []))) in 
      begin 
        match pTy with 
-       | Pi(v,s,t) -> if res_debug(check contexte y s (steps ^ ";" ^(pretty_print_exTm exT [])))
+       | Pi(v,s,t) -> if res_debug(check contexte y s (steps ^ ";" ^(pretty_print_exTm exT []))) 
 		    then create_retSynth (create_report true (contexte_to_string contexte []) steps "NO") (substitution_inTm t (Ann(y,s)) 0)
 		    else  create_retSynth (create_report false (contexte_to_string contexte []) steps "Y don't have the type of S") Star
        | _ -> create_retSynth (create_report false (contexte_to_string contexte []) steps "Appl: pTy must be of type Pi ") Star
      end
-  | _ -> failwith "il faut que fasse iter" 
-(*   | Iter (p,n,f,z) -> if check contexte () (read ("(-> (pi ) ())")) "" ldebug
-		      then
-		      else *) 
-
+  | _ -> failwith "a faire..."
+(* nul nul nul   | Iter (p,n,f,z) -> if res_debug(check contexte p (read "(-> N *)") (steps ^ ";" ^(pretty_print_exTm exT [])))
+		      then 
+			 begin
+			   if res_debug(check contexte n (read "N") (steps ^ ";" ^(pretty_print_exTm exT [])))
+			   then 
+			     begin 
+			       if res_debug(check contexte f (read "(pi n N (-> (P n) (P (succ n))))") (steps ^ ";" ^(pretty_print_exTm exT [])))
+			       then
+				 begin 
+				   if res_debug(check contexte z () (steps ^ ";" ^(pretty_print_exTm exT [])))
+				   then
+				   else
+				 end 
+			       else create_retSynth (create_report false (contexte_to_string contexte []) steps "Iter: f is not of type (pi n N (-> (P n) (P (succ n))))") Star
+			     end 
+			   else create_retSynth (create_report false (contexte_to_string contexte []) steps "Iter: n is not of type Nat") Star
+			 end
+		      else create_retSynth (create_report false (contexte_to_string contexte []) steps "Iter: P is not of type (-> N *)") Star
+*)
 

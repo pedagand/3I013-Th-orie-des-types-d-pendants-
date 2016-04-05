@@ -23,7 +23,13 @@ let inputs =
    ("(lambda a (lambda b (pi P (-> A *) (-> (P a) (P b)))))",
     FVar "x1","(lambda a (lambda b (pi P (-> A *) (-> (P x1) (P b)))))");
    ("(lambda b (pi P (-> A *) (-> (P a) (P b))))",
-    FVar "x1","(lambda b (pi P (-> A *) (-> (P a) (P x1))))")
+    FVar "x1","(lambda b (pi P (-> A *) (-> (P a) (P x1))))");   
+   ("(lambda x (: (p0(x , b)) (N X N)))",
+    FVar "x1","(lambda x (: (p0(x1 , b)) (N X N)))");
+   ("(lambda x (: (p1(x , b)) (N X N)))",
+    FVar "x1","(lambda x (: (p1(x1 , b)) (N X N)))");
+   ("(pi x * (x X N))",FVar "x1","(pi x * (x1 X N))");
+   ("(lambda x (pi x x *))",FVar "x1","(lambda x (pi x x1 *))");      
 
   ]
 
