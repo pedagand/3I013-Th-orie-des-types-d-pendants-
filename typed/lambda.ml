@@ -1,28 +1,34 @@
 open Sexplib
 
-
+(*=Type *)
 type typ = 
 | Bool
 | Nat 
 | Fleche of typ * typ
+(*=End *)
 | Croix of typ * typ 
 
 (* Correspondance avec le papier 
 Abs = Lam
 Inf = Inv *)
+
+(*=inTm *)
 type inTm = 
   | Abs of string * inTm
-  | True | False 
   | Inv of exTm
+(*=End *)
+  | True | False 
   | Zero 
   | Succ of inTm
   | Pair of inTm * inTm 
 (* Iter of inTm * inTm * inTm *)
 (* XXX: You've forgotten the iterator for natural numbers *)
+(*=exTm *)
 and exTm = 
   | FVar of string
   | BVar of int
   | Appl of exTm * inTm
+(*=End *)
   | Ifte of inTm * exTm * exTm
   | Ann of inTm * typ
   | Iter of inTm * inTm * exTm

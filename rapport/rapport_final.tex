@@ -381,21 +381,16 @@ familiers aux développeurs, tels que les entiers, les booléens, \etc
 
 Nous allons ici voir une représentation des booléens accompagnée de la 
 structure de contrôle \texttt{if ... then ... else ...}.
-Voici les termes correspondants aux constructeurs True et False
+Voici les termes correspondants aux constructeurs $True$, $False$ et 
+$IfThenElse$
 \begin{align*}
   \True &\triangleq \lambda x.\lambda y. y  \\
-  \False &\triangleq \lambda x.\lambda y. x
-\end{align*}
-
-\todo{Définir \Ifte immédiatement, histoire de rendre le paragraphe suivant compréhensible.}
-
-On assimile ces deux termes aux booléens True \todo{comme toujours, écrire ces termes dans le math mode} et False car leur calcul au sein
-de l'application d'un Ifte reproduit le comportement attendu.
-Nous pouvons désormais introduire le terme correspondant à la structure de 
-controle IfThenElse.
-\begin{align*}
+  \False &\triangleq \lambda x.\lambda y. x \\
   \Ifte &\triangleq \lambda x.\lambda y.\lambda z. x\: y\: z  \\
 \end{align*}
+
+On assimile ces deux termes aux booléens $True$ et $False$ car leur calcul au sein
+de l'application d'un $Ifte$ reproduit le comportement attendu.
 
 \begin{example}
   Voici un exemple de réduction du terme Ifte \todo{Mettre des variables nommées (et les étapes intermédiaires)}
@@ -412,7 +407,7 @@ controle IfThenElse.
 \end{example}
 
 Ici nous n'avons aucun moyen de vérifier avant normalisation que le premier
-argument de Ifte est un booléen. \todo{Bof, je ne sais pas ce que cette remarque apporte} %broder un peu plus ?
+argument de Ifte est un booléen. \todo{Bof, je ne sais pas ce que cette remarque apporte}
 
 \todo{Tu pourrais faire une petite remarque sur l'encodage objet des
   booléens, qui est effectivement utilisé dans des langages purement
@@ -660,7 +655,8 @@ Si \emph{n} est un \emph{Succ(num)} alors il faut d'abord evaluer l'application
 
 \section{Le lambda calcul simplement typé}
 
-Introduire la notion de type en règle générale.
+%je ne sais pas si je met ça ici ou dans l'introduction du debut à voir
+En gros dire que ça ne sert a rien de compiler du code qui ne peut pas marcher
 
 \subsection{Les types}
 
@@ -997,16 +993,71 @@ Regardons maintenant les règles de typage de ces différents constructeurs:
 \end{align*}
 
 
-
-
 \subsubsection{Les booléens}
 
+Afin de pouvoir typer nos termes il nous faut introduire le type \emph{Bool}.
 
+
+En suivant la meme demarche que  pour les entiers les 
+constructeurs \emph{True} et \emph{False} sont désormais des \emph{inTermes}
+et le constructeur \emph{Ifte} un \emph{exTerme}
+
+
+
+Nous pouvons désormais typer nos booléens de la manière suivante:
+\begin{align*}
+  &\cfrac{}
+  {\Gamma\vdash Bool \ni true}&\mbox{(True)} \\
+  &\cfrac{}
+  {\Gamma\vdash Bool \ni false}&\mbox{(False)} \\
+  &\cfrac{\Gamma\vdash Bool \ni c \:\: \Gamma\vdash t \in C \:\: \Gamma\vdash e \in C}
+  {\Gamma\vdash ifte\: c\: t\: e\in C}&\mbox{(Ifte)}
+\end{align*}
+
+On constate ici un exemple bien utile des types. En effet 
+précédement avant evaluation de l'ensemble du terme nous ne pouvions 
+pas savoir si le terme \emph{c} était \emph{True} ou \emph{False}.
+D'ésormais nous avons la certitude avant execution que ce terme peut 
+ou non s'évaluer.
 
 \subsubsection{Les paires}
 
+La paire est un objet mathématique qui est définit comme
+un esemble composé de deux éléments. Nous allons donc les implémenters dans notre language.
+Cela va nous permettre de crée des collections d'éléments. 
+Pour ce faire nous allons implémenter trois nouveaux constructeurs:
+les \emph{paires} sous la forme \emph{($a\,b$)}, et \emph{$\pi 0$} qui appliqué à une paire 
+permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
+Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
+introduisons donc ce le type \emph{produit} de la forme \emph{($a*b$)}.
+
+Nous allons maintenant évaluer nos termes, 
+
+
+Règle de typages des paires:
+\begin{align*}
+  &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
+  {\Gamma\vdash (A*B) \ni (a,b)}&\mbox{(Paire)} \\
+  &\cfrac{\Gamma\vdash p \in (A*B)} 
+    {\Gamma\vdash \pi 0(p) \in A}&\mbox{($\pi 0$)} \\
+    &\cfrac{\Gamma\vdash p \in (A*B)} 
+    {\Gamma\vdash \pi 1(p) \in B}&\mbox{($\pi 1$)} \\
+\end{align*}
+
+%on peut parler du fait que de faire des paires de paires c'est long a checker c'est mieux de faire des vecteurs pour ça?
 
 \subsection{Implémentation}
+
+Voici donc l'implémentation du $\lambda$ calcule simplement typé.
+
+\subsubsection{Représentation des termes et des types}
+
+
+Commençon tout d'abord par donné la représentation des \emph{inTermes}
+ainsi que des \emph{exTermes}
+
+\codefrom{typed}{lambda}{inTm}
+\codefrom{typed}{lambda}{exTm}
 
 
 
