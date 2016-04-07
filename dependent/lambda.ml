@@ -13,6 +13,13 @@ type inTm =
   | Nat
   | Pair of inTm * inTm 
   | Cross of inTm * inTm
+  | List of inTm 
+  | Nil of inTm 
+  | Cons of inTm * inTm * inTm 
+(*
+  | Vec of inTm * inTm 
+  | DNil of inTm 
+  | DCons of inTm * inTm *)
 and exTm = 
   | Ann of inTm * inTm 
   | BVar of int 
@@ -21,7 +28,6 @@ and exTm =
   | Iter of inTm * inTm * inTm * inTm  
   | P0 of exTm
   | P1 of exTm 
-(* d'apres les regles c'est bien tout du inTm *)
 type value = 
   | VLam of (value -> value)
   | VNeutral of neutral 
@@ -115,6 +121,12 @@ let rec parse_term env t =
 	 Pair((parse_term env a),(parse_term env b))
       | Sexp.List [a;Sexp.Atom "X";b] -> 
 	 Cross((parse_term env a),(parse_term env b))
+      | Sexp.List [Sexp.Atom "list";alpha] -> 
+	 List(parse_term env alpha)
+      | Sexp.List [Sexp.Atom "nil";alpha] -> 
+	 Nil(parse_term env alpha)
+      | Sexp.List [Sexp.Atom "cons";alpha; a; xs] -> 
+	 Cons((parse_term env alpha),(parse_term env a),(parse_term env xs))
       | _ -> Inv(parse_exTm env t)
 and parse_exTm env t = 
   let rec lookup_var env n v
@@ -151,6 +163,9 @@ let rec pretty_print_inTm t l =
   | Nat -> "N" 
   | Pair(a,b) -> "(" ^ pretty_print_inTm a l ^ " , " ^ pretty_print_inTm b l ^ ")"
   | Cross(a,b) -> "(" ^ pretty_print_inTm a l ^ " X " ^ pretty_print_inTm b l ^ ")"
+  | List(alpha) -> "(list " ^ pretty_print_inTm alpha l ^ ")"
+  | Nil(alpha) -> "(nil " ^ pretty_print_inTm alpha l ^ ")"
+  | Cons(alpha,a,xs) -> "(cons " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm xs l ^ ")"
 and pretty_print_exTm t l =
   match t with 
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
@@ -184,6 +199,9 @@ let rec substitution_inTm t tsub var =
   | Nat -> Nat
   | Pair(x,y) -> Pair((substitution_inTm x tsub var),(substitution_inTm y tsub var))
   | Cross(x,y) -> Cross((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  | List(alpha) -> List(substitution_inTm alpha tsub var)
+  | Nil(alpha) -> Nil(substitution_inTm alpha tsub var)
+  | Cons(alpha,a,xs) -> Cons((substitution_inTm alpha tsub var),(substitution_inTm a tsub var),(substitution_inTm xs tsub var))
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -245,6 +263,7 @@ and big_step_eval_inTm t envi =
   | Nat -> VNat
   | Pair(x,y) -> VPair((big_step_eval_inTm x envi),(big_step_eval_inTm y envi))
   | Cross(x,y) -> VCross((big_step_eval_inTm x envi),(big_step_eval_inTm y envi))
+(* je vais mettre les big step après *)
 
 
 (* il me semble qu'il me faut une fonction de relie libre avant de lancer big step eval dans le check pour que celui ci puisse faire le travail 
@@ -422,6 +441,35 @@ let rec check contexte inT ty steps =
 		   else create_report false (contexte_to_string contexte []) steps "Cross : b is not of type Star"     
 	 | _ -> failwith "A changer aussi toutes les étoiles ne se valent pas"
      end
+  | List(alpha) -> 
+     begin 
+       match ty with 
+       | Star -> check contexte alpha Star (steps ^ ";" ^(pretty_print_inTm inT []))
+       | _ -> failwith "A changer pour trouver une sol durable"
+     end
+  | Nil(alpha) -> 
+     begin 
+       match ty with 
+       | List(a) -> (* ici esque je dois faire la reduction des deux alpha je pense que oui *)
+	  if equal_inTm alpha a
+	  then check contexte alpha Star (steps ^ ";" ^(pretty_print_inTm inT []))
+	  else create_report false (contexte_to_string contexte []) steps "Nil alpha is not of type of a"     
+       | _ -> failwith "A changer pour trouver une sol durable"
+     end
+  | Cons(alpha,a,xs) -> 
+     begin
+       match ty with  
+       | List(alphabis) -> 
+	  if (equal_inTm alpha alphabis) && (res_debug(check contexte alpha Star (steps ^ ";" ^(pretty_print_inTm inT []))))
+	  then 
+	    begin 
+	      if res_debug(check contexte a alpha (steps ^ ";" ^(pretty_print_inTm inT [])))
+	      then check contexte xs ty (steps ^ ";" ^(pretty_print_inTm inT []))
+	      else create_report false (contexte_to_string contexte []) steps "Cons a is not of type alpha"     
+	    end 
+	  else create_report false (contexte_to_string contexte []) steps "Cons , alpha is not equal or alpha is not of type Star"     
+       | _ -> failwith "peut etre trouver une autre solution"
+     end      
 and synth contexte exT steps =
   match exT with 
   | BVar x -> create_retSynth (create_report false (contexte_to_string contexte []) steps "BVar : not possible during type checking") Star
@@ -441,8 +489,7 @@ and synth contexte exT steps =
 		    else  create_retSynth (create_report false (contexte_to_string contexte []) steps "Y don't have the type of S") Star
        | _ -> create_retSynth (create_report false (contexte_to_string contexte []) steps "Appl: pTy must be of type Pi ") Star
      end
-  | _ -> failwith "a faire..."
-(* nul nul nul   | Iter (p,n,f,z) -> if res_debug(check contexte p (read "(-> N *)") (steps ^ ";" ^(pretty_print_exTm exT [])))
+(*  | Iter (p,n,f,z) -> if res_debug(check contexte p (read "(-> N *)") (steps ^ ";" ^(pretty_print_exTm exT [])))
 		      then 
 			 begin
 			   if res_debug(check contexte n (read "N") (steps ^ ";" ^(pretty_print_exTm exT [])))
@@ -459,6 +506,6 @@ and synth contexte exT steps =
 			     end 
 			   else create_retSynth (create_report false (contexte_to_string contexte []) steps "Iter: n is not of type Nat") Star
 			 end
-		      else create_retSynth (create_report false (contexte_to_string contexte []) steps "Iter: P is not of type (-> N *)") Star
-*)
+		      else create_retSynth (create_report false (contexte_to_string contexte []) steps "Iter: P is not of type (-> N *)") Star *)
+  | _ -> failwith "je dois faire p0 et p1"
 

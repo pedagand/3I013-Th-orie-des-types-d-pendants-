@@ -19,7 +19,10 @@ let inputs =
     ((Pair(Inv(FVar "x"),Inv(FVar "y"))),"(x , y)");
     ((Cross(Inv(FVar "x"),Inv(FVar "y"))),"(x X y)");
     (Inv(P0(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))),"(p0 (: (a , b) (N X N)))");
-    (Inv(P1(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))),"(p1 (: (a , b) (N X N)))")
+    (Inv(P1(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))),"(p1 (: (a , b) (N X N)))");
+    (Cons(Nat,Zero,Nil(Nat)),"(cons N zero (nil N))");
+    (List(Nat),"(list N)");
+    (Nil(Nat),"(nil N)");
   ]
 
 let tests = List.map (fun (term, res) -> "test" >:: fun ctxt -> assert_equal (compare_term (pretty_print_inTm term []) res) true) inputs

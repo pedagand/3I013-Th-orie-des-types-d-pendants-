@@ -31,7 +31,14 @@ let inputs
        ("(p0 (: (a , b) (N X N)))", 
 	Inv(P0(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))));
        ("(p1 (: (a , b) (N X N)))", 
-	Inv(P1(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))))
+	Inv(P1(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))));
+       ("(iter (lambda x x) zero (lambda x (succ x)) zero)",
+	Inv(Iter(Abs("x",Inv(BVar 0)),Zero,Abs("x",Succ(Inv(BVar 0))),Zero)));
+       ("(list N)",List(Nat));
+       ("(nil N)", Nil(Nat));
+       ("(cons N zero (nil N))",(Cons(Nat,Zero,Nil(Nat))));
+	
+	 
       (* ( (pretty_print_inTm test1x []),(test1x)); *)
       (* (test1y),(test1x) ;*)]
 	

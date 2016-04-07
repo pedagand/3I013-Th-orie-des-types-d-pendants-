@@ -36,7 +36,14 @@ let inputs =
     (eq, "(pi A * (-> A (-> A *)))",true); 
     (test1y,"*",true);
     ("(succ zero)","N",true);
-    (testcheck4x,"*",true)
+    (testcheck4x,"*",true);
+    ("(list N)","*",true);
+    ("(nil N)","(list N)",true);
+    ("(cons N zero (nil N))","(list N)",true);
+    ("(cons N zero (nil *))","(list N)",false);
+    ("(cons * zero (nil N))","(list N)",false);
+    
+
   ]
 
     
