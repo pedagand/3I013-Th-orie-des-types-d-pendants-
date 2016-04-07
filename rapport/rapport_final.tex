@@ -1058,7 +1058,20 @@ représentation de nos types
 
 
 Comme nous l'énoncions dans la section sur l'évaluation,
-il nous faut aussi représenté le type des \emph{Value}
+il nous faut aussi représenté le type des \emph{Value} et
+\emph{Neutral}
+
+\codefrom{typed}{lambda}{Value}
+\codefrom{typed}{lambda}{Neutral}
+
+On constate que \emph{VLam} la value correspondant à une abstraction est 
+maintenant une fonction Ocaml. Cela aura pour effet lors de l'évaluation
+d'appliquer celles-ci automatiquement. 
+
+\subsection{evaluation}
+
+
+
 
 
 

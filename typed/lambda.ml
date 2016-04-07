@@ -46,7 +46,6 @@ type lambda_term =
   | SP0 of lambda_term 
   | SP1 of lambda_term
 
-(* test de l'implémentation du papier "tutorial" *)
 (*=Value *)
 type value = 
   | VLam of (value -> value)
