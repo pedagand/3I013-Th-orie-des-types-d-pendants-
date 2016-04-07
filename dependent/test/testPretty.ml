@@ -10,16 +10,16 @@ let compare_term a b =
 
 let inputs = 
   [ 
-    ((Abs("x",Abs("y",Abs("z",Inv(Appl(BVar 2, Inv(Appl(BVar 1, Inv(BVar 0))))))))),"(lambda x (lambda y (lambda z (x (y z)))))");
-    ((Inv(Ann(Abs("x",Inv(BVar 0)),Pi("x",Star,Star)))),"(: (lambda x x) (pi x * *))");
-    ((Pi("x",Star,Pi("y",Star,Pi("z",Star,Star)))),
+    ((Abs(Global "x",Abs(Global "y",Abs(Global "z",Inv(Appl(BVar 2, Inv(Appl(BVar 1, Inv(BVar 0))))))))),"(lambda x (lambda y (lambda z (x (y z)))))");
+    ((Inv(Ann(Abs(Global "x",Inv(BVar 0)),Pi(Global "x",Star,Star)))),"(: (lambda x x) (pi x * *))");
+    ((Pi(Global "x",Star,Pi(Global "y",Star,Pi(Global "z",Star,Star)))),
      "(pi x * (pi y * (pi z * *)))");
     ((Succ(Succ(Zero))),"(succ (succ zero))");
     ((Inv(Iter(Nat,Nat,Nat,Nat))),"(iter N N N N)");
-    ((Pair(Inv(FVar "x"),Inv(FVar "y"))),"(x , y)");
-    ((Cross(Inv(FVar "x"),Inv(FVar "y"))),"(x X y)");
-    (Inv(P0(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))),"(p0 (: (a , b) (N X N)))");
-    (Inv(P1(Ann(Pair(Inv(FVar "a"),Inv(FVar "b")),Cross(Nat,Nat)))),"(p1 (: (a , b) (N X N)))");
+    ((Pair(Inv(FVar (Global "x")),Inv(FVar (Global "y")))),"(x , y)");
+    ((Cross(Inv(FVar (Global "x")),Inv(FVar (Global "y")))),"(x X y)");
+    (Inv(P0(Ann(Pair(Inv(FVar (Global "a")),Inv(FVar (Global "b"))),Cross(Nat,Nat)))),"(p0 (: (a , b) (N X N)))");
+    (Inv(P1(Ann(Pair(Inv(FVar (Global "a")),Inv(FVar (Global "b"))),Cross(Nat,Nat)))),"(p1 (: (a , b) (N X N)))");
     (Cons(Nat,Zero,Nil(Nat)),"(cons N zero (nil N))");
     (List(Nat),"(list N)");
     (Nil(Nat),"(nil N)");
