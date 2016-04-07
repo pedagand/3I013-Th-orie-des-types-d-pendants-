@@ -293,7 +293,6 @@ let rec contexte_to_string contexte =
   | (Global s,w) :: tail -> "(" ^ s ^ "," ^ pretty_print_inTm (value_to_inTm 0 w) [] ^ ");" ^ contexte_to_string tail  
   | _ -> failwith "Must not append"
 
-let () = Printf.printf "%s" (pretty_print_inTm (value_to_inTm 0 (big_step_eval_inTm (read "(pi A * (-> A (-> A *)))") [])) [])
 
 
 let rec check contexte inT ty steps = 
@@ -302,11 +301,11 @@ let rec check contexte inT ty steps =
      begin  
        match ty with 
        | VPi(s,t) -> let freshVar = gensym () in 
-		     check (((Global freshVar),s)::contexte) y (t (vfree (Global freshVar))) (pretty_print_inTm inT [] ^ ";")
+		     check (((Global freshVar),s)::contexte) (substitution_inTm y (FVar(Global(freshVar))) 0) (t (vfree (Global freshVar))) (pretty_print_inTm inT [] ^ ";"^ steps) 
        | _ -> create_report false (contexte_to_string contexte) steps "Abs type must be a Pi"
      end 
   | Inv(x) -> 
-     let ret = synth contexte x steps in 
+     let ret = synth contexte x (pretty_print_inTm inT [] ^ ";" ^ steps) in 
      if res_debug_synth ret
      then 
        begin 
@@ -325,8 +324,8 @@ let rec check contexte inT ty steps =
      begin 
        match ty with 
        | VStar -> let freshVar = gensym () in 
-		  if res_debug(check contexte s VStar (pretty_print_inTm inT [] ^ ";"))
-		  then check (((Global freshVar),(big_step_eval_inTm s []))::contexte) (substitution_inTm t (FVar(Global(freshVar))) 0) VStar (pretty_print_inTm inT [] ^ ";")
+		  if res_debug(check contexte s VStar (pretty_print_inTm inT [] ^ ";"^ steps))
+		  then check (((Global freshVar),(big_step_eval_inTm s []))::contexte) (substitution_inTm t (FVar(Global(freshVar))) 0) VStar (pretty_print_inTm inT [] ^ ";"^ steps)
 		  else create_report false (contexte_to_string contexte) steps "Pi : S is not of type Star"
        | _ -> create_report false (contexte_to_string contexte) steps "Pi : ty must be of type Star"
      end 
@@ -335,12 +334,27 @@ and synth contexte exT steps =
   match exT with 
   | BVar x -> create_retSynth (create_report false (contexte_to_string contexte) steps "BVar : not possible during type checking") VStar
   | FVar x -> create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (List.assoc x contexte)
-  | Ann(x,t) -> let ret = check contexte t VStar (pretty_print_exTm exT [] ^ ";") in 
+  | Ann(x,t) -> let ret = check contexte t VStar (pretty_print_exTm exT [] ^ ";"^ steps) in 
+		let eval_t = big_step_eval_inTm t [] in
 		if res_debug(ret)
 		then 
 		  begin 
-		    if 
+		    if res_debug(check contexte x eval_t (pretty_print_exTm exT [] ^ ";"))
+		    then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") eval_t
+		    else create_retSynth (create_report false (contexte_to_string contexte) steps "Ann : x is not of type t") VStar
 		  end
-		else
+		else create_retSynth (create_report false (contexte_to_string contexte) steps "Ann : t is not of type VStar") VStar
+  | Appl(f,s) -> 
+     let synth_f = synth contexte f (pretty_print_exTm exT [] ^ ";"^ steps) in 
+     begin
+       match ret_debug_synth synth_f with 
+       | VPi(s_pi,fu) -> if res_debug(check contexte s s_pi (pretty_print_exTm exT [] ^ ";"))
+		     then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (fu (big_step_eval_inTm s [])) 
+		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Appl : s is not of type S") VStar
+       | _ -> create_retSynth (create_report false (contexte_to_string contexte) steps "Appl : f is not of type Pi") VStar
+     end
+  | _ -> failwith "HAHAHAHAHAHAHA"
 
- 
+
+
+(* let () = Printf.printf "%s" (print_report (check [] (read "(lamba x x)") (big_step_eval_inTm (read "(-> * *)") []) "")) *)

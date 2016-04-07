@@ -9,7 +9,7 @@ let compare_term a b =
 
 
 let inputs = 
-  [ 
+  [ ((Abs(Global"x",Inv(BVar 0))),"(lambda x x)");
     ((Abs(Global "x",Abs(Global "y",Abs(Global "z",Inv(Appl(BVar 2, Inv(Appl(BVar 1, Inv(BVar 0))))))))),"(lambda x (lambda y (lambda z (x (y z)))))");
     ((Inv(Ann(Abs(Global "x",Inv(BVar 0)),Pi(Global "x",Star,Star)))),"(: (lambda x x) (pi x * *))");
     ((Pi(Global "x",Star,Pi(Global "y",Star,Pi(Global "z",Star,Star)))),
