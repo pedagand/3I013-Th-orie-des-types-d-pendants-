@@ -7,6 +7,7 @@
 \usepackage[francais]{babel}
 \usepackage{amsthm, amssymb, amsmath}
 \usepackage{hyperref}
+\usepackage{mathpartir}
 
 %% ** OCaml listings
 
@@ -709,19 +710,38 @@ Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 
 \begin{figure}
 
-\begin{align*}
-&  \cfrac{x:T\,\in\Gamma}
-         {\Gamma\vdash x:T}\mbox{(Var)} 
-  \\
-&  \cfrac{\Gamma, x:A \vdash t:B}
-         {\Gamma \vdash \lambda x. t \,:\, A\rightarrow B}\mbox{(Abs)} \\
-&  \cfrac{\Gamma \vdash f : A\rightarrow B \quad
-          \Gamma \vdash s : A}
-         {\Gamma\vdash f\: s : B}\mbox{(App)} \\
-&  \mathsf{bool}:\mathsf{true}|\mathsf{false}\mbox{(Bool)} \\
-&  \cfrac{t1:\mathsf{bool}\,t2:T\,t3:T}
-         {\Gamma\vdash if t1 then t2 else t3}\mbox{(If-else)} \\
-\end{align*}
+\[
+\begin{array}{c}
+\inferrule[(Var)]%
+             {x:T\,\in\Gamma}%
+             {\Gamma\vdash x:T} 
+\medskip\\
+\inferrule[(Abs)]%
+          {\Gamma, x:A \vdash t:B}%
+          {\Gamma \vdash \lambda x. t \,:\, A\rightarrow B}
+\qquad
+\inferrule[(App)]%
+          {\Gamma \vdash f : A\rightarrow B \\
+           \Gamma \vdash s : A}%
+          {\Gamma\vdash f\: s : B}
+\medskip\\
+\inferrule[(true)]
+          {{}}
+          {\Gamma\vdash \mathsf{true} : \mathsf{bool}}
+\qquad
+\inferrule[(false)]
+          {{}}
+          {\Gamma\vdash \mathsf{false} : \mathsf{bool}}
+\medskip\\
+\inferrule[(If-else)]
+          {t1:\mathsf{bool} \\
+           t2:T \\
+           t3:T}
+         {\Gamma\vdash if t1 then t2 else t3}
+\end{array}
+\]
+
+\todo{Définir des macros pour true, false, ifthenelse, bool}
 
 \caption{Typage (lambda calcul simplement typé)}
 \label{fig:typage-simple}
