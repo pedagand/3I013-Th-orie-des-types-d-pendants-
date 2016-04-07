@@ -7,8 +7,8 @@ let suite =
 	    ; "test unit" >::: TestUnit.eval
 	    ; "test check" >::: TestCheck.tests *)
 	    ; "test pretty" >::: TestPretty.tests
-(*	    ; "test sub" >::: TestSub.tests
-	    ; "test equal" >::: TestEqual.tests*)
+	    ; "test sub" >::: TestSub.tests
+(*	    ; "test equal" >::: TestEqual.tests*)
 	    ; "test big_step">::: TestBig_step.tests  
 	    ]
 

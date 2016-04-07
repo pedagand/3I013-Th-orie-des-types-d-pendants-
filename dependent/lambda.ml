@@ -48,9 +48,7 @@ type debug =
   | Steps of string
   | Error of string
 and debug_synth = 
-  | RetSynth of debug * debug_synth
-  | Val of value
-  | None
+  | RetSynth of debug * value
 
 (* fonction pour les rapports d'erreurs *)
 let create_report s c e er= 
@@ -85,6 +83,7 @@ let ret_debug_synth d =
   match d with 
   | RetSynth(Report(Success(s),c,e,er),y) -> y 
   | _ -> failwith "RetSynth don't have a good shape"
+
 
 let rec parse_term env t = 
       match t with   
@@ -187,6 +186,34 @@ and pretty_print_exTm t l =
   | P1(x) -> "(p1 " ^ pretty_print_exTm x l ^ ")"
 
 
+
+let rec substitution_inTm t tsub var = 
+  match t with 
+  | Inv x -> Inv(substitution_exTm x tsub var)
+  | Abs(x,y) -> Abs(x,(substitution_inTm y tsub (var+1)))
+  | Star -> Star
+  | Pi(v,x,y) -> Pi(v,(substitution_inTm x tsub var),(substitution_inTm y tsub (var+1)))
+  | Zero -> Zero 
+  | Succ n -> Succ(substitution_inTm n tsub var)
+  | Nat -> Nat
+  | Pair(x,y) -> Pair((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  | Cross(x,y) -> Cross((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  | List(alpha) -> List(substitution_inTm alpha tsub var)
+  | Nil(alpha) -> Nil(substitution_inTm alpha tsub var)
+  | Cons(alpha,a,xs) -> Cons((substitution_inTm alpha tsub var),(substitution_inTm a tsub var),(substitution_inTm xs tsub var))
+and substitution_exTm  t tsub var = 
+  match t with 
+  | FVar x -> FVar x
+  | BVar x when x = var -> tsub
+  | BVar x -> BVar x
+  | Appl(x,y) -> Appl((substitution_exTm x tsub var),(substitution_inTm y tsub var))
+  | Ann(x,y) -> Ann((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  | Iter(p,n,f,a) -> Iter((substitution_inTm p tsub var),(substitution_inTm n tsub var),(substitution_inTm f tsub var),(substitution_inTm a tsub var))
+  | P0(x) -> P0(substitution_exTm x tsub var)
+  | P1(x) -> P1(substitution_exTm x tsub var)
+
+
+
 let vfree n = VNeutral(NFree n)
   
 let rec big_step_eval_inTm t envi = 
@@ -194,6 +221,7 @@ let rec big_step_eval_inTm t envi =
   | Inv(i) -> big_step_eval_exTm i envi
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
   | Star -> VStar
+  | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 
@@ -214,14 +242,105 @@ let boundfree i n =
   | Quote k -> BVar (i - k - 1)
   | x -> FVar x
 
+let gensym =
+  let c = ref 0 in
+  fun () -> incr c; "x" ^ string_of_int !c
 
 let rec value_to_inTm i v =
   match v with 
   | VLam f -> value_to_inTm (i+1) (f (vfree(Quote i)))
   | VNeutral n -> Inv(neutral_to_exTm i n)
-  | _ -> failwith "Pas si vite garçon"
+  | VPi(x,f) -> let var = gensym () in 
+		begin
+		  Pi(Global(var),(value_to_inTm i x),(value_to_inTm (i+1) (f(vfree(Quote i)))))
+		end
+  | VStar -> Star
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> boundfree i x
   | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
 
+
+let rec equal_inTm t1 t2 = 
+  match (t1,t2) with 
+  | (Abs(_,x1),Abs(_,x2)) -> equal_inTm x1 x2
+  | (Pi(_,x1,y1),Pi(_,x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Star,Star) -> true 
+  | (Zero,Zero) -> true 
+  | (Succ(n1),Succ(n2)) -> equal_inTm n1 n2
+  | (Nat,Nat) -> true
+  | (Inv(x1),Inv(x2)) -> equal_exTm x1 x2
+  | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Cross(x1,y1),Cross(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | _ -> false
+and equal_exTm t1 t2 = 
+  match (t1,t2) with 
+  | (Ann(x1,y1),Ann(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (BVar(x1),BVar(x2)) -> x1 = x2
+  | (FVar(x1),FVar(x2)) -> x1 = x2
+  | (Appl(x1,y1),Appl(x2,y2)) -> equal_exTm x1 x2 = equal_inTm y1 y2 
+  | (Iter(w1,x1,y1,z1),Iter(w2,x2,y2,z2)) -> 
+     equal_inTm w1 w2 = equal_inTm x1 x2 = equal_inTm y1 y2 = equal_inTm z1 z2
+  | (P0(x1),P0(x2)) -> equal_exTm x1 x2
+  | (P1(x1),P1(x2)) -> equal_exTm x1 x2
+  | _ -> false
+
+
+
+let rec contexte_to_string contexte = 
+  match contexte with 
+  | [] -> "|" 	    
+  | (Global s,w) :: tail -> "(" ^ s ^ "," ^ pretty_print_inTm (value_to_inTm 0 w) [] ^ ");" ^ contexte_to_string tail  
+  | _ -> failwith "Must not append"
+
+let () = Printf.printf "%s" (pretty_print_inTm (value_to_inTm 0 (big_step_eval_inTm (read "(pi A * (-> A (-> A *)))") [])) [])
+
+
+let rec check contexte inT ty steps = 
+  match inT with 
+  | Abs(x,y) -> 
+     begin  
+       match ty with 
+       | VPi(s,t) -> let freshVar = gensym () in 
+		     check (((Global freshVar),s)::contexte) y (t (vfree (Global freshVar))) (pretty_print_inTm inT [] ^ ";")
+       | _ -> create_report false (contexte_to_string contexte) steps "Abs type must be a Pi"
+     end 
+  | Inv(x) -> 
+     let ret = synth contexte x steps in 
+     if res_debug_synth ret
+     then 
+       begin 
+	 if equal_inTm (value_to_inTm 0 (ty)) (value_to_inTm 0 (ret_debug_synth ret))
+	 then create_report true (contexte_to_string contexte) steps "NO"
+	 else create_report false (contexte_to_string contexte) steps "Inv: ret and ty are not equal"
+       end
+     else create_report false (contexte_to_string contexte) steps "Inv: Synth of x goes wrong"
+  | Star -> 
+     begin 
+      match ty with 
+	| VStar -> create_report true (contexte_to_string contexte) steps "No"
+	| _ -> create_report false (contexte_to_string contexte) steps "Star : ty must be of type Star"
+     end
+  | Pi (v,s,t) -> 
+     begin 
+       match ty with 
+       | VStar -> let freshVar = gensym () in 
+		  if res_debug(check contexte s VStar (pretty_print_inTm inT [] ^ ";"))
+		  then check (((Global freshVar),(big_step_eval_inTm s []))::contexte) (substitution_inTm t (FVar(Global(freshVar))) 0) VStar (pretty_print_inTm inT [] ^ ";")
+		  else create_report false (contexte_to_string contexte) steps "Pi : S is not of type Star"
+       | _ -> create_report false (contexte_to_string contexte) steps "Pi : ty must be of type Star"
+     end 
+  | _ -> failwith "HEHEHEHEHE"
+and synth contexte exT steps =
+  match exT with 
+  | BVar x -> create_retSynth (create_report false (contexte_to_string contexte) steps "BVar : not possible during type checking") VStar
+  | FVar x -> create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (List.assoc x contexte)
+  | Ann(x,t) -> let ret = check contexte t VStar (pretty_print_exTm exT [] ^ ";") in 
+		if res_debug(ret)
+		then 
+		  begin 
+		    if 
+		  end
+		else
+
+ 
