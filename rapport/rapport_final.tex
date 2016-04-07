@@ -100,7 +100,6 @@
 blablawsdsdfsdf
 
 
-Voici du code :
 
 %% \codefrom{dossier}{fichier}{tag}
 %%   où 'dossier' est "no_type", ou "typed", ou "dependent"
@@ -110,28 +109,24 @@ Voici du code :
 \section{$\lambda$-calcul non typé}
 
 En 1936, Alonzo Church introduit le lambda calcul non typé
-(citation de church). Le $\lambda$-calcul est
+~\citep{church:lambda-calcul}. Le $\lambda$-calcul est
 un modèle de calcul universel, tout comme les machines de Turing. Celui-ci repose
 sur une syntaxe minimaliste et permet de formaliser le concept de fonction. Il est au coeur de nombreuses recherches dans le domaine de la 
 programmation fonctionnelle. Le lambda calcul non typé a connu un formidable 
 succès pratique, donnant lieu à de multiples variantes dont on trouvera une présentation
- moderne et synthétique dans l'ouvrage de (citation pierce).
+ moderne et synthétique dans l'ouvrage de ~\citet{pierce:tapl}.
 
 \todo{Ne pas attendre la fin pour mettre les citations bibtex. Faire ça au fur et à mesure.}
 
 \subsection{Présentation formelle}
 
 \subsubsection{Syntaxe}
-Le lambda calcul \todo{écrire $\lambda$-calcul} est composé uniquement de \(\lambda\)-termes dont voici la syntaxe
+Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la syntaxe
 
 \newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
 \newcommand{\App}[2]{\ensuremath{#1\:#2}}
 \newcommand{\Var}[1]{\ensuremath{#1}}
 
-\todo{Utiliser les commandes \verb!Lam!, \verb!App! et \verb!Var!
-  pour construire des $\lambda$-termes. Cela permet de changer
-  rapidement la mise en forme par la suite, si besoin. Penser HTML \&
-  CSS : il faut découpler au maximum le contenu de la présentation.}
 
 \begin{align*}
   t &::= & \mbox{(lambda terme)} \\
@@ -173,11 +168,11 @@ Si la variable n'a pas été déclarée, elle est dite libre.
 
 \todo{Définir formellement un prédicat \(\IsFree\) qui calcule (récursivement)
   l'ensemble des variables libres d'un \(\lambda\)-terme.}
-  \begin{align*}
-    \IsFree(x) &\triangleq ? \\
-    \IsFree(\lambda x. t) &\triangleq ? \\
-    \IsFree(f s) &\triangleq ? \\
-  \end{align*}
+\begin{align*}
+  \IsFree(x) &\triangleq ? \\
+  \IsFree(\lambda x. t) &\triangleq ? \\
+  \IsFree(f s) &\triangleq ? \\
+\end{align*}
 
 
 \begin{example}
@@ -188,7 +183,7 @@ Si la variable n'a pas été déclarée, elle est dite libre.
 
 Un terme ne contenant aucune occurrence de variable libre est dit ``clos''.
 \begin{example}
-  \label{example:ouvert-clos}
+  \label{example:ouvert-clos}  
   Dans le lambda terme \((\lambda x. \lambda y. x\: y)\: y\), la
   variable \(x\) est liée ainsi que la première occurence de la
   variable \(y\). Cependant, la variable \(y\) à l'extérieur des
@@ -204,7 +199,7 @@ Un des problèmes introduit par cette représentation des variables est qu'il de
 
 \newcommand{\equivAlpha}{\mathop{\equiv_\alpha}}
 
-On considère que deux termes sont alpha équivalents \todo{écrire ``\(\alpha\)-équivalents''} si et seulement si ils sont 
+On considère que deux termes sont \(\alpha\)-équivalents si et seulement si ils sont 
 égaux au renommage de leur variables liées près. 
 \begin{example}
   Voici deux termes alpha équivalents 
@@ -223,61 +218,56 @@ entre eux. Mais il nous faut tout d'abord définir le mécanisme de substitution
 
 \newcommand{\subst}[3]{#1[#2 := #3]}
 
-\todo{Utiliser la ``command'' substitution.}
 
 La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
 à remplacer l'occurrence d'une variable liée par un \(\lambda\)-terme.
-On note généralement la substitution de la variable x \todo{attention à ne pas mettre de variables ``mathématiques'' dans le corps du texte, sans l'entourer du mode math. Ici on écrira \Var{x}, pas x.} dans le terme t par le 
+On note généralement la substitution de la variable \Var{x} dans le terme \Var{t} par le 
 terme u avec la notation suivante. 
 \[ 
 \subst{t}{x}{u}
 \]
 
-\todo{Donner la définition formelle de la substitution ici.}
+Définition formelle de la substitution: 
+\begin{align*}
+    \subst{x}{x}{u} &\triangleq u \\
+    \subst{x}{y}{u} &\triangleq x \\
+    \subst{\lambda x.t}{x}{u} &\triangleq \lambda x.(\subst{t}{x}{u}) \\
+    \subst{\lambda y.t}{x}{u} &\triangleq \lambda x.t \\
+    \subst{(t\: v)}{x}{u} &\triangleq (\subst{t}{x}{u}\: \subst{v}{x}{u}) 
+\end{align*}
 
 \begin{example}
   \attention{Cet exemple est étrange. La substitution se fait \emph{sous} le lambda?!}
 
-  Soit le terme \(\lambda\)x.x[x:=\(\lambda\)y.y], après avoir effectué la
+  Soit le terme \(\lambda\)x.(\subst{x}{x}{\(\lambda\)y.y}), après avoir effectué la
   substitution nous obtenons le terme \(\lambda\)x.\(\lambda\)y.y
 \end{example}
 
 
-\todo{Cf. remarque au-dessus.} Nous avons analysé un cas de
-substitution cependant on peut etre confronté à devoir substituer dans
-une application ou une abstraction, voici donc les règles pour la
-substitution \attention{Il y a 2 cas pour le lambda : on substitue
-  \Var{x} et le binder est \Var{y} avec $\Var{x} \neq \Var{y}$, ou on
-  substitue \Var{x} et le binder est \Var{x}}
-
-\attention{$\leadsto$ n'est pas le bon symbole : on utilisera ce
-  symbole pour définir la relation de réduction. Ici, on veut utiliser
-  le même symbole que l'on utilise habituellement lorsque l'on définit
-  un prédicat mathématique, comme $\IsFree$ plus tôt}
-
-\begin{align*}
-&(u v)[x := z]\leadsto(u[x := z] v[x := z]) \\
-&(\lambda .t)[x := z]\leadsto\lambda .t[x := z] \\
-\end{align*}
-
-%je ne sais pas exactement quel titre donner a cette partie normalisation 
-%ou reduction 
 \subsubsection{$\beta$-réduction}
 
 Seules les applications dont le membre de gauche est une abstraction
 peuvent être réduites, on appelle cela une \emph{redex}.
-\attention{Pas clair :} C'est à dire que l'application (t u) ne peut
-pas etre réduite à moins que le terme t ne s'évalue en une
-abstraction, (nous verrons ceci plus en détail dans la section
-suivante). \todo{Au lieu d'une vague définition, donner la définition
-  formelle de la $\beta$-réduction.}
 
 \begin{example}
-  Soit le terme ((\(\lambda\)x.\(\lambda\)y.y x) z).  Ce terme est
+  Le terme \(\App{\Lam{x}{x}}{u}\) est une redex tandisque le terme
+  \(\App{x]{u}\) n'en est pas une.
+\end{example}
+
+En voici une définition formelle:
+\begin{align*}
+    Reduction(x) &\triangleq x \\
+    Reduction(\lambda x.t) &\triangleq \lambda x.t \\
+    Reduction(x\: u) &\triangleq x\:u \\
+    Reduction(\lambda x.t\: u) &\triangleq \subst{t}{x}{u} \\
+\end{align*}
+
+
+\begin{example}
+  Soit le terme \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
   sous la forme d'une application ayant une abstraction comme membre
   de gauche. La réduction consiste à substituer la variable liée par
-  l'abstraction par le membre droit de l'application. On obtient donc \(\lambda\)x.\(\lambda\)y.z x
-  \todo{Écrire \emph{tous} les termes dans le math mode, par exemple le dernier terme devrait être \(\Lam{x}{\Lam{y}{\App{z}{x}}}\)}
+  l'abstraction par le membre droit de l'application. On obtient donc \(\Lam{x}{\Lam{y}{\App{z}{x}}}\)}
 \end{example}
 
 \begin{example}
@@ -301,9 +291,11 @@ autant que possible notre terme. \todo{Expliquer que l'on a le choix
 
 %changer les fleches 
 \begin{example}
-  \todo{Texte pas clair}
-  Le terme (((\(\lambda\)x.x) (\(\lambda\)y.y)) z) \(\leadsto\) ((\(\lambda\)y.y) y) 
-\(\leadsto\) y %saut de ligne
+  Le terme 
+  \begin{align*}
+    (((\lambda x.x) (\lambda y.y)) z) &\leadsto ((\lambda y.y) y) \\
+    & \leadsto y
+  \end{align*}
   Ici y n'est plus réductible c'est donc la forme normale du terme.
 \end{example}
 
@@ -321,19 +313,7 @@ de forme normale.
                                         &\leadsto \ldots \\
   \end{align*}
 \end{example}
-%je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
-%introduire un peu la suite du rapport 
-Dans les sections suivantes, nous verrons lorsque nous introduirons
-les systèmes de type que l'on peut ne considérer que des termes qui
-réduisent vers une forme normale (c'est une des propriétés
-intéressante offerte par les systèmes de type)
 
-\attention{Question classique : si tu ne peux plus écrire de
-  programmes qui ne terminent pas, tu n'es plus Turing complet donc tu
-  es strictement moins expressif que tous les langages de
-  programmation existants. Est-ce gênant ?}
-
-\todo{Cf. ma remarque plus haut : faire remonter cette explication.}
 Il existe de nombreuses stratégies de normalisation des termes dans le
 lambda calcul non typé, les plus connues étant l'\emph{appel par nom}
 et l'\emph{appel par valeur}.  Pour le lambda calcul non typé la
@@ -346,9 +326,19 @@ pas à l'intérieur des abstractions. \todo{Donner la définition
 ne peut pas atteindre une forme normale, cependant celle ci a moins de
 risque \todo{``moins de risque'' n'est pas une définition
   formelle. Donner une explication plus précise.} de rentrer dans une
-boucle d'évaluation infinie. Nous n'avons pas encore les propriétés
-offertes par les systèmes de types qui garantirait qu'un terme bien
-typé admet toujours une forme normale.
+boucle d'évaluation infinie.
+
+%je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
+%introduire un peu la suite du rapport 
+Dans les sections suivantes, nous verrons lorsque nous introduirons
+les systèmes de type que l'on peut ne considérer que des termes qui
+réduisent vers une forme normale (c'est une des propriétés
+intéressante offerte par les systèmes de type)
+
+\attention{Question classique : si tu ne peux plus écrire de
+  programmes qui ne terminent pas, tu n'es plus Turing complet donc tu
+  es strictement moins expressif que tous les langages de
+  programmation existants. Est-ce gênant ?}
 
 \begin{example}
   Voici un exemple d'évaluation avec la stratégie call by value
@@ -1052,12 +1042,23 @@ Voici donc l'implémentation du $\lambda$ calcule simplement typé.
 
 \subsubsection{Représentation des termes et des types}
 
-
+Tout comme nous l'avons fait précédement nous allons nous contenté
+de présenté l'implémentation du noyeau de notre language, nous introduirons 
+les différents encodages dans les sections suivantes.
 Commençon tout d'abord par donné la représentation des \emph{inTermes}
 ainsi que des \emph{exTermes}
 
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
+
+De la meme façon que nous avons représenté nos termes voici la 
+représentation de nos types 
+
+\codefrom{typed}{lambda}{Type}
+
+
+Comme nous l'énoncions dans la section sur l'évaluation,
+il nous faut aussi représenté le type des \emph{Value}
 
 
 

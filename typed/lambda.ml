@@ -47,18 +47,21 @@ type lambda_term =
   | SP1 of lambda_term
 
 (* test de l'implémentation du papier "tutorial" *)
+(*=Value *)
 type value = 
   | VLam of (value -> value)
+  | VNeutral of neutral 
+(*=End *)
   | VTrue 
   | VFalse
-  | VZero
   | VSucc of value
-  | VNeutral of neutral 
+  | VZero
   | VPair of value * value 
+(*=Neutral *)
 and neutral = 
   | NFree of string 
   | NApp of neutral * value 
-
+(*=End *)
 
 
 (* Le commentaire suivant représente ce qui perdra l'humanité *)
