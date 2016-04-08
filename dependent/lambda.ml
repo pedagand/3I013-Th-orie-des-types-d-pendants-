@@ -22,6 +22,9 @@ type inTm =
   | List of inTm 
   | Nil of inTm 
   | Cons of inTm * inTm * inTm 
+  | Vec of inTm * inTm
+  | DNil of inTm
+  | DCons of inTm * inTm 
 and exTm = 
   | Ann of inTm * inTm 
   | BVar of int 
@@ -31,11 +34,18 @@ and exTm =
   | P0 of exTm
   | P1 of exTm 
  
+(*= Value*)
 type value = 
   | VLam of (value -> value)
   | VNeutral of neutral 
   | VStar 
   | VPi of value * (value -> value)
+(*= End*)
+(*= Value_Nat*)
+  | VNat
+  | VZero
+  | VSucc of value
+(*=End*)
 and neutral = 
   | NFree of name 
   | NApp of neutral * value 
@@ -65,6 +75,11 @@ let print_report r =
 	 "-Steps : " ^ e ^ "\n" ^
 	   "-Error : " ^ er ^ "\n" 
   | _ -> failwith "can't print something which is not a report" 
+
+let print_report_synth r = 
+  match r with 
+  | RetSynth(Report(s,c,e,er),y) -> print_report (Report(s,c,e,er))
+  | _ -> failwith "report synth don't have a good shape"
 
 let res_debug d = 
   match d with 
@@ -222,18 +237,29 @@ let rec big_step_eval_inTm t envi =
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
   | Star -> VStar
   | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
+  | Nat -> VNat
+  | Zero -> VZero
+  | Succ(n) -> VSucc(big_step_eval_inTm n envi)
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "TBD"
+and vitter (n,f,a) =
+  match n with
+  | VZero -> a
+  | VSucc(x) -> vapp(f,(vitter (x,f,a)))
+  | _ -> failwith "vitter n must be VZero or VSucc"
 and big_step_eval_exTm t envi = 
   match t with 
   | Ann(x,_) -> big_step_eval_inTm x envi 
   | FVar(v) -> vfree v 
   | BVar(v) -> List.nth envi v 
   | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
+  | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm n envi),
+			    (big_step_eval_inTm f envi),
+			    (big_step_eval_inTm a envi))
   | _ -> failwith "Chaques choses en son temps"
 
 
@@ -255,6 +281,9 @@ let rec value_to_inTm i v =
 		  Pi(Global(var),(value_to_inTm i x),(value_to_inTm (i+1) (f(vfree(Quote i)))))
 		end
   | VStar -> Star
+  | VNat -> Nat
+  | VZero -> Zero
+  | VSucc(n) -> Succ(value_to_inTm i n)
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> boundfree i x
@@ -313,7 +342,7 @@ let rec check contexte inT ty steps =
 	 then create_report true (contexte_to_string contexte) steps "NO"
 	 else create_report false (contexte_to_string contexte) steps "Inv: ret and ty are not equal"
        end
-     else create_report false (contexte_to_string contexte) steps "Inv: Synth of x goes wrong"
+     else create_report false (contexte_to_string contexte) steps ("Inv: Synth of x goes wrong \n ----Rapport du Inv---\n" ^ print_report_synth ret ^ "\n------Fin Rapport Inv---\n")
   | Star -> 
      begin 
       match ty with 
@@ -328,6 +357,24 @@ let rec check contexte inT ty steps =
 		  then check (((Global freshVar),(big_step_eval_inTm s []))::contexte) (substitution_inTm t (FVar(Global(freshVar))) 0) VStar (pretty_print_inTm inT [] ^ ";"^ steps)
 		  else create_report false (contexte_to_string contexte) steps "Pi : S is not of type Star"
        | _ -> create_report false (contexte_to_string contexte) steps "Pi : ty must be of type Star"
+     end 
+  | Nat -> 
+     begin 
+       match ty with
+       | VStar -> create_report true (contexte_to_string contexte) steps "No"
+       | _ -> create_report false (contexte_to_string contexte) steps "Nat : ty must be VStar"
+     end 
+  | Zero -> 
+     begin 
+       match ty with 
+       | VNat -> create_report true (contexte_to_string contexte) steps "No"
+       | _ -> create_report false (contexte_to_string contexte) steps "Zero : ty must be VNat"
+     end
+  | Succ(x) -> 
+     begin 
+       match ty with 
+	 | VNat -> check contexte x VNat (pretty_print_inTm inT [] ^ ";"^ steps)
+	 | _ -> create_report false (contexte_to_string contexte) steps "Succ : ty must be VNat"
      end 
   | _ -> failwith "HEHEHEHEHE"
 and synth contexte exT steps =
@@ -353,6 +400,34 @@ and synth contexte exT steps =
 		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Appl : s is not of type S") VStar
        | _ -> create_retSynth (create_report false (contexte_to_string contexte) steps "Appl : f is not of type Pi") VStar
      end
+  | Iter(p,n,f,a) -> let big_p = big_step_eval_inTm p [] in
+		     let big_n = big_step_eval_inTm n [] in 
+ 		     let check_p = check contexte p (big_step_eval_inTm (read "(-> N *)") []) (pretty_print_exTm exT [] ^ ";") in    
+		     let check_n = check contexte n (big_step_eval_inTm (read "N") []) (pretty_print_exTm exT [] ^ ";") in
+		     let check_f = check contexte f (big_step_eval_inTm (Pi(Global("n"),Nat,Pi(Global("NO"),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),n))),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])  (pretty_print_exTm exT [] ^ ";") in
+		     let check_a = check contexte a (vapp(big_p,VZero)) (pretty_print_exTm exT [] ^ ";") in
+		     if res_debug(check_n)
+		     then 
+		       begin 
+			 if res_debug(check_p)
+			 then 
+			   begin 
+			     if res_debug(check_f)
+			     then
+			       begin 
+				 if res_debug(check_a)
+				 then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (vapp(big_p,big_n)) 
+				 else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : a is not of type (P 0)") VStar
+			       end
+			     else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : f is not of type (pi n N (-> (P n) (P (succ n))))") VStar
+			   end 
+			 else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : p is not of type (-> N *)") VStar
+		       end 
+		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : n is not of type VNat") VStar
+
+
+
+     
   | _ -> failwith "HAHAHAHAHAHAHA"
 
 
