@@ -33,6 +33,7 @@ and exTm =
   | Iter of inTm * inTm * inTm * inTm  
   | P0 of exTm
   | P1 of exTm 
+  | DFold of inTm * inTm * inTm * inTm * inTm * inTm 
  
 (*= Value*)
 type value = 
@@ -46,9 +47,15 @@ type value =
   | VZero
   | VSucc of value
 (*=End*)
+(*= Value_Vector*)
+  | VVec of value * value 
+  | VDNil of value
+  | VDCons of value * value 
+(*=End*)
 and neutral = 
   | NFree of name 
   | NApp of neutral * value 
+  | VDFold of value * value * value * value * value * value 
 
 
 type debug = 
@@ -141,6 +148,12 @@ let rec parse_term env t =
 	 Nil(parse_term env alpha)
       | Sexp.List [Sexp.Atom "cons";alpha; a; xs] -> 
 	 Cons((parse_term env alpha),(parse_term env a),(parse_term env xs))
+      | Sexp.List [Sexp.Atom "vec";alpha; n] -> 
+	 Vec((parse_term env alpha),(parse_term env n))
+      | Sexp.List [Sexp.Atom "dnil";alpha] -> 
+	 DNil(parse_term env alpha)
+      | Sexp.List [Sexp.Atom "dcons";a;xs] -> 
+	 DCons((parse_term env a),(parse_term env xs))
       | _ -> Inv(parse_exTm env t)
 and parse_exTm env t = 
   let rec lookup_var env n v
@@ -158,6 +171,8 @@ and parse_exTm env t =
      Iter((parse_term env p),(parse_term env n),(parse_term env f),(parse_term env z))
   | Sexp.List [Sexp.Atom ":" ;x; t] -> 
      Ann((parse_term env x),(parse_term env t))
+  | Sexp.List [Sexp.Atom "dfold";alpha;p;n;xs;f;a] -> 
+     DFold((parse_term env alpha),(parse_term env p),(parse_term env n),(parse_term env xs),(parse_term env f),(parse_term env a))
   | Sexp.Atom v -> lookup_var env 0 (Global(v))
   | Sexp.List (f::args) -> 
      List.fold_left 
@@ -167,7 +182,7 @@ and parse_exTm env t =
   | _ -> failwith "erreur de parsing" 
 
 let read t = parse_term [] (Sexp.of_string t)
-
+ 
 let rec pretty_print_inTm t l = 
   match t with 
   | Abs(Global(str),x) -> "(lambda " ^ str ^ " " ^ pretty_print_inTm x (str :: l) ^ ")"
@@ -184,6 +199,9 @@ let rec pretty_print_inTm t l =
   | List(alpha) -> "(list " ^ pretty_print_inTm alpha l ^ ")"
   | Nil(alpha) -> "(nil " ^ pretty_print_inTm alpha l ^ ")"
   | Cons(alpha,a,xs) -> "(cons " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm xs l ^ ")"
+  | Vec(alpha,n) -> "(vec " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm n l ^ ")"
+  | DNil(alpha) -> "(dnil " ^ pretty_print_inTm alpha l ^ ")"
+  | DCons(a,xs) -> "(dcons " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm xs l ^ ")"
 and pretty_print_exTm t l =
   match t with 
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
@@ -199,6 +217,8 @@ and pretty_print_exTm t l =
   | Iter(p,n,f,z) -> "(iter " ^ pretty_print_inTm p l ^ " " ^ pretty_print_inTm n l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm z l ^ ")"
   | P0(x) -> "(p0 " ^ pretty_print_exTm x l ^ ")"
   | P1(x) -> "(p1 " ^ pretty_print_exTm x l ^ ")"
+  | DFold(alpha,p,n,xs,f,a) -> "(dfold " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm p l ^ " " ^pretty_print_inTm n l ^ 
+				 " " ^ pretty_print_inTm xs l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm a l ^ ")"
 
 
 
@@ -216,6 +236,9 @@ let rec substitution_inTm t tsub var =
   | List(alpha) -> List(substitution_inTm alpha tsub var)
   | Nil(alpha) -> Nil(substitution_inTm alpha tsub var)
   | Cons(alpha,a,xs) -> Cons((substitution_inTm alpha tsub var),(substitution_inTm a tsub var),(substitution_inTm xs tsub var))
+  | Vec(alpha,n) -> Vec((substitution_inTm alpha tsub var),(substitution_inTm n tsub var))
+  | DNil(alpha) -> DNil(substitution_inTm alpha tsub var)
+  | DCons(a,xs) -> DCons((substitution_inTm a tsub var),(substitution_inTm a tsub var))
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -226,6 +249,8 @@ and substitution_exTm  t tsub var =
   | Iter(p,n,f,a) -> Iter((substitution_inTm p tsub var),(substitution_inTm n tsub var),(substitution_inTm f tsub var),(substitution_inTm a tsub var))
   | P0(x) -> P0(substitution_exTm x tsub var)
   | P1(x) -> P1(substitution_exTm x tsub var)
+  | DFold(alpha,p,n,xs,f,a) -> DFold((substitution_inTm alpha tsub var),(substitution_inTm p tsub var),(substitution_inTm n tsub var),
+				     (substitution_inTm xs tsub var),(substitution_inTm f tsub var),(substitution_inTm a tsub var))
 
 
 
@@ -240,6 +265,9 @@ let rec big_step_eval_inTm t envi =
   | Nat -> VNat
   | Zero -> VZero
   | Succ(n) -> VSucc(big_step_eval_inTm n envi)
+  | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
+  | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
+  | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 
@@ -260,7 +288,7 @@ and big_step_eval_exTm t envi =
   | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm n envi),
 			    (big_step_eval_inTm f envi),
 			    (big_step_eval_inTm a envi))
-  | _ -> failwith "Chaques choses en son temps"
+  | _ -> failwith "Chaques choses en son temps nottamment DFold"
 
 
 let boundfree i n = 
@@ -284,10 +312,15 @@ let rec value_to_inTm i v =
   | VNat -> Nat
   | VZero -> Zero
   | VSucc(n) -> Succ(value_to_inTm i n)
+  | VVec(alpha,n) -> Vec((value_to_inTm i alpha),(value_to_inTm i n))
+  | VDNil(alpha) -> DNil(value_to_inTm i alpha)
+  | VDCons(a,xs) -> DCons((value_to_inTm i a),(value_to_inTm i xs)) 
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> boundfree i x
   | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
+  | VDFold(alpha,p,n,xs,f,a) -> DFold((value_to_inTm i alpha),(value_to_inTm i p),(value_to_inTm i n),
+				      (value_to_inTm i xs),(value_to_inTm i f),(value_to_inTm i a))
 
 
 let rec equal_inTm t1 t2 = 
@@ -375,6 +408,34 @@ let rec check contexte inT ty steps =
        match ty with 
 	 | VNat -> check contexte x VNat (pretty_print_inTm inT [] ^ ";"^ steps)
 	 | _ -> create_report false (contexte_to_string contexte) steps "Succ : ty must be VNat"
+     end 
+  | Vec(alpha,n) -> 
+     begin        
+       match ty with 
+       | VStar -> let check_alpha = check contexte alpha VStar (pretty_print_inTm inT [] ^ ";"^ steps) in
+		  if res_debug(check_alpha) 
+		  then check contexte n VNat (pretty_print_inTm inT [] ^ ";"^ steps)
+		  else create_report false (contexte_to_string contexte) steps "Vec : alpha must be of type star"
+       | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be VStar"
+     end 
+       (* ici c'est toujours pareil je ne sais pas si je dois matcher une FVar ou pas *)
+  | DNil(alpha) -> 
+     begin
+       match ty with
+       | VVec(alpha_vec,zero) -> if equal_inTm (value_to_inTm 0 (big_step_eval_inTm alpha [])) 
+					       (value_to_inTm 0 alpha_vec)
+				then create_report true (contexte_to_string contexte) steps "NO"
+				else create_report false (contexte_to_string contexte) steps "DNil : Alpha must be the sames"
+       | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be a VVec"       
+     end 
+  | DCons(a,xs) -> 
+     begin 
+       match ty with 
+       | VVec(alpha,VSucc(n)) -> let check_xs = check contexte xs (VVec(alpha,n)) (pretty_print_inTm inT [] ^ ";"^ steps) in 
+				 if res_debug(check_xs)
+				 then check contexte a alpha (pretty_print_inTm inT [] ^ ";"^ steps)
+				 else create_report false (contexte_to_string contexte) steps "DCons : xs must be of type (VVec alpha n)"
+       | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
      end 
   | _ -> failwith "HEHEHEHEHE"
 and synth contexte exT steps =

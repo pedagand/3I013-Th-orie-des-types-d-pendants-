@@ -38,6 +38,10 @@ let inputs
        ("(list N)",List(Nat));
        ("(nil N)", Nil(Nat));
        ("(cons N zero (nil N))",(Cons(Nat,Zero,Nil(Nat))));
+       ("(vec N (succ zero))",Vec(Nat,Succ(Zero)));
+       ("(dnil N)",DNil(Nat));
+       ("(dcons zero (dnil N))",DCons(Zero,DNil(Nat)));
+       ("(dfold alpha P m xs f a)",Inv(DFold(Inv(FVar(Global "alpha")),Inv(FVar(Global "P")),Inv(FVar(Global "m")),Inv(FVar(Global "xs")),Inv(FVar(Global "f")),Inv(FVar(Global "a")))));
        
       (* ( (pretty_print_inTm test1x []),(test1x)); *)
       (* (test1y),(test1x) ;*)]

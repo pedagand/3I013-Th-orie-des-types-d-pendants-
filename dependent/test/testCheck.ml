@@ -45,17 +45,26 @@ let inputs =
     ("(succ zero)","N",true);
     ("(lambda x N)","(-> N *)",true);
 (*    ("(iter (lambda x N) (succ (succ zero)) (lambda x (lambda y (succ x))) zero)","N",true); *)
-    (testcheck4x,"*",true); (*
+    (testcheck4x,"*",true); 
+    ("(vec N (succ (succ zero)))","*",true);
+    ("(dnil N)","(vec N zero)",true);			      
+    ("(dnil zero)","(vec N zero)",false);
+    ("(dcons zero (dnil N))","(vec N (succ zero))",true);	  
+    ("(dcons zero (dcons zero (dnil N)))","(vec N (succ (succ zero)))",true);
+
+(*
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);
     ("(cons N zero (nil N))","(list N)",true);
     ("(cons N zero (nil *))","(list N)",false);
     ("(cons * zero (nil N))","(list N)",false); *)
+				       
     
 
   ]
 
-let () = Printf.printf "%s" (print_report(check [] (read "(iter (lambda x N) (succ (succ zero)) (lambda x (lambda y (succ x))) zero)") (big_step_eval_inTm (read "N") []) ""))
+(* let () = Printf.printf "%s" (print_report(check [] (read "(dcons zero (dnil N))") (big_step_eval_inTm (VVec(VNat,VSucc(VZero))) []) ""))  *)
+
     
 let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (big_step_eval_inTm (read chek) []) "")) res) inputs 
 

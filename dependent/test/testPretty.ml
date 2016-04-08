@@ -23,6 +23,10 @@ let inputs =
     (Cons(Nat,Zero,Nil(Nat)),"(cons N zero (nil N))");
     (List(Nat),"(list N)");
     (Nil(Nat),"(nil N)");
+    (Inv(DFold(Inv(FVar(Global "alpha")),Inv(FVar(Global "P")),Inv(FVar(Global "m")),Inv(FVar(Global "xs")),Inv(FVar(Global "f")),Inv(FVar(Global "a")))),"(dfold alpha P m xs f a)");
+    (DCons(Zero,DNil(Nat)),"(dcons zero (dnil N))");
+    (DNil(Nat),"(dnil N)");
+    (Vec(Nat,Succ(Zero)),"(vec N (succ zero))");
   ]
 
 let tests = List.map (fun (term, res) -> "test" >:: fun ctxt -> assert_equal (compare_term (pretty_print_inTm term []) res) true) inputs
