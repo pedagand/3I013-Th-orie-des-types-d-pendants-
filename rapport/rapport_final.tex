@@ -70,6 +70,10 @@
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 \newcommand{\attention}[1]{\textcolor{orange}{#1}}
 \newcommand{\etc}{\textit{etc.}}
+\newcommand{\true}{\mathsf{true}}
+\newcommand{\false}{\mathsf{false}}
+\newcommand{\bool}{\mathsf{bool}}
+\newcommand{\ifte}{\mathsf{IfThenElse}}
 
 %% ** Title
 
@@ -117,7 +121,6 @@ programmation fonctionnelle. Le lambda calcul non typé a connu un formidable
 succès pratique, donnant lieu à de multiples variantes dont on trouvera une présentation
  moderne et synthétique dans l'ouvrage de ~\citet{pierce:tapl}.
 
-\todo{Ne pas attendre la fin pour mettre les citations bibtex. Faire ça au fur et à mesure.}
 
 \subsection{Présentation formelle}
 
@@ -140,11 +143,7 @@ Pour faire une analogie avec les mathématiques, une abstraction peut
 être vue comme une définition de fonction anonyme.
  
 \begin{example}
- La fonction identité est définie par le lambda terme \todo{écrire \(\lambda\)-terme} suivant :
-  %
-  \[ 
-  \lambda x. x
-  \]
+ La fonction identité est définie par le $lambda$-terme suivant : $\Lam{x}{\Var{x}}$
 \end{example}
 
 On peut constater avec cette syntaxe que les abstractions ne prennent
@@ -153,9 +152,9 @@ arguments peut etre représenté, par curryfication, à l'aide une
 succession de fonctions à un seul argument.
 
 \begin{example}
-Le \(\lambda\)-terme  \(\lambda x y. t\) correspond au terme
-\(\lambda x.\lambda y.t\)   
+  Le \(\lambda\)-terme $\Lam{x y}{t}$ correspond au terme %$\Lam{x}{\Lam{y}{t}}$  
 \end{example} 
+
 Dans la suite de cet article nous utiliserons des fonctions à un seul
 argument.
 
@@ -167,8 +166,6 @@ Une variable est liée lorsque celle ci est déclarée dans le corps d'un lambda
 dans l'exemple précédent x était une variable liée. 
 Si la variable n'a pas été déclarée, elle est dite libre. 
 
-\todo{Définir formellement un prédicat \(\IsFree\) qui calcule (récursivement)
-  l'ensemble des variables libres d'un \(\lambda\)-terme.}
 \begin{align*}
   \IsFree(x) &\triangleq ? \\
   \IsFree(\lambda x. t) &\triangleq ? \\
@@ -177,24 +174,23 @@ Si la variable n'a pas été déclarée, elle est dite libre.
 
 
 \begin{example}
-  Dans le terme suivant \(\lambda x.\lambda y.x\:y\:z\) , les variables \Var{x} et 
-  \Var{y} sont liées tandis que la variable \Var{z} est libre 
+  Dans le terme suivant \(\lambda x.\lambda y.x\:y\:z\) \(\Lam{x}{\Lam{y}{\App{\App{\Var{x}}{\Var{y}}}{\Var{z}}}}\), 
+  les variables $\Var{x}$ et $\Var{y}$ sont liées tandis que la variable $\Var{z}$ est libre 
 \end{example}
 
 
 Un terme ne contenant aucune occurrence de variable libre est dit ``clos''.
-\begin{example}
+
+\begin{example}  
   \label{example:ouvert-clos}  
-  Dans le lambda terme \((\lambda x. \lambda y. x\: y)\: y\), la
-  variable \(x\) est liée ainsi que la première occurence de la
-  variable \(y\). Cependant, la variable \(y\) à l'extérieur des
+  Dans le $\lambda$-terme \(\App{\Lam{x}{\Lam{y}{\App{x}{y}}}}{\Var{y}}\), la
+  variable $Var{x}$ est liée ainsi que la première occurence de la
+  variable $Var{y}$. Cependant, la variable $Var{y}$ à l'extérieur des
   parenthèse est libre.
 \end{example}
 
-\todo{Utilise \texttt{label} et \texttt{ref} pour faire des références
-  en LaTex. Cf. \texttt{example:ouvert-clos} ci-dessous.}
-
-Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). \attention{Il faut donc introduire la notion d'\(\alpha\)-équivalence}.
+\label{problemelibreliee}
+Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). 
 
 \subsubsection{$\alpha$-équivalence}
 
@@ -205,7 +201,7 @@ On considère que deux termes sont \(\alpha\)-équivalents si et seulement si il
 \begin{example}
   Voici deux termes alpha équivalents 
   \begin{align*}
-    & \lambda x.x \equivAlpha \lambda y.y \\
+    & \Lam{x}{Var{x}} \equivAlpha \Lam{y}{Var{y}} \\
   \end{align*}
 \end{example}
   
@@ -222,7 +218,7 @@ entre eux. Mais il nous faut tout d'abord définir le mécanisme de substitution
 
 La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
 à remplacer l'occurrence d'une variable liée par un \(\lambda\)-terme.
-On note généralement la substitution de la variable \Var{x} dans le terme \Var{t} par le 
+On note généralement la substitution de la variable $\Var{x}$ dans le terme $\Var{t}$ par le 
 terme u avec la notation suivante. 
 \[ 
 \subst{t}{x}{u}
@@ -238,10 +234,8 @@ Définition formelle de la substitution:
 \end{align*}
 
 \begin{example}
-  \attention{Cet exemple est étrange. La substitution se fait \emph{sous} le lambda?!}
-
-  Soit le terme \(\lambda\)x.(\subst{x}{x}{\(\lambda\)y.y}), après avoir effectué la
-  substitution nous obtenons le terme \(\lambda\)x.\(\lambda\)y.y
+  Soit le terme $\Lam{x}{\subst{x}{x}{\Lam{y}{y}}}$     \(\lambda\)x.(\subst{x}{x}{\(\lambda\)y.y}), après avoir effectué la
+  substitution nous obtenons le terme $\Lam{x}{\Lam{y}{Var{y}}}$  \(\lambda\)x.\(\lambda\)y.
 \end{example}
 
 
@@ -252,15 +246,15 @@ peuvent être réduites, on appelle cela une \emph{redex}.
 
 \begin{example}
   Le terme \(\App{\Lam{x}{x}}{u}\) est une redex tandisque le terme
-  \(\App{x]{u}\) n'en est pas une.
+  \(\App{x}{u}\) n'en est pas une.
 \end{example}
 
 En voici une définition formelle:
 \begin{align*}
-    Reduction(x) &\triangleq x \\
-    Reduction(\lambda x.t) &\triangleq \lambda x.t \\
-    Reduction(x\: u) &\triangleq x\:u \\
-    Reduction(\lambda x.t\: u) &\triangleq \subst{t}{x}{u} \\
+    Reduction(x) &\triangleq \Var{x} \\
+    Reduction(\Lam{x}{t}) &\triangleq \Lam{x}{t} \\
+    Reduction(\App{\Var{x}}{\Var{u}}) &\triangleq \App{\Var{x}}{\Var{u}} \\
+    Reduction(\App{\Lam{x}{\Var{t}}}{\Var{u}}) &\triangleq \subst{t}{x}{u} \\
 \end{align*}
 
 
@@ -268,7 +262,8 @@ En voici une définition formelle:
   Soit le terme \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
   sous la forme d'une application ayant une abstraction comme membre
   de gauche. La réduction consiste à substituer la variable liée par
-  l'abstraction par le membre droit de l'application. On obtient donc \(\Lam{x}{\Lam{y}{\App{z}{x}}}\)}
+  l'abstraction par le membre droit de l'application. On obtient donc 
+   \(\Lam{x}{\Lam{y}{\App{z}{x}}}\)
 \end{example}
 
 \begin{example}
@@ -282,6 +277,7 @@ En voici une définition formelle:
 
 \subsubsection{Stratégie de réduction : appel par nom}
 
+\label{reduction:call_by_name}
 Un terme est dit en \emph{forme normale} si on ne peut plus lui
 appliquer de réduction. La normalisation consiste donc à reduire
 autant que possible notre terme. \todo{Expliquer que l'on a le choix
@@ -290,7 +286,6 @@ autant que possible notre terme. \todo{Expliquer que l'on a le choix
   l'appel par nom, qui est garantie de trouver la forme normale si
   elle existe}
 
-%changer les fleches 
 \begin{example}
   Le terme 
   \begin{align*}
@@ -353,16 +348,15 @@ intéressante offerte par les systèmes de type)
 
 
 
-\subsection{Enrichir le lambda calcul}
+\subsection{Encodages à la Church}
 
-\attention{Ce n'est pas vraiment un ``enrichissement'' : toutes ces
-  fonctionnalités existent déjà dans le calcul. Ce sont plutôt des
-  ``encodages'' d'objets familiers dans le lambda calcul.}
+~\citet{church:lambda-calcul}
 
-Maintenant que le noyau de notre language a été défini, nous pouvons
-introduire de nouvelles \todo{``nouvelles'' n'est pas le bon terme}
-constructions qui vont nous permettre d'exprimer des concepts
-familiers aux développeurs, tels que les entiers, les booléens, \etc
+Le $\lambda$-calcul possède un noyeau de language minimaliste cependant 
+Church ~\citet{church:lambda-calcul} a introduit de nombreux encodages de 
+construtions familières aux développeurs, tels que les entiers,
+les booléens, ...
+
 
 \subsubsection{Les booléens de Church}
 
@@ -375,9 +369,9 @@ structure de contrôle \texttt{if ... then ... else ...}.
 Voici les termes correspondants aux constructeurs $True$, $False$ et 
 $IfThenElse$
 \begin{align*}
-  \True &\triangleq \lambda x.\lambda y. y  \\
-  \False &\triangleq \lambda x.\lambda y. x \\
-  \Ifte &\triangleq \lambda x.\lambda y.\lambda z. x\: y\: z  \\
+  \True &\triangleq \lambda x.\lambda y. y  \Lam{x}{\Lam{y}{\Var{y}}} \\
+  \False &\triangleq \lambda x.\lambda y. x \Lam{x}{\Lam{y}{\Var{x}}} \\
+  \Ifte &\triangleq \lambda x.\lambda y.\lambda z. x\: y\: z  \Lam{x}{\Lam{y}{\Lam{z}{\App{\Var{x}}{\App{\Var{y}}{\Var{z}}}}}}  \\
 \end{align*}
 
 On assimile ces deux termes aux booléens $True$ et $False$ car leur calcul au sein
@@ -398,7 +392,8 @@ de l'application d'un $Ifte$ reproduit le comportement attendu.
 \end{example}
 
 Ici nous n'avons aucun moyen de vérifier avant normalisation que le premier
-argument de Ifte est un booléen. \todo{Bof, je ne sais pas ce que cette remarque apporte}
+argument de Ifte est un booléen, nous ne pouvons pas garantire la bonne évaluation
+de notre terme.
 
 \todo{Tu pourrais faire une petite remarque sur l'encodage objet des
   booléens, qui est effectivement utilisé dans des langages purement
@@ -445,30 +440,25 @@ De la même manière, on construit l'addition de deux nombres \(m\) et
 Nous nous attarderons ici sur les choix d'implémentations et il sera question
 d'analyser certaines parties du code et non sa totalité.
 
-\subsubsection{Représentation des lambda termes}
-%ici j'ai enlever la partie indices de de bruijn je la met ici mais je ne sais pas si le titre est bien 
+\subsubsection{Représentation des $\lambda$-termes}
  
-Pour pallier au problème que nous énoncions précédement \todo{faire
-  une référence explicite avec un \verb!label!/\verb!ref!}, nous
+Pour pallier au problème que nous énoncions précédement ~\ref{problemelibreliee}, nous
 utilisons une représentation particulière pour les variables liées:
 les indices de de Bruijn.  Nous allons ainsi représenter les variables
-liées non pas par un nom mais par un entier naturel. \todo{Expliquer à
-  quoi correspond l'entier naturel, sinon on ne comprend pas ton
-  exemple.}
+liées non pas par un nom mais par un entier naturel. Cette valeur est determiné 
+à partir du nombre de $\lambda$ entre la variable et le $\lambda$ qui la lie.
 
 \begin{example}
-  Le lambda terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
+  Le $\lambda$-terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
+  et le terme $\Lam{x}{\Lam{y}{x}}$ s'écrira maintenant $\lambda.\lambda.1$ 
 \end{example}
 
-\todo{Avant de donner la définition OCaml, il faut aussi introduire la
-  représentation des variables libres et donc citer les papiers
-  standards sur la représentation ``locally nameless''}
+Mais nous n'allons pas simplement utilisé une représentation avec les indices de de Bruijn 
+car pour la représentation des variables libres nous utiliserons comme précédement un nom
+de variable. On appelle cette représentation ``locally nameless'' ~\citep{chargueraud:locally-nameless}
 
-\todo{Phrase un peu vague :} Pour représenter les types en Ocaml les
-types sommes sont très intéressants car ils offrent une manipulation
-souple à l'aide du pattern matching. \todo{Tu peux simplement dire de
-  traduire naturellement la définition inductive des termes que tu
-  avais donné dans le monde formel.}
+Voici le code Ocaml traduisant la définition inductive des termes que nous avions 
+définis.
 
 \codefrom{untyped}{lambda}{untyped_term}
 
@@ -476,13 +466,9 @@ souple à l'aide du pattern matching. \todo{Tu peux simplement dire de
   vers la définition formelle. Tu pourrais utiliser une ``footnote''.}
 
 Cette représentation se rapproche au plus de la spécification
-formelle, seule la distinction entre les variables liées (BoundVar
-\todo{comme pour les specs formels, ne pas écrire du code en mode
-  normal. Écrire \lstinline!BoundVar! au lieu de BoundVar.}) et les
-variables libres (FreeVar) diffère du fait que l'\attention{on utilise
-  désormais la représentation avec les indices de de
-  Bruijn}. \todo{C'est plus que ça : avoir \lstinline!FreeVar!
-  signifie que tu es locally nameless, ce qui est plus que de Bruijn}.
+formelle, seule la distinction entre les variables liées \lstinline!BoundVar! et les
+variables libres \lstinline!FreeVar! diffère du fait que que nous utilisons désormais 
+la représentation ``locally nameless''.
 
 
 \subsubsection{Analyse syntaxique}
@@ -496,14 +482,11 @@ variables libres (FreeVar) diffère du fait que l'\attention{on utilise
 Afin de permettre de construire des termes rapidement et le plus lisible 
 possible la création d'un parseur s'imposait.
 La notation choisie a été la notation préfixe (notation polonaise inversée),
-une syntaxe très proche du langage lisp qui en plus d'etre simple à comprendre
-est assez facile à parser (à l'aide des bibliothèques de S-expression)
+une syntaxe très proche du langage lisp. En plus d'etre simple à comprendre
+elle est facile à implémenter avec l'aide des S-expressions.
 
-\todo{Ne pas utiliser $\leadsto$, qui devrait être réservé pour la réduction}
-\todo{Ne pas écrire de texte dans le math mode : l'espacement n'est pas bon. Utiliser lstinline}
 \begin{example}
   Voici un exemple de correspondance entre les termes avant et après parsing
-
   \begin{tabular}{ll}
     \lstinline!(lambda x x)! & \lstinline!Abs(BoundVar 0)! \\
     \lstinline!(x y)! & \lstinline!Appl(FreeVar "x", FreeVar "y")!
@@ -513,12 +496,10 @@ est assez facile à parser (à l'aide des bibliothèques de S-expression)
 Comme on peut le constater dans l'exemple pour alléger la redaction des termes,
 on utilise une représentation des variables classiques, c'est dans le parseur que 
 l'on determine la valeur de l'indice d'une variable si celle ci est liée et son 
-nom si celle ci est libre.
-%Changer la derniere formulation
+nom si celle ci est libre. Les termes sont donc bien conforme à la 
+représentation ``locally nameless''
 Pour l'affichage de nos termes on effectue l'opération inverse, c'est à dire que
 les chaines de caractères en sortie seront elle memes des S-expressions.
-
-
 
 \subsubsection{Substitution}
 
@@ -540,7 +521,7 @@ avoir besoin d'introduire l'\(\alpha\) conversion} \todo{c'est encore autre chos
   \lambda.0[0 := \lambda.x]\leadsto\lambda.\lambda.x
   \]
   On constate bien que dans la première représentation on pense que la variable
-  x est liée alors que celle-ci \todo{attention, ``celle-ci'', pas ``celle ci''. Pareil pour les variantes.} devrait en réalité etre libre comme dans la 
+  x est liée alors que celle-ci devrait en réalité etre libre comme dans la 
   représentation avec les indices de de Bruijn.
 \end{example}
 
@@ -575,12 +556,10 @@ Si l'on trouve un redex, on reduit puis l'on evalue le resultat de la reduction,
 et si le membre de gauche n'est pas une variable on evalue celui-ci pour determiner
 si celui ci peut nous donner une abstraction afin de pouvoir effectuer une réduction.
 Conformément à la stratégie, on n'évalue jamais le membre de gauche d'une application
-pour les raisons énoncées dans la section d'évaluation \todo{faire une référence explicite}.
+pour les raisons énoncées dans la section d'évaluation ~\citep{reduction:call_by_name}.
 
 
 \subsubsection{Les booléens}
-
-\todo{Ce texte arrive trop tôt : introduire les booléens comme une extension dans le lambda calcul typé, inutile de le mettre ici}
 
 Afin d'implémenter les boléens dans notre language un choix d'implémentation 
 possible est de simplement définir de nouveaux termes True,False et Ifte
@@ -618,8 +597,6 @@ terme.
 
 \subsubsection{Les entiers}
 
-\todo{Ce texte arrive trop tôt : introduire les entiers comme une extension dans le lambda calcul typé, inutile de le mettre ici}
-
 Tout comme pour les booléens nous allons ajouté les trois constructeurs 
 \emph{Zero},\emph{Succ} et \emph{Iter} à notre language.
 
@@ -627,7 +604,7 @@ Tout comme pour les booléens nous allons ajouté les trois constructeurs
 
 Pour ce qui est de la substitution et la réduction le comportement est très
 similaire à celui des boléens et ne nécessite pas d'explications supplémentaires.
-%mettre un petit saut a la ligne 
+
 Substitution:
 
 \codefrom{untyped}{lambda}{nat_substitution}
@@ -657,9 +634,10 @@ Considérons \emph{P} l'ensemble des types de base comme par exemple
 Et soit \emph{T} l'ensemble des types, on peut alors définir de façon inductive
 ce qu'est un type.
 \begin{align*}
-  &\emph{int} \in T \\
-  &\forall x,y \in T, x \rightarrow y \in T \\
-  &\forall x,y \in T, (x * y) \in T   
+  T &::= int! \\
+  &| bool \\
+  &| T \rightarrow T \\
+  &| T \times T \\
 \end{align*}
 
 Le type \(\rightarrow\) correpond au type des fonctions et le type (a*b)
@@ -667,13 +645,15 @@ correspond au type des couples que nous allons désormais introduire dans notre 
 
 \begin{example}
   Voici des exemples de type:
-  \begin{align*}
-  & int \rightarrow int & \mbox{1} \\
-  & (int * int) &\mbox{2} \\
-  \end{align*}
-  Le type (1) est celui d'une fonction prenant un argument de type \emph{int} et 
-  retournant un résultat de type \emph{int}.
-  Le second type correspond a une pair donc le membre de gauche est un \emph{int}
+  \begin{equation}
+    int \rightarrow bool  \label{eq_1} 
+  \end{equation}
+  \begin{equation}
+    (bool * int) \label{eq_2} 
+  \end{equation}
+  Le type \ref{eq_1} est celui d'une fonction prenant un argument de type \emph{int} et 
+  retournant un résultat de type \emph{bool}.
+  Le second type \ref{eq_2} correspond a une pair donc le membre de gauche est un \emph{bool}
   et le membre de droit un \emph{int}
 \end{example}
 
@@ -684,7 +664,7 @@ se répercute aussi sur les types.
 \begin{example}
   Soit la fonction \(\lambda\)x\:y.(x y) peut s'exprimer 
   \(\lambda\)x.\(\lambda\)y.(x y) qui pourrait donc avoir 
-  le type int \(\rightarrow\) int \(\rightarrow\) int  
+  le type int \(\rightarrow\) (int \(\rightarrow\) int)
 \end{example}
 
 \subsection{Système de type}
@@ -709,7 +689,6 @@ liste ordonnée de paires variable/type :
 Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 
 \begin{figure}
-
 \[
 \begin{array}{c}
 \inferrule[(Var)]%
@@ -741,11 +720,9 @@ Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 \end{array}
 \]
 
-\todo{Définir des macros pour true, false, ifthenelse, bool}
-
 \caption{Typage (lambda calcul simplement typé)}
 \label{fig:typage-simple}
-\end{figure}   
+\end{figure} 
 
 La règle (Var) spécifie le typage des variables. Cette expression se
 lit en partant du numérateur pour déduire le dénumérateur : supposons
@@ -757,12 +734,17 @@ abstractions. L'abstraction construit un type de la forme \(A
 \Rightarrow B\) : il faut donc que la variable associée au lambda
 terme soit de type \(A\) et le résultat de type \(B\).
 
-La règle (App) sécifie le typage de l'application. Une application pour etre 
-considérée comme une redex doit avoir un membre de gauche une abstraction, 
-donc un type A \(A\rightarrow B\) et pour le membre de droite un terme 
-de type A. 
+La règle (App) sécifie le typage de l'application. Ici le première
+argument d'une application doit nécéssairement etre du type 
+$A \rightarrow B$. Dans la section d'évaluation ~\ref{reduction:call_by_name}
+nous avions vu que l'on réduisait seulement les \emph{redex}.
+Maintenant nous pouvons éliminé les applications qui ne réduise pas grace à
+notre système de type. De plus on vérifie que \emph{s} est bien du type 
+\emph{A} pour garantire l'évaluation.
+
 
 \begin{example}
+  \label{probleme:type_simple}
   Voici donc quelques exemples de dérivations de type.
   Ces dérivations se lisent du bas vers le haut.
   
@@ -776,15 +758,16 @@ de type A.
 %ici je pourrais dire que l'on doit annoter tous les termes mais que c'est trop lourd
 %syntaxiquement donc que on préfère introduire le bi-directionnel
 Comme nous avons pu le constater dans le dernière exemple il nous manque des informations
-afin de pouvoir type-checker une application dont le membre de gauche est une rédex.
-Nous allons donc introduire une nouvelle représentation de nos termes afin de résoudre ce 
-problème.
+quand au type de \emph{f}. En effet lorsque l'on vérifie une \emph{Appl} il faut 
+vérifier que le membre de gauche est de type $A \rightarrow B$ alors que l'on ne connait 
+que \emph{B}. Nous allons donc introduire une nouvelle représentation de nos termes 
+afin de résoudre ce problème.
 
 \subsubsection{Système de type bi-directionnel}
 
-Les applications dont le membre de gauche est une abstractions posent problème 1
-nous allons donc séparer nos \(\lambda\) termes en deux.
-D'un coté les termes pouvant se trouver à gauche dans une application et les autres.
+Les applications dont le membre de gauche est une abstractions posent problème ~\ref{probleme:type_simple} 
+nous allons donc catégoriser nos \(\lambda\) termes dans deux sous catégorie. 
+D'un coté les termes pouvant se trouver à gauche au sein d'une application et les autres.
 
 \begin{align*}
   ex &::= & \mbox{exTermes} \\
@@ -796,12 +779,12 @@ D'un coté les termes pouvant se trouver à gauche dans une application et les a
 \end{align*}
 
 On constate tout d'abord qu'un nouveau terme à fait son apparition, \emph{inv}.
-Celui ci permet de passer des inTermes aux exTermes. Pour l'instant on ne peut pas
+Celui ci permet de passer des \emph{inTermes} aux \emph{exTermes}. Pour l'instant on ne peut pas
 encore faire le chemin inverse, c'est à dire passer des exTermes aux inTermes nous 
 l'introduiront par la suite.
 On a maintenant résolu notre problème d'avoir une application dont le membre de gauche
 est une abstraction, cependant si l'on ne peut plus écrire des termes sous cette forme
-cela retire tous les calculs de celui ci.
+cela retire tous les calculs de notre language.
 La principale raison pour laquel nous ne pouvions pas typechecker les abstractions 
 dans le membre gauche de l'application était du au manque d'information quand au type 
 de celle ci.
