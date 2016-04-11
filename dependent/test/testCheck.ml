@@ -51,7 +51,8 @@ let inputs =
     ("(dnil zero)","(vec N zero)",false);
     ("(dcons zero (dnil N))","(vec N (succ zero))",true);	  
     ("(dcons zero (dcons zero (dnil N)))","(vec N (succ (succ zero)))",true);
-
+								      ("(lambda x ?)","(-> * *)",false);								      
+								      
 (*
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);

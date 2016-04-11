@@ -25,6 +25,7 @@ type inTm =
   | Vec of inTm * inTm
   | DNil of inTm
   | DCons of inTm * inTm 
+  | What
 and exTm = 
   | Ann of inTm * inTm 
   | BVar of int 
@@ -112,6 +113,7 @@ let rec parse_term env t =
       | Sexp.Atom "*" -> Star
       | Sexp.Atom "zero" -> Zero
       | Sexp.Atom "N" -> Nat 
+      | Sexp.Atom "?" -> What
       | Sexp.List [Sexp.Atom "succ"; n] -> 
 	 Succ(parse_term env n)
       | Sexp.List [Sexp.Atom "lambda"; Sexp.Atom var; body] -> 
@@ -202,6 +204,7 @@ let rec pretty_print_inTm t l =
   | Vec(alpha,n) -> "(vec " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm n l ^ ")"
   | DNil(alpha) -> "(dnil " ^ pretty_print_inTm alpha l ^ ")"
   | DCons(a,xs) -> "(dcons " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm xs l ^ ")"
+  | What -> "?"
 and pretty_print_exTm t l =
   match t with 
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
@@ -239,6 +242,7 @@ let rec substitution_inTm t tsub var =
   | Vec(alpha,n) -> Vec((substitution_inTm alpha tsub var),(substitution_inTm n tsub var))
   | DNil(alpha) -> DNil(substitution_inTm alpha tsub var)
   | DCons(a,xs) -> DCons((substitution_inTm a tsub var),(substitution_inTm a tsub var))
+  | What -> What
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -334,6 +338,7 @@ let rec equal_inTm t1 t2 =
   | (Inv(x1),Inv(x2)) -> equal_exTm x1 x2
   | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
   | (Cross(x1,y1),Cross(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (What,What) -> true
   | _ -> false
 and equal_exTm t1 t2 = 
   match (t1,t2) with 
@@ -437,6 +442,7 @@ let rec check contexte inT ty steps =
 				 else create_report false (contexte_to_string contexte) steps "DCons : xs must be of type (VVec alpha n)"
        | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
      end 
+  | What -> create_report false (contexte_to_string contexte) steps ("What : we try to push this terme " ^ (pretty_print_inTm (value_to_inTm 0 ty)  []))
   | _ -> failwith "HEHEHEHEHE"
 and synth contexte exT steps =
   match exT with 

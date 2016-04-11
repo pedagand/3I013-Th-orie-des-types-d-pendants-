@@ -27,6 +27,8 @@ let inputs =
     (DCons(Zero,DNil(Nat)),"(dcons zero (dnil N))");
     (DNil(Nat),"(dnil N)");
     (Vec(Nat,Succ(Zero)),"(vec N (succ zero))");
+    (What,"?");
+    (Abs(Global"x",What),"(lambda x ?)");
   ]
 
 let tests = List.map (fun (term, res) -> "test" >:: fun ctxt -> assert_equal (compare_term (pretty_print_inTm term []) res) true) inputs
