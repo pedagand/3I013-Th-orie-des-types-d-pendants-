@@ -6,7 +6,9 @@ type typ =
 | Nat 
 | Fleche of typ * typ
 (*=End *)
+(*=type_pair *)
 | Croix of typ * typ 
+(*=End *)
 
 (* Correspondance avec le papier 
 Abs = Lam
@@ -20,9 +22,9 @@ type inTm =
   | True | False 
   | Zero 
   | Succ of inTm
+(*=inTm_pair *)
   | Pair of inTm * inTm 
-(* Iter of inTm * inTm * inTm *)
-(* XXX: You've forgotten the iterator for natural numbers *)
+(*=End *)
 (*=exTm *)
 and exTm = 
   | FVar of string
@@ -32,8 +34,10 @@ and exTm =
   | Ifte of inTm * exTm * exTm
   | Ann of inTm * typ
   | Iter of inTm * inTm * exTm
+(*=exTm_pair *) 
   | P0 of exTm
   | P1 of exTm 
+(*=End *)
 
 type lambda_term =
   | SFVar of string 
@@ -55,7 +59,9 @@ type value =
   | VFalse
   | VSucc of value
   | VZero
+(*=value_pair *)
   | VPair of value * value 
+(*=End *)
 (*=neutral *)
 and neutral = 
   | NFree of string 
@@ -197,13 +203,15 @@ let rec lambda_term_to_string t =
   | SP0(x) -> "(SP0" ^ lambda_term_to_string x ^ ")"
   | SP1(x) -> "(SP1" ^ lambda_term_to_string x ^ ")"
 
+(*=vfree *)
 let vfree name = VNeutral(NFree name)
+(*=End *)
 
 let gensym2 =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
-
+(*=value_to_inTm *)
 let rec value_to_inTm i v =
   match v with 
   | VLam(f) -> let var = gensym2 () in 
@@ -211,18 +219,20 @@ let rec value_to_inTm i v =
 		 Abs(var,(value_to_inTm (i+1) (f(vfree(string_of_int (-i))))))
 	       end 
   | VNeutral(x) -> Inv(neutral_to_exTm i x)
+(*=End *)
   | VSucc(n) -> Succ(value_to_inTm i n)
   | VZero -> Zero 
   | VTrue -> True 
   | VFalse -> False 
   | VPair(x,y) -> Pair((value_to_inTm i x),(value_to_inTm i y)) 
+(*=neutral_to_exTm *)
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> let k = int_of_string x in
 	       if k <= 0 then BVar(i + k - 1)
 	       else FVar x
   | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
-
+(*=End *)
 		     
 
 let rec substitution_inTm t tsub var = 
@@ -461,6 +471,7 @@ let rec check contexte inT ty
     | False -> if ty = Bool then true else false
     | Zero -> if ty = Nat then true else false 
     | Succ x -> if ty = Nat then check contexte x Nat else false
+(*=check_pair *)
     | Pair(x,y) -> 
        begin 
 	 match ty with 
@@ -469,6 +480,7 @@ let rec check contexte inT ty
 			 else failwith "In Pair(x,y) x is not of type a"				  
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
+(*=End *)
 (*=synth *)
 and synth contexte exT 
     = match exT with
@@ -507,6 +519,7 @@ and synth contexte exT
 			 else failwith "Iter 2nd arg must be of type_a -> type_a"
 		       end 
 		     else failwith "Iter first arg must be a Nat"
+(*=synth *)
     | P0(x) -> 
        begin 
 	 match (synth contexte x) with 
@@ -519,12 +532,9 @@ and synth contexte exT
 	 | Croix(a,b) -> b
 	 | _ -> failwith "P1 must be applied to a pair" 	   
        end 
+(*=Pair *)
 	
-(* romisfrag : checker la synthèse de Iter *)				 
 		     
- 
-(* XXX: turn into unit tests *)
-(* [https://en.wikipedia.org/wiki/B,_C,_K,_W_system] *)
 
 
 

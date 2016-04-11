@@ -803,10 +803,16 @@ Voici donc notre nouvelle représentation des termes:
   &|inv(ex) &\mbox{Inv} \\
 \end{align*}
 
+
 \begin{example}
 Voici maintenant la dérivation qui nous possait problème précédement.
 FAIRE LA DERIVATION ET CA MARCHE !!
 \end{example}
+
+Nous avons donc résolu ce problème grace à l'introduction d'un système bi-directionnel
+cependant si nous avions introduit l'annotation directement dans notre système précédent le 
+problème ne se serait pas posé. Cependant cette solution nous à permis de savoir précisément 
+quand il était nécéssaire d'annoter nos termes et donc de réduire au maximum le nombre d'annotations.
 
 Voici donc nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
 
@@ -979,6 +985,7 @@ Désormais nous avons la certitude avant execution que ce terme retourne
 le terme correspondant à la branche \emph{then} ou \emph{else}
 
 \subsubsection{Le produit cartésien}
+\label{produit_cartesien}
 
 Le produit cartésien est un objet mathématique qui est définit comme
 un ensemble composé de deux éléments.
@@ -1037,6 +1044,7 @@ de façon algorithmique.
 La fonction gensym utilisée ici permet de crée un nom de variable assurant que celui n'a encore jamais
 été utilisé. 
 
+\label{check}
 \codefrom{typed}{lambda}{check}
 \codefrom{typed}{lambda}{synth}
 
@@ -1140,11 +1148,72 @@ Commençons par donner le code de celle ci, nous le commenterons après.
 \codefrom{typed}{lambda}{vapp}
 \codefrom{typed}{lambda}{big_step_eval_inTm}
 
+
+
 La règle de l'annotation \emph{Ann} ne nécéssite pas d'explications particulières car
 elle est conforme à la spécification. 
 L'évaluation de l'abstraction \emph{Abs} se traduit par la création d'une \emph{VLam}
 dont le corps est une fonction anonyme. 
-Pour l'application nous faisons appelle à une fonction vapp
+
+%revoir ce paragraphe.
+Cette représentation nous permet de reconsidérer la façon de voir la 
+réduction d'une \emph{Abstraction}. En effet lorsque l'on applique une \emph{Abstraction}
+à un terme nous avions introduit la substitution, qui consiste à remplacer les occurences 
+des variables liée à ce terme. La transformation d'une \emph{Abstraction} consiste donc à 
+crée une fonction anonyme puis à évaluer le terme contenue dans celle ci en ajoutant dans le 
+contexte la variable liée à cette fonction. Lors de l'évaluation d'une variable liée, on va
+retrouver dans le contexte l'argument correspondant. On aura donc bien le comportement attendu
+lors de l'application de cette fonction anonyme, car cela va remplacer les occurences de la 
+variable.
+
+\begin{example}
+  Soit le terme \(\App{\Lam{x}{\Var{x}}}{u}\), avec la méthode d'évaluation à petit pas,
+  on évalue en effectuant $\subst{x}{x}{u}$ ce qui nous donne comme résultat
+  \emph{u}. 
+  Avec l'évaluation à grands pas on évalue le terme $\Lam{x}{x}$ en 
+  \emph{function arg $\rightarrow$ arg} ce qui appliqué à \emph{u} nous renvoi bien celui ci.
+\end{example}
+
+Pour l'application nous faisons appelle à une fonction vapp. Dans le cas ou l'on atch une 
+\emph{VLam} on applique directement la fonction, sinon on crée un \emph{NApp} contenant les 
+deux arguments. 
+
+La fonction \emph{VFree} permet simplement à partir d'un nom de crée une \emph{NFree}
+à l'intérieure d'un \emph{VNeutral}.
+Elle permet simplement d'alléger le code de la fonction.
+
+\codefrom{typed}{lambda}{vfree}
+
+
+Une fois nos termes normalisés il nous faut maintenant un moyen de repasser nos termes
+dans la représentation classique. Il nous faut donc implémenter cette fonction permettant de 
+faire cette association, voici son code:
+
+\codefrom{typed}{lambda}{value_to_inTm}
+\codefrom{typed}{lambda}{neutral_to_exTm}
+
+Afin de transformer une value \emph{VLam} en \emph{Abs} il nous faut 
+appliquer la fonction \emph{f} à une variable libre. Ici il y a un choix d'implémentation 
+au niveau de la valeur de cette variable, on met une valeur négative ce qui va nous permettre
+par la suite de les reconaitres lors de l'évaluation des variables libres. Ainsi nous pourrons les
+transformer en variables liées et non libre avec le bon indice de de Bruijn.
+
+\subsubsection{Produit cartésien}
+
+Nous allons maintenant implémenté le produit cartésien afin d'enrichire notre 
+language. Tout d'abord comme nous l'avons vu dans la section \ref{produit_cartesien}
+il nous faut introduire trois nouveaux termes ainsi qu'un nouveau constructeurs de type.
+\emph{Type}
+\codefrom{typed}{lambda}{type_pair}
+\emph{inTermes}
+\codefrom{typed}{lambda}{inTm_pair}
+\emph{exTermes}
+\codefrom{typed}{lambda}{exTm_pair}
+\emph{value}
+\codefrom{typed}{lambda}{value_pair}
+
+Il nous faut maintenant implémenter les règles de typage dans notre algorithme
+
 
 %% Voici donc les règles d'évaluations:
 %% \begin{align*}
