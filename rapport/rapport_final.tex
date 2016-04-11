@@ -811,7 +811,7 @@ FAIRE LA DERIVATION ET CA MARCHE !!
 Voici donc nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
 
 \begin{figure}
-
+\label{regles typage bidirectionnel}
 \center\(\Gamma\vdash T \ni t\)  
 
 \begin{align*}
@@ -890,75 +890,41 @@ forme normale pour nos termes contrairement au \(\lambda\) calcul non typé.
   Nous ne pouvons donc plus écrire ce terme.
 \end{example}
 
-\subsubsection{Reduction forte Passage dans le monde non typé}
+\subsubsection{Reduction forte}
 
-Dans le \(\lambda\) calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Call by value}
-car nous souhaitions %hoho 
-eviter au maximum d'évaluer des termes ne pouvant se normaliser, au détriment de ne pas pouvoir
-en normaliser certains.
+\label{reduction_forte}
+Dans le \(\lambda\) calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Appel par nom}
+car nous souhaitions éviter d'évaluer des termes ne pouvant se normaliser et donc de provoquer la
+terminaison prématurée du programme, au détriment de ne pas pouvoir en normaliser certains.
 D'après les propriétés de la section précédente nous disposons de la certitude que une fois 
-type-checker nos termes réduiront vers une forme normale. 
+acceptés par le type-checker nos termes réduisent tous.
 Nous allons donc implémenter une stratégie de réduction forte.
 
 Les types ne sont pas utiles lors de l'évaluation. Nous allons donc tout d'abord implémenter
-une fonction de réduction forte sur les \(\lambda\) termes non typés que l'on appliquera
+une fonction de réduction forte sur les \(\lambda\)-termes non typés que l'on appliquera
 à des termes correctements typé que l'on transformera par la suite en terme non typés.
 
-Voici la specification de notre réduction forte :
+Voici la spécification de notre réduction forte :
 %si ce n'est pas ce genre de chose qu'il faut que je dise je ferais un texte ici expliquant la réduction forte.
 \begin{align*}
   reduction forte && \\
   & x & \rightarrow x \\
-  & \lambda x.x & \rightarrow \lambda x.(reduction forte x) \\
-  & (x y) & \rightarrow ((reduction forte x) (reduction forte y)) \\
+  & \lambda x.x & \rightarrow \lambda x.(reduction forte \:x) \\
+  & (x \:y) & \rightarrow ((reduction forte \:x) (reduction forte \:y)) \\
 \end{align*}
 
-Pour transformer nos termes du monde typer il suffit de faire la correspondance entre nos termes 
-typé et ceux du \(\lambda\) calcul non typé. Seul l'annotation n'est pas évidente, mais 
-il suffit de la remplacer par le terme qu'elle contient.
+La traduction de nos termes bidirectionnels vers les termes non typés
+est transparente, il suffit d'effacer les annotations de type.
 
 \begin{example}
   Faire un exemple ou avec l'ancien cela ne marchait pas et maintenant ça marche
 \end{example}
 
-\subsubsection{Evaluation à grands pas}
-
-Nous allons maintenant implémenté une nouvelle réduction. Les termes obtenus
-après évaluation sont identiques à la précédente mais la manière diffère.
-On utilise la flèche \(\Downarrow\) pour signifie que l'on evalue complètement 
-les termes. Nous n'obtenons plus de \emph{inTermes} ni de \emph{exTermes} mais
-des valeurs et des termes neutres.
-\begin{align*}
-  v &::= &\mbox{Valeurs} \\
-  &| \lambda x \rightarrow v &\mbox{Abstraction} \\
-  &| n &\mbox{terme neutre} \\
-  n &::= &\mbox{Neutres} \\
-  &|x &\mbox{Variable} \\
-  &|n v &\mbox{Application} \\
-\end{align*}
-Ici la représentation de l'abstraction sous la forme \(\lambda x\rightarrow v\)
-est lié au fait qu'une abstraction avec ces termes est une fonction, nous verrons
-plus tard que nous utiliserons les fonctions Ocaml afin de réaliser cette implémentation.
-
-Voici donc les règles d'évaluations:
-\begin{align*}
-  &\cfrac{t \Downarrow t'}
-  {t:T \Downarrow t'}&\mbox{(Ann)}&\: \\
-  &\cfrac{}
-  {x \Downarrow x}&\mbox{Var} \\
-  &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
-  {t\:t'\Downarrow \: v'}&\mbox{Appl redex} \\
-  &\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
-  {t\:t'\Downarrow \: n \: v'}&\mbox{Appl} \\
-  &\cfrac{e \Downarrow \: v}
-  {\lambda x.t \Downarrow \: \lambda x.v}&\mbox{Abs}
-\end{align*}
-
-\subsection{Nouvelles implémentations} %changer le titre
+\subsection{Extensions} 
 
 Dans notre précédent language nous avions introduit les booléens ainsi que les entiers,
 nous verrons ici la façon de les représenters ainsi que leurs règles de typage.
-Nous introduirons aussi un nouveau constructeur, les paires.
+Nous introduirons aussi un nouvel encodage, les paires.
 
 \subsubsection{Les entiers}
 
@@ -973,16 +939,15 @@ de préciser où les placer.
 %sur eux mais je sais pas si ici je peux en parler
 \emph{Succ} et \emph{Zero} sont des \emph{inTermes} étant donné que l'on peut determiner leur 
 type sans le synthétiser contrairement à \emph{Iter}.
-Les règles d'évaluations n'ont pas évolués depuis la précédente spécification il n'est donc pas 
-nécéssaire de se repencher sur le sujet.
+Les règles d'évaluations restent inchangés depuis la précédente spécification.
 Regardons maintenant les règles de typage de ces différents constructeurs:
 \begin{align*}
   &\cfrac{\:}
-  {\Gamma\vdash Nat \ni Zero}&\mbox{(Zero)} \\
+  {\Gamma\vdash Nat \ni \mathrm{Zero}}&\mbox{(Zero)} \\
   &\cfrac{\Gamma\vdash Nat \ni t}
-  {\Gamma\vdash Nat \ni Succ(t)}&\mbox{(Succ)} \\
-  &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash a \in B \:\: \Gamma\vdash A\rightarrow B \ni f}
-  {\Gamma\vdash iter\: n\: f\: a \in B}&\mbox{(Iter)} \\
+  {\Gamma\vdash Nat \ni \mathrm{Succ(t)}}&\mbox{(Succ)} \\
+  &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash a \in A \:\: \Gamma\vdash A\rightarrow A \ni f}
+  {\Gamma\vdash \mathrm{iter}\: n\: f\: a \in A}&\mbox{(Iter)} \\
 \end{align*}
 
 
@@ -1004,22 +969,24 @@ Nous pouvons désormais typer nos booléens de la manière suivante:
   &\cfrac{}
   {\Gamma\vdash Bool \ni false}&\mbox{(False)} \\
   &\cfrac{\Gamma\vdash Bool \ni c \:\: \Gamma\vdash t \in C \:\: \Gamma\vdash e \in C}
-  {\Gamma\vdash ifte\: c\: t\: e\in C}&\mbox{(Ifte)}
+  {\Gamma\vdash \mathrm{ifte}\: c\: t\: e\in C}&\mbox{(Ifte)}
 \end{align*}
 
-On constate ici un exemple bien utile des types. En effet 
+On constate ici un exemple d'utilisation concrète des types. En effet 
 précédement avant evaluation de l'ensemble du terme nous ne pouvions 
 pas savoir si le terme \emph{c} était \emph{True} ou \emph{False}.
-D'ésormais nous avons la certitude avant execution que ce terme peut 
-ou non s'évaluer.
+Désormais nous avons la certitude avant execution que ce terme retourne 
+le terme correspondant à la branche \emph{then} ou \emph{else}
 
-\subsubsection{Les paires}
+\subsubsection{Le produit cartésien}
 
-La paire est un objet mathématique qui est définit comme
-un esemble composé de deux éléments. Nous allons donc les implémenters dans notre language.
+Le produit cartésien est un objet mathématique qui est définit comme
+un ensemble composé de deux éléments.
 Cela va nous permettre de crée des collections d'éléments. 
-Pour ce faire nous allons implémenter trois nouveaux constructeurs:
-les \emph{paires} sous la forme \emph{($a\,b$)}, et \emph{$\pi 0$} qui appliqué à une paire 
+Pour ce faire nous allons implémenter un nouveau constructeur:
+les \emph{paires} sous la forme \emph{($a\,b$)}
+Nous allons aussi rajouter deux éliminateurs, les projections:
+\emph{$\pi 0$} qui appliqué à une paire 
 permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
 Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
 introduisons donc ce le type \emph{produit} de la forme \emph{($a*b$)}.
@@ -1030,26 +997,26 @@ Nous allons maintenant évaluer nos termes,
 Règle de typages des paires:
 \begin{align*}
   &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
-  {\Gamma\vdash (A*B) \ni (a,b)}&\mbox{(Paire)} \\
+  {\Gamma\vdash A*B \ni a,b}&\mbox{(Paire)} \\
   &\cfrac{\Gamma\vdash p \in (A*B)} 
-    {\Gamma\vdash \pi 0(p) \in A}&\mbox{($\pi 0$)} \\
-    &\cfrac{\Gamma\vdash p \in (A*B)} 
-    {\Gamma\vdash \pi 1(p) \in B}&\mbox{($\pi 1$)} \\
+  {\Gamma\vdash p.\pi 0 \in A}&\mbox{($\pi 0$)} \\
+  &\cfrac{\Gamma\vdash p \in (A*B)} 
+  {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
 \end{align*}
 
 %on peut parler du fait que de faire des paires de paires c'est long a checker c'est mieux de faire des vecteurs pour ça?
 
 \subsection{Implémentation}
 
-Voici donc l'implémentation du $\lambda$ calcule simplement typé.
+Voici donc une implémentation du $\lambda$-calcule simplement typé.
 
 \subsubsection{Représentation des termes et des types}
 
-Tout comme nous l'avons fait précédement nous allons nous contenté
-de présenté l'implémentation du noyeau de notre language, nous introduirons 
-les différents encodages dans les sections suivantes.
-Commençon tout d'abord par donné la représentation des \emph{inTermes}
-ainsi que des \emph{exTermes}
+Comme nous précédement nous allons nous contenter de 
+de présenter l'implémentation du noyau de notre language, nous introduirons 
+les différents extensions dans les sections suivantes.
+Commençons tout d'abord par donné la représentation des \emph{inTermes}
+ainsi que celle des \emph{exTermes}
 
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
@@ -1060,18 +1027,141 @@ représentation de nos types
 \codefrom{typed}{lambda}{Type}
 
 
-Comme nous l'énoncions dans la section sur l'évaluation,
-il nous faut aussi représenté le type des \emph{Value} et
-\emph{Neutral}
+\subsubsection{Type checker}
 
-\codefrom{typed}{lambda}{Value}
-\codefrom{typed}{lambda}{Neutral}
+Le point centrale de cette nouvelle implémentation est le type-checker, 
+il sera ici question de l'implémentation des règles bi-directionnelles.
+Il nous faut donc traduire nos règles \ref{regles typage bidirectionnel} 
+de façon algorithmique. 
 
-On constate que \emph{VLam} la value correspondant à une abstraction est 
-maintenant une fonction Ocaml. Cela aura pour effet lors de l'évaluation
-d'appliquer celles-ci automatiquement. 
+La fonction gensym utilisée ici permet de crée un nom de variable assurant que celui n'a encore jamais
+été utilisé. 
 
-\subsection{evaluation}
+\codefrom{typed}{lambda}{check}
+\codefrom{typed}{lambda}{synth}
+
+Pour cette implémentation nous avons choisis générer des exeptions lorsque le terme
+n'était pas correctement typé. Cela permet de terminer le programme directement car de toute
+façon le terme serait refusé. Nous reviendrons cependant sur certains points négatifs de cette
+méthode dans l'implémentation des types dépendants.
+
+Nous disposons d'une fonction de vérification \emph{Check} ayant pour 
+paramètres: un contexte qui est une liste de paires de la forme \emph{(var,type)},
+un \emph{inTerme} ainsi qu'un type. Elle retourne un booléens permettant de déterminer
+si le terme est correctement typé.
+La fonction de synthèse \emph{synth} prend un contexte et un \emph{exTerme} 
+et renvoi le type de celui ci.
+
+Pour la vérification de l'abstraction on vérifie si le type en entrée est bien une flèche,
+si c'est le cas il nous faut appelé recursivement notre fonction afin de vérifier le terme
+sous le $\lambda$. Pour effectuer cet appel il nous faut libérer les variables liées à ce 
+$lambda$ à l'aide de la substitution et de l'insérer avec son type dans le contexte.
+
+Pour l'inversion on synthétise un type et on le compare à celui en entrée.
+Pour l'instant les types sont statiques %peut etre changer le mot 
+et ils ne possèdent pas de variables. Cela nous permet donc d'utiliser la fonction 
+d'égalité d'Ocaml. 
+
+Analysons maintenant les règles de synthèses, et commençons par les variables.
+Etant donné que nous libérons l'ensemble des variables liées par les $\lambda$ 
+si le type-checker en rencontre une le terme est immédiatement refuser.
+Pour les variables libres la fonction retourne son type en parcourant le contexte
+à l'aide de la méthode \emph{assoc} du module \emph{List}.
+Nous n'avons plus réellement de choix d'implémentation à commenter, le reste est 
+une simple traduction de nos règles \ref{regles typage bidirectionnel}.
+
+
+\subsubsection{Réduction forte à petits pas}
+\label{reduction_petits_pas}
+
+
+Nous allons donc implémenté une fonction de réduction 
+On appelle cette implémentation de réduction ``à petits pas'' car 
+on effectue les réductions étapes par étape. Cela se raproche fortement 
+de l'implémentation que nous avons donné de la réduction dans le $\lambda$-calcul
+non typé du point de vue de l'implémentation.
+
+Les termes préfixés d'un \emph{S} sont équivalents aux $\lambda$-termes 
+du $\lambda$-calcul non typé, l'annotation n'est donc plus présente.
+
+\codefrom{typed}{lambda}{reduction_forte}
+
+Pour l'application \emph{SAppl} si le terme est une \emph{SAbs} on 
+effectue la substitution puis l'on évalue le terme obtenu.
+Sinon on évalue d'abord celui ci, si l'on obtient une \emph{SAbs} 
+on appel la réduction sur l'application de celui ci au terme de droite
+sinon il ne nous reste plus qu'à évaluer le terme de droite.
+
+Lorsque l'on réduit sous une \emph{SAbs} il nous faut d'abord libérer l'ensemble des
+variables qui lui sont liées. Il nous faut les reliers une fois la réduction terminé 
+nous avons donc implémenter une fonction pour effectuer cette opération RELIE LIBRE. %a changer
+Elle prend en argument le nom de la variable libre, la valeur de son indice de de Bruijn 
+et le terme. Son code est assez triviale nous ne le présenterons donc pas ici.
+
+Les autres règles ne nécéssitent pas de commentaires particuliers.
+
+\subsubsection{Réduction forte à grands pas}
+
+Nous allons maintenant implémenté une nouvelle réduction. 
+Comme nous l'avons vu dans la section \ref{reduction_forte} %peut etre dans la partie safety je ne me souviens plus a voir 
+la réduction forte aboutie forcément à une forme normale, les termes que nous obtenons
+sont donc les memes qu'avec la réduction précédente \ref{reduction_petits_pas}. Nous allons donc implémenter 
+d'une nouvelle façon cette réduction. Le but de cette implémentation est d'exploiter 
+les ressources mises à dispositions par les languages de programmation fonctionnelle.
+Elle a aussi pour effet d'évaluer complètement les termes, on peut le constater du fait %a changer
+que les fonctions prenenent des \emph{inTermes} ou des \emph{exTermes} en entrée et retourne des valeurs.
+Les valeurs ne sont plus réinterprétées par la suite.
+
+On utilise la flèche \(\Downarrow\) pour signifie que l'on evalue complètement 
+les termes. Nous n'obtenons plus de \emph{inTermes} ni de \emph{exTermes} mais
+des valeurs et des termes neutres.
+\begin{align*}
+  v &::= &\mbox{Valeurs} \\
+  &| \lambda x \rightarrow v &\mbox{Abstraction} \\
+  &| n &\mbox{terme neutre} \\
+  n &::= &\mbox{Neutres} \\
+  &|x &\mbox{Variable} \\
+  &|n v &\mbox{Application} \\
+\end{align*}
+Ici la représentation de l'abstraction sous la forme \(\lambda x\rightarrow v\)
+est lié au fait qu'une abstraction avec ces termes est une fonction.
+Voici donc le code correspondant en Ocaml:
+
+\codefrom{typed}{lambda}{value}
+\codefrom{typed}{lambda}{neutral}
+
+La value \emph{VLam} est bien représenté par une fonction Ocaml
+Pour ce qui est de l'évaluation les règles formelles sont les memes que pour 
+la réduction à petit pas. 
+Commençons par donner le code de celle ci, nous le commenterons après.
+
+
+\codefrom{typed}{lambda}{big_step_eval_exTm}
+\codefrom{typed}{lambda}{vapp}
+\codefrom{typed}{lambda}{big_step_eval_inTm}
+
+La règle de l'annotation \emph{Ann} ne nécéssite pas d'explications particulières car
+elle est conforme à la spécification. 
+L'évaluation de l'abstraction \emph{Abs} se traduit par la création d'une \emph{VLam}
+dont le corps est une fonction anonyme. 
+Pour l'application nous faisons appelle à une fonction vapp
+
+%% Voici donc les règles d'évaluations:
+%% \begin{align*}
+%%   &\cfrac{t \Downarrow t'}
+%%   {t:T \Downarrow t'}&\mbox{(Ann)}&\: \\
+%%   &\cfrac{}
+%%   {x \Downarrow x}&\mbox{Var} \\
+%%   &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
+%%   {t\:t'\Downarrow \: v'}&\mbox{Appl redex} \\
+%%   &\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
+%%   {t\:t'\Downarrow \: n \: v'}&\mbox{Appl} \\
+%%   &\cfrac{e \Downarrow \: v}
+%%   {\lambda x.t \Downarrow \: \lambda x.v}&\mbox{Abs}
+%% \end{align*}
+
+
+
 
 
 
@@ -1100,4 +1190,13 @@ d'appliquer celles-ci automatiquement.
 
 %Il faudrait que pour les booléens et tout ce genre de choses je fasse dans la partie formelle des spec correspondants aux evaluations ect..
 
+
+%partie pour quand l'inspiration est partie
+
+%pour introduire la fonctin d'égalité dans le type checker des types dépendants il faut dire que avant on pouvait comparer nos types directements avec la fonction d'égalité de ocaml car il n'y avait pas de variables dans nos types alors que maintenant oui
+
+%Dans les types dépendants on pourra dire que l'on considère que nos termes sont des programmes 
+
+
 \end{document}
+

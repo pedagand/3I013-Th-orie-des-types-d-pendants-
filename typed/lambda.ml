@@ -46,7 +46,7 @@ type lambda_term =
   | SP0 of lambda_term 
   | SP1 of lambda_term
 
-(*=Value *)
+(*=value *)
 type value = 
   | VLam of (value -> value)
   | VNeutral of neutral 
@@ -56,21 +56,11 @@ type value =
   | VSucc of value
   | VZero
   | VPair of value * value 
-(*=Neutral *)
+(*=neutral *)
 and neutral = 
   | NFree of string 
   | NApp of neutral * value 
 (*=End *)
-
-
-(* Le commentaire suivant représente ce qui perdra l'humanité *)
-(*let test = VLam(function x -> match x with 
-			      | VNeutral(NFree x) -> VNeutral(NFree(x ^ x)))
-match test with VLam x -> x (VNeutral(NFree "x"))*)
-  
-
-(* XXX: Implement alpha-equivalence/equality of [inTm] and [exTm] *)
-(* test: alphaEq (lambda x x) (lambda y y) = true *)
 
 
 
@@ -82,8 +72,6 @@ let rec typ_to_string t =
   | Fleche(x,y) -> typ_to_string x ^ "->" ^ typ_to_string y
   | Croix(x,y) -> "(" ^ typ_to_string x ^ " X " ^ typ_to_string y ^ ")"
 
-
-(* XXX: resurrect the Lisp parser *)
 
 let rec parse_term env t = 
       match t with   
@@ -172,11 +160,6 @@ and pretty_print_type t l =
     
 
 
-
-
-
-
-(* t un terme et l une liste de nom de variable générer avec les binder *)
 let rec exTm_to_string t l = 
 match t with
 | FVar x -> x 
@@ -198,9 +181,6 @@ match t with
 | Pair (x,y) -> "(" ^ inTm_to_string x l ^ "," ^ inTm_to_string y l ^ ")"
 
 
-
-(* a transformer en pretty printing  *)
-
 let rec lambda_term_to_string t = 
   match t with
   | SFVar v -> v
@@ -218,11 +198,11 @@ let rec lambda_term_to_string t =
   | SP1(x) -> "(SP1" ^ lambda_term_to_string x ^ ")"
 
 let vfree name = VNeutral(NFree name)
-(* let boundfree i x = *)
 
 let gensym2 =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
+
 
 let rec value_to_inTm i v =
   match v with 
@@ -301,21 +281,25 @@ let rec relie_libre i bv t =
   | SP0(x) -> SP0(relie_libre i bv x)
   | SP1(x) -> SP1(relie_libre i bv x)
 
+(*=relie_libre_inTm *)
 let rec relie_libre_inTm i bv t = 
   match t with 
   | Abs(x,y) -> Abs(x,(relie_libre_inTm i (bv + 1) y))
   | Inv(x) -> Inv(relie_libre_exTm i bv x)
+(*=End *)
   | True -> True
   | False -> False 
   | Zero -> Zero 
   | Succ(x) -> Succ(relie_libre_inTm i bv x)
   | Pair(x,y) -> Pair((relie_libre_inTm i bv x),(relie_libre_inTm i bv y))
+(*=relie_libre_exTm *)
 and relie_libre_exTm  i bv t = 
   match t with 
   | BVar v -> BVar v 
   | FVar v when v = string_of_int i -> BVar bv
   | FVar v -> FVar v 
   | Appl(x,y) -> Appl((relie_libre_exTm i bv x),(relie_libre_inTm i bv y))
+(*=End*)
   | Ifte(x,y,z) -> Ifte((relie_libre_inTm i bv x),(relie_libre_exTm i bv y),(relie_libre_exTm i bv z))
   | Ann(x,y) -> Ann((relie_libre_inTm i bv x),y)
   | P0(x) -> P0(relie_libre_exTm i bv x)
@@ -324,7 +308,7 @@ and relie_libre_exTm  i bv t =
 
 
 
-(* XXX: not verified, run (many) tests first *)
+(*=reduction_forte *)
 let rec reduction_forte t i  = 
   match t with 
     | SFVar  v -> SFVar  v
@@ -334,10 +318,11 @@ let rec reduction_forte t i  =
     | SAppl(x,y) -> 
        begin 
 	 match reduction_forte x i with 
-	 | SFVar  z -> SAppl(x,(reduction_forte y i))
+	 | SFVar z -> SAppl(x,(reduction_forte y i))
 	 | SAbs z -> reduction_forte (SAppl(SAbs(z),y)) i 
 	 | autre -> SAppl(autre,reduction_forte y i)			        
        end 
+(*=End *)
     | STrue -> STrue
     | SFalse -> SFalse
     | SIfte (x,y,z) when x = STrue -> reduction_forte y i
@@ -356,7 +341,6 @@ let rec reduction_forte t i  =
 	 match n with 
 	 | SSucc x -> (reduction_forte (SIter(x,f,(reduction_forte (SAppl(f,a)) i))) i)
 	 | SZero -> reduction_forte a i 
-	     (* ici je ne failwith pas parceque je pense que le terme est bien formé juste que on ne peut pas le réduire plus, vu que on est pas en typé *)
 	 | _ -> SIter(n,f,a) 
        end 
     | SPair (x,y) -> SPair((reduction_forte x i),(reduction_forte y i))
@@ -373,14 +357,14 @@ let rec reduction_forte t i  =
 	 | _ -> SP1(reduction_forte x i)
        end
 
-
+(*=big_step_eval_exTm *)
 let rec big_step_eval_exTm t envi = 
   match t with
     | Ann(x,_) -> big_step_eval_inTm x envi
     | FVar v -> vfree v 
     | BVar v -> List.nth envi v
     | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))
-    (* tentative d'évaluation de iter *)
+(*=End *)
     | Iter(n,f,a) -> viter(big_step_eval_inTm n envi, 
                            big_step_eval_inTm f envi,
                            big_step_eval_exTm a envi)
@@ -409,15 +393,19 @@ and viter (v, f,a) =
   | VZero ->  a
   | VSucc v -> vapp (f, (viter (v, f, a)))
   | _ -> failwith "Impossible (viter)"
+(*=vapp *)
 and vapp v = 
   match v with 
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "Impossible (vapp)"
+(*=End *)
+(*=big_step_eval_inTm *)
 and big_step_eval_inTm t envi = 
   match t with 
   | Inv(i) -> big_step_eval_exTm i envi
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg :: envi)))
+(*=End *)
   | Zero -> VZero
   | Succ n -> VSucc (big_step_eval_inTm n envi)
   | Pair(x,y) -> VPair((big_step_eval_inTm x envi),(big_step_eval_inTm y envi))
@@ -451,6 +439,7 @@ let gensym =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
+(*=check *)
 let rec check contexte inT ty
     = match inT with
     | Abs(x, b) -> 
@@ -467,6 +456,7 @@ let rec check contexte inT ty
        begin 
        tyT = ty
        end 
+(*=End *)
     | True -> if ty = Bool then true else false
     | False -> if ty = Bool then true else false
     | Zero -> if ty = Nat then true else false 
@@ -479,6 +469,7 @@ let rec check contexte inT ty
 			 else failwith "In Pair(x,y) x is not of type a"				  
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
+(*=synth *)
 and synth contexte exT 
     = match exT with
     | Ann(tm, ty) ->
@@ -499,6 +490,7 @@ and synth contexte exT
               failwith "Argument type invalid"
          | _ -> failwith "Function type invalid"
        end
+(*=End *)
     | Ifte(x,y,z) -> if check contexte x Bool then 
 		       begin 
 			 let ttrue = synth contexte y in 
