@@ -200,6 +200,7 @@ On considère que deux termes sont \(\alpha\)-équivalents si et seulement si il
 \end{example}
   
 \subsection{Calculer dans le lambda calcul}
+\label{calculer_dans_le_lambda_calcul}
 
 Dans le lambda calcul pur, il n'existe pas de primitive pour effectuer des 
 calculs. Le seul moyen de calculer de nouveaux termes est de les appliquer 
@@ -635,14 +636,15 @@ En gros dire que ça ne sert a rien de compiler du code qui ne peut pas marcher
 
 Il est important avant tout de définir ce qu'est un type.
 Considérons \emph{P} l'ensemble des types de base comme par exemple 
-(\emph{int}) l'ensemble des entiers.
-Et soit \emph{T} l'ensemble des types, on peut alors définir de façon inductive
+\emph{int} l'ensemble des entiers et \emph{bool} l'ensemble des booléens.
+Et soit \emph{*} l'ensemble des types, on peut alors définir de façon inductive
 ce qu'est un type.
 \begin{align*}
-  T &::= int! \\
+  * &::= \\
+  &| int \\
   &| bool \\
-  &| T \rightarrow T \\
-  &| T \times T \\
+  &| * \rightarrow * \\
+  &| * \times * \\
 \end{align*}
 
 Le type \(\rightarrow\) correpond au type des fonctions et le type (a*b)
@@ -669,16 +671,16 @@ se répercute aussi sur les types.
 \begin{example}
   Soit la fonction \(\lambda\)x\:y.(x y) peut s'exprimer 
   \(\lambda\)x.\(\lambda\)y.(x y) qui pourrait donc avoir 
-  le type int \(\rightarrow\) (int \(\rightarrow\) int)
+  le type (int \(\rightarrow\) int)\(\rightarrow\) int \(\rightarrow\) int
 \end{example}
 
 \subsection{Système de type}
 
 Introduire le système de type en une ligne
-\subsubsection{Système de type mono-directionnel}
+\subsubsection{Spécification}
 
-Afin de faciliter la lecture et la compréhension nous allons nous intérésser dans 
-un premier temps aux règles de typage pour les termes appartenants au noyau 
+Afin de faciliter la lecture et la compréhension nous allons dans 
+un premier temps donner les règles de typage pour les termes appartenants au noyau 
 du language. Nous donnerons les autres règles dans les sections suivantes.
 
 La vérification de type s'effectue dans un \emph{contexte} qui assigne
@@ -688,7 +690,7 @@ liste ordonnée de paires variable/type :
 \begin{align*}
   \Gamma &::= &\mbox{(contexte)} \\
          &\quad . & \mbox{(contexte vide)} \\
-         &\quad \Gamma, x : T & \mbox{(type de variable)} 
+         &\quad \Gamma, x : * & \mbox{(type de variable)} 
 \end{align*}
 
 Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
@@ -770,9 +772,9 @@ afin de résoudre ce problème.
 
 \subsubsection{Système de type bi-directionnel}
 
-Les applications dont le membre de gauche est une abstractions posent problème ~\ref{probleme:type_simple} 
-nous allons donc catégoriser nos \(\lambda\) termes dans deux sous catégorie. 
-D'un coté les termes pouvant se trouver à gauche au sein d'une application et les autres.
+Les applications dont le membre de gauche est une abstractions posent problème comme vu dans l'exemple ~\ref{probleme:type_simple}.
+Nous allons donc catégoriser nos \(\lambda\)-termes dans deux sous catégorie, 
+d'un coté les termes pouvant se trouver à gauche au sein d'une application et les autres.
 
 \begin{align*}
   ex &::= & \mbox{exTermes} \\
@@ -823,7 +825,7 @@ Voici donc nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-d
 
 \begin{figure}
 \label{regles typage bidirectionnel}
-\center\(\Gamma\vdash T \ni t\)  
+\center\boxed{\Gamma\vdash T \ni t}
 
 \begin{align*}
   &\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
@@ -832,7 +834,7 @@ Voici donc nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-d
   {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} \\
 \end{align*}
 
-\center\(\Gamma\vdash t \in T\) 
+\center\boxed{\Gamma\vdash t \in T}
 
 \begin{align*}
   &\cfrac{x:T \in \Gamma}
@@ -857,46 +859,39 @@ determiner.
 EXEMPLE DE DERIVATION AVEC LES NOUVELLES REGLES
 \end{example}
 
+\todo{ajouter une phrase sur le fait qu'un terme bien typé par la spec est bien type dans notre système}
+\subsection{Normalisation} %en gros calculer dans le lambda calcul non typé
 
-\subsection{Opérations sur les termes} %en gros calculer dans le lambda calcul non typé
+Dans cette section nous verrons certaines propriétés offertent par les systèmes de type, et nous parlerons 
+de l'évaluation. Nous ne reviendrons pas sur la substitution ni la réduction car cela reste identique par 
+rapport à la section \ref{calculer_dans_le_lambda_calcul}.
 
-Nous avons désormais une nouvelle représentation de nos termes, il nous faut donc 
-redéfinir les règles de substitution, de réduction et d'évaluation.
-Certaines seront triviales.
-
-\subsubsection{Substitution}
-%a voir 
-Je ne pense pas que ce soit une bonne idée de faire une section sur la substitution, à la limite une petite
-
-\subsubsection{Safety = Progress + Preservation}
-%section sur les propriétés des types
+\subsubsection{Méta-théorie}
 
 Le typage permet d'obtenir, à la compilation, des garanties quant à la
 bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés essentielles d'un système de type :
 \begin{description}
 \item[``Progress'':] soit \(t\) un terme correctement typé alors \(t\) est une valeur ou il
  existe une réduction telle que \(t \leadsto t'\)
-\item[``Preservation'':] si un terme est correctement typé alors il existe une règle
- de dérivation pour ce terme, le terme obtenu est lui aussi correctement
- typé.
+\item[``Preservation'':] si un terme \emph{t} a le type \emph{T}
+et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type \emph{T}
 \end{description}
 
 La conjonction de ces deux propriétés donne le slogan 
 ``un programme bien typé ne plante jamais'' (citation Milner)  
-tout programme bien typé réduit vers une valeur générant, 
-à chaque étape de réduction, un terme bien typé.
+tout programme bien typé réduit vers une valeur nécessairement bien typé. 
 
-Nous avons désormais des garanties quand à la terminaison de nos programme
-ce qui se traduit par le fait que l'on pourra systématiquement obtenir une 
-forme normale pour nos termes contrairement au \(\lambda\) calcul non typé.
+Nous avons désormais des garanties quant à la terminaison de nos programme.
+Cela se traduit par le fait que l'on pourra systématiquement obtenir une 
+forme normale pour nos termes contrairement au \(\lambda\)-calcul non typé.
 
 \begin{example}
   Reprenons le terme ((\(\lambda\)x.x x) (\(\lambda\)x.x x)) que nous ne parvenions 
-  pas à réduire précédement. Maintenant ce terme ne peut plus etre écris car essayons
-  de lui trouver un type afin d'annoter le membre de gauche de l'application.
+  pas à réduire précédement. Maintenant ce terme ne peut plus etre écrit. Essayons
+  tout de meme de trouver un type pour l'annotation du membre gauche de l'application.
   \begin{align*}
-    term & ((\lambda x.x x : T) (\lambda x.x x)) \\
-    T & Nat \rightarrow Nat \rightarrow Nat \rightarrow ...
+    & ((\lambda x.x x : ?X) (\lambda x.x x)) \\
+    ?X &::= ?X \rightarrow ?X
   \end{align*}  
   Nous ne pouvons donc plus écrire ce terme.
 \end{example}
@@ -904,24 +899,24 @@ forme normale pour nos termes contrairement au \(\lambda\) calcul non typé.
 \subsubsection{Reduction forte}
 
 \label{reduction_forte}
-Dans le \(\lambda\) calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Appel par nom}
+Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Appel par nom}
 car nous souhaitions éviter d'évaluer des termes ne pouvant se normaliser et donc de provoquer la
-terminaison prématurée du programme, au détriment de ne pas pouvoir en normaliser certains.
+terminaison prématurée du programme.
 D'après les propriétés de la section précédente nous disposons de la certitude que une fois 
 acceptés par le type-checker nos termes réduisent tous.
 Nous allons donc implémenter une stratégie de réduction forte.
 
 Les types ne sont pas utiles lors de l'évaluation. Nous allons donc tout d'abord implémenter
-une fonction de réduction forte sur les \(\lambda\)-termes non typés que l'on appliquera
-à des termes correctements typé que l'on transformera par la suite en terme non typés.
+une fonction de réduction forte sur les \(\lambda\)-termes non typés.
 
 Voici la spécification de notre réduction forte :
 %si ce n'est pas ce genre de chose qu'il faut que je dise je ferais un texte ici expliquant la réduction forte.
+\todo{a changer avec un tableau de cfrac montrant l'évaluation}
 \begin{align*}
-  reduction forte && \\
-  & x & \rightarrow x \\
-  & \lambda x.x & \rightarrow \lambda x.(reduction forte \:x) \\
-  & (x \:y) & \rightarrow ((reduction forte \:x) (reduction forte \:y)) \\
+  rdf ::=&\: \\
+  x &\rightarrow x \\
+  \lambda x.x &\rightarrow \lambda x.(reduction forte \:x) \\
+  (x \:y) &\rightarrow ((reduction forte \:x) (reduction forte \:y)) \\
 \end{align*}
 
 La traduction de nos termes bidirectionnels vers les termes non typés
@@ -935,7 +930,7 @@ est transparente, il suffit d'effacer les annotations de type.
 
 Dans notre précédent language nous avions introduit les booléens ainsi que les entiers,
 nous verrons ici la façon de les représenters ainsi que leurs règles de typage.
-Nous introduirons aussi un nouvel encodage, les paires.
+Nous introduirons aussi un nouveau type, le produit cartésien.
 
 \subsubsection{Les entiers}
 
@@ -994,14 +989,14 @@ le terme correspondant à la branche \emph{then} ou \emph{else}
 
 Le produit cartésien est un objet mathématique qui est définit comme
 un ensemble composé de deux éléments.
-Cela va nous permettre de crée des collections d'éléments. 
+Cela nous permettra de crée des collections d'éléments. 
 Pour ce faire nous allons implémenter un nouveau constructeur:
 les \emph{paires} sous la forme \emph{($a\,b$)}
 Nous allons aussi rajouter deux éliminateurs, les projections:
 \emph{$\pi 0$} qui appliqué à une paire 
 permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
 Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
-introduisons donc ce le type \emph{produit} de la forme \emph{($a*b$)}.
+introduisons donc ce le type \emph{produit} de la forme \emph{($a\times b$)}.
 
 Nous allons maintenant évaluer nos termes, 
 
@@ -1009,10 +1004,10 @@ Nous allons maintenant évaluer nos termes,
 Règle de typages des paires:
 \begin{align*}
   &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
-  {\Gamma\vdash A*B \ni a,b}&\mbox{(Paire)} \\
-  &\cfrac{\Gamma\vdash p \in (A*B)} 
+  {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
+  &\cfrac{\Gamma\vdash p \in (A\times B)} 
   {\Gamma\vdash p.\pi 0 \in A}&\mbox{($\pi 0$)} \\
-  &\cfrac{\Gamma\vdash p \in (A*B)} 
+  &\cfrac{\Gamma\vdash p \in (A\times B)} 
   {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
 \end{align*}
 
