@@ -104,13 +104,6 @@
 
 blablawsdsdfsdf
 
-
-
-%% \codefrom{dossier}{fichier}{tag}
-%%   où 'dossier' est "no_type", ou "typed", ou "dependent"
-%%      'fichier' est le chemin vers un fichier dans le dossier
-%%      'tag' est une déclaration de la forme (*=tag *) (code) (*=End *) dans le source
-
 \section{$\lambda$-calcul non typé}
 
 En 1936, Alonzo Church introduit le lambda calcul non typé
@@ -167,9 +160,9 @@ dans l'exemple précédent x était une variable liée.
 Si la variable n'a pas été déclarée, elle est dite libre. 
 
 \begin{align*}
-  \IsFree(x) &\triangleq ? \\
-  \IsFree(\lambda x. t) &\triangleq ? \\
-  \IsFree(f s) &\triangleq ? \\
+  \IsFree(x) &\triangleq \{x\} \\
+  \IsFree(\lambda x. t) &\triangleq \IsFree(t)/\{x\} \\
+  \IsFree(f s) &\triangleq \IsFree(f) \cup \IsFree(s) \\
 \end{align*}
 
 
@@ -190,7 +183,8 @@ Un terme ne contenant aucune occurrence de variable libre est dit ``clos''.
 \end{example}
 
 \label{problemelibreliee}
-Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). 
+Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). Il faut donc introduire la notion 
+d'$\alpha$-équivalence.
 
 \subsubsection{$\alpha$-équivalence}
 
@@ -234,13 +228,15 @@ Définition formelle de la substitution:
 \end{align*}
 
 \begin{example}
-  Soit le terme $\Lam{x}{\subst{x}{x}{\Lam{y}{y}}}$     \(\lambda\)x.(\subst{x}{x}{\(\lambda\)y.y}), après avoir effectué la
-  substitution nous obtenons le terme $\Lam{x}{\Lam{y}{Var{y}}}$  \(\lambda\)x.\(\lambda\)y.
+  Soit le terme $\Lam{x}{\subst{x}{x}{\Lam{y}{y}}}$, après avoir effectué la
+  substitution nous obtenons le terme $\Lam{x}{\Lam{y}{\Var{y}}}$.
 \end{example}
 
 
 \subsubsection{$\beta$-réduction}
 
+
+\label{reduction}
 Seules les applications dont le membre de gauche est une abstraction
 peuvent être réduites, on appelle cela une \emph{redex}.
 
@@ -280,11 +276,12 @@ En voici une définition formelle:
 \label{reduction:call_by_name}
 Un terme est dit en \emph{forme normale} si on ne peut plus lui
 appliquer de réduction. La normalisation consiste donc à reduire
-autant que possible notre terme. \todo{Expliquer que l'on a le choix
-  des rédex : il faut donc choisir une stratégie de
-  réduction. Préciser que l'on ne s'intéresse qu'à une stratégie :
-  l'appel par nom, qui est garantie de trouver la forme normale si
-  elle existe}
+autant que possible notre terme. Cependant il existe tout de meme deux 
+formes normales, la faible qui considère qu'un lambda est une valeur 
+finale, et la forte où meme les redex à l'intérieure d'une \emph{abstraction}
+doivent etre évaluées.
+Il existe donc plusieurs stratégies de réduction qui permettent d'atteindre 
+différents type de forme normale.
 
 \begin{example}
   Le terme 
@@ -312,17 +309,31 @@ de forme normale.
 
 Il existe de nombreuses stratégies de normalisation des termes dans le
 lambda calcul non typé, les plus connues étant l'\emph{appel par nom}
-et l'\emph{appel par valeur}.  Pour le lambda calcul non typé la
-stratégie la plus sûre \todo{``sûr'' n'est pas le mot le plus
-  adapté. Sois plus précis.} est la call by value \todo{utiliser le
-  terme français : appel par valeur}.  En effet, elle consiste à
-réduire seulement le terme de gauche des redex, et où l'on ne reduit
-pas à l'intérieur des abstractions. \todo{Donner la définition
-  formelle de la réduction appel par valeur} Pour certains termes, on
-ne peut pas atteindre une forme normale, cependant celle ci a moins de
-risque \todo{``moins de risque'' n'est pas une définition
-  formelle. Donner une explication plus précise.} de rentrer dans une
-boucle d'évaluation infinie.
+et l'\emph{appel par valeur}.  Pour le lambda calcul non typé 
+nous avons choisis d'utilisé l\emph{appel par valeur}. Elle consiste à
+réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}.
+
+\begin{align*}
+  AppelParValeur(x) &\triangleq x \\
+  AppelParValeur(\Lam{x}{t}) &\triangleq \Lam{x}{t} \\
+  AppelParValeur(\App{\Lam{x}{t}}{u}) &\triangleq AppelParValeur(\subst{t}{x}{u}) \\
+  AppelParValeur(\App{t}{u}) &\triangleq AppelParValeur(\App{AppelParValeur(t)}{u})
+\end{align*}
+
+Pour certains termes, on ne peut pas atteindre une forme normale forte, cela
+permet de se rapprocher des définitions de fonctions dans les languages de 
+programmations où l'on ne précalcule pas les valeurs au seins d'une fonction.
+
+\begin{example}
+  Voici une réduction avec la stratégie \emph{appel par valeur}:
+  \begin{align*}
+    & \App{\Lam{x}{\Var{x}}}({\App{\Lam{y}{\Var{y}}}({\Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}}})) \\
+    \rightarrow & \App{\Lam{y}{\Var{y}}}({\Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}})\\
+    \rightarrow & \Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}\\
+    \nrightarrow & \:
+  \end{align*}
+  Ici il n'y a plus rien à réduire avec notre stratégie. On obtient une forme normale faible.
+\end{example}
 
 %je sais pas si cette partie la est judicieuse je pense que oui ça permet d'
 %introduire un peu la suite du rapport 
@@ -371,23 +382,21 @@ $IfThenElse$
 \begin{align*}
   \True &\triangleq \lambda x.\lambda y. y  \Lam{x}{\Lam{y}{\Var{y}}} \\
   \False &\triangleq \lambda x.\lambda y. x \Lam{x}{\Lam{y}{\Var{x}}} \\
-  \Ifte &\triangleq \lambda x.\lambda y.\lambda z. x\: y\: z  \Lam{x}{\Lam{y}{\Lam{z}{\App{\Var{x}}{\App{\Var{y}}{\Var{z}}}}}}  \\
+  \Ifte &\triangleq \Lam{l}{\Lam{m}{\Lam{n}{\App{\Var{l}}{\App{\Var{m}}{\Var{n}}}}}}  \\
 \end{align*}
 
 On assimile ces deux termes aux booléens $True$ et $False$ car leur calcul au sein
 de l'application d'un $Ifte$ reproduit le comportement attendu.
 
 \begin{example}
-  Voici un exemple de réduction du terme Ifte \todo{Mettre des variables nommées (et les étapes intermédiaires)}
+  Voici un exemple de réduction du terme Ifte avec comme condition \emph{False}:
   \begin{align*}
-    &(\lambda .\lambda .\lambda . 2\: 1\: 0) \: (\lambda . \lambda . 0) \: x \: y  \\
-<<<<<<< HEAD
-    & TODO mettre les etapes intermediaires \\
-    & x \\
-=======
-    & %TODO:mettre les étapes intermediaires \\
-    % & x 
->>>>>>> 5cc165101157f81f98655e861cfee469c75b56ad
+    &\App{\App{\App{(\Lam{l}{\Lam{m}{\Lam{n}{\App{\App{l}{m}}{n}}}}})({\Lam{x}{\Lam{y}{y}}}}){v}}{w} \\
+    \rightarrow & \App{\App{({\Lam{m}{\Lam{n}{\App{\App({\Lam{x}{\Lam{y}{y}}}){m}}{n}}}}}){v}}{w} \\
+    \rightarrow & \App{(\Lam{n}{\App{\App({\Lam{x}{\Lam{y}{y}}}){v}}{n}})}{w} \\
+    \rightarrow & \App{\App({\Lam{x}{\Lam{y}{y}}}){v}}{w}) \\
+    \rightarrow & \App({\Lam{y}{y}}){w}) \\
+    \rightarrow & \Var{w}
   \end{align*}
 \end{example}
 
@@ -505,27 +514,24 @@ les chaines de caractères en sortie seront elle memes des S-expressions.
 
 On découvre ici un nouvel avantage de notre représentation avec les indices de
 de Bruijn, car il n'est pas nécessaire de prendre des précautions quant au
-nom des variables de notre terme substituant % à changer
-qui rendrait liée une variable qui était libre. \attention{Cela nous permet de ne pas 
-avoir besoin d'introduire l'\(\alpha\) conversion} \todo{c'est encore autre chose ça.}
+nom des variables de notre terme substituant qui rendrait liée une variable qui était libre. 
 
 \begin{example}
-  Avec la représentation classique: \todo{Je pense que cet exemple est incorrect}
+  Avec la représentation classique:
   \[ 
   \lambda x.x[x := \lambda y.x]\leadsto\lambda x.\lambda y.x
   \]
-  \todo{Expliquer en détail le problème quand on effectue la substitution.}
-
-  Avec les indices de de bruijn
+  
+  On constate dans cet exemple que la substitution génère une ambiguité sur la variable \emph{x},
+  on ne peut plus déterminé si celle-ci est liée ou libre.
+  Voici la meme substitution avec la représentation ``locally nameless''
   \[ 
   \lambda.0[0 := \lambda.x]\leadsto\lambda.\lambda.x
   \]
-  On constate bien que dans la première représentation on pense que la variable
-  x est liée alors que celle-ci devrait en réalité etre libre comme dans la 
-  représentation avec les indices de de Bruijn.
+  Ici l'ambiguité n'existe plus, on sait que \emph{x} est une variable libre.
 \end{example}
 
-\todo{Écrire une phrase introductrice pour ce bout de code}
+Implémentons donc la substitution dans notre programme:
 
 \codefrom{untyped}{lambda}{substitution}
 
@@ -535,11 +541,10 @@ traversés. Si l'on recontre une BoundVar avec comme indice var on retourne donc
 place de celle-ci.
 
 
-\subsubsection{Reduction et évaluation}
-La fonction de réduction consiste donc à trouver des redex \todo{par
-  n'importe quel redex : l'appel par nom contracte le redex le plus à
-  gauche} afin de substituer le membre de droite de l'application dans
-le membre de gauche. \todo{Préciser que cette remarque s'applique au cas ``application''} Nous appelons la fonction de substitution  avec la
+\subsubsection{$\beta$-Reduction et évaluation}
+La fonction de réduction consiste donc à trouver les applications dont le membre 
+de gauche est une abstraction \ref{reduction}.
+Nous appelons la fonction de substitution  avec la
 valeur \(0\) car on souhaite substituer l'ensemble des variables du binder
 \(\lambda\) en cours.
 
@@ -1212,7 +1217,17 @@ il nous faut introduire trois nouveaux termes ainsi qu'un nouveau constructeurs 
 \emph{value}
 \codefrom{typed}{lambda}{value_pair}
 
-Il nous faut maintenant implémenter les règles de typage dans notre algorithme
+Il nous faut maintenant implémenter les règles de typage au sein de notre algotithme:
+
+\emph{check}
+\codefrom{typed}{lambda}{check_pair}
+\emph{synth}
+\codefrom{typed}{lambda}{synth_pair}
+
+Rien à commenter,
+
+
+
 
 
 %% Voici donc les règles d'évaluations:
