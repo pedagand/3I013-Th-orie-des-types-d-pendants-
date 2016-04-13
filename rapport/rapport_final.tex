@@ -633,6 +633,7 @@ Si \emph{n} est un \emph{Succ(num)} alors il faut d'abord evaluer l'application
 En gros dire que ça ne sert a rien de compiler du code qui ne peut pas marcher
 
 \subsection{Les types}
+\label{simple_type}
 
 Il est important avant tout de définir ce qu'est un type.
 Considérons \emph{P} l'ensemble des types de base comme par exemple 
@@ -755,11 +756,12 @@ notre système de type. De plus on vérifie que \emph{s} est bien du type
   Voici donc quelques exemples de dérivations de type.
   Ces dérivations se lisent du bas vers le haut.
   
-  
-  JE PENSE QUE JE VAIS DEVOIR FAIRE DES CFRACS DE CFRACS ECT MAIS SI
-  IL EXISTE UNE MEILLEUR SOLUTION JE PREFERE ATTENDRE
+ 
+
+  je vais faire le typage du terme $\lambda x. \lambda y. x y$ avec le type (int -> bool) -> int -> bool 
   %faire une application basique avec le lambda terme de l'identité a gauche appliqué a un truc nul et le tout de type entier cela 
   % va nous permettre de montrer que l'on doit faire de la magie sur le type de A
+  et après juste une application sans $\lambda$ par dessus
 \end{example}
 
 %ici je pourrais dire que l'on doit annoter tous les termes mais que c'est trop lourd
@@ -818,10 +820,9 @@ FAIRE LA DERIVATION ET CA MARCHE !!
 
 Nous avons donc résolu ce problème grace à l'introduction d'un système bi-directionnel
 cependant si nous avions introduit l'annotation directement dans notre système précédent le 
-problème ne se serait pas posé. Cependant cette solution nous à permis de savoir précisément 
-quand il était nécéssaire d'annoter nos termes et donc de réduire au maximum le nombre d'annotations.
+problème ne se serait pas posé.
 
-Voici donc nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
+Voici nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
 
 \begin{figure}
 \label{regles typage bidirectionnel}
@@ -855,15 +856,14 @@ Pour la vérification on connait le type \emph{T} et l'on souhaite déterminer s
 est bien de ce type. Pour la synthèse, on ne connait pas le type de \emph{t} et l'on souhaite le
 determiner.
 
-\begin{example}
-EXEMPLE DE DERIVATION AVEC LES NOUVELLES REGLES
-\end{example}
+Le système de type bi-directionnel que nous avons introduit est équivalent à celui de la section \ref{simple_type}.
+En effet si nous avions résolu le problème de l'application \ref{probleme:type_simple} nous aurions du annoter 
+l'ensemble des termes de gauche dans une application.
 
-\todo{ajouter une phrase sur le fait qu'un terme bien typé par la spec est bien type dans notre système}
 \subsection{Normalisation} %en gros calculer dans le lambda calcul non typé
 
 Dans cette section nous verrons certaines propriétés offertent par les systèmes de type, et nous parlerons 
-de l'évaluation. Nous ne reviendrons pas sur la substitution ni la réduction car cela reste identique par 
+de l'évaluation. Nous ne reviendrons pas sur la substitution ni la $\beta$-réduction car cela reste identique par 
 rapport à la section \ref{calculer_dans_le_lambda_calcul}.
 
 \subsubsection{Méta-théorie}
@@ -900,10 +900,9 @@ forme normale pour nos termes contrairement au \(\lambda\)-calcul non typé.
 
 \label{reduction_forte}
 Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Appel par nom}
-car nous souhaitions éviter d'évaluer des termes ne pouvant se normaliser et donc de provoquer la
-terminaison prématurée du programme.
+car nous souhaitions évaluer les termes vers une forme normale faible.  
 D'après les propriétés de la section précédente nous disposons de la certitude que une fois 
-acceptés par le type-checker nos termes réduisent tous.
+acceptés par le type-checker nos termes réduisent tous vers une forme normale forte.
 Nous allons donc implémenter une stratégie de réduction forte.
 
 Les types ne sont pas utiles lors de l'évaluation. Nous allons donc tout d'abord implémenter
@@ -911,7 +910,13 @@ une fonction de réduction forte sur les \(\lambda\)-termes non typés.
 
 Voici la spécification de notre réduction forte :
 %si ce n'est pas ce genre de chose qu'il faut que je dise je ferais un texte ici expliquant la réduction forte.
-\todo{a changer avec un tableau de cfrac montrant l'évaluation}
+\todo{Question?: présentation 1 ou 2}
+\begin{align*}
+  \cfrac{}
+  {x \leadsto x} \\
+  \cfrac{}
+  {u : T \leadsto u} \\
+\end{align*}
 \begin{align*}
   rdf ::=&\: \\
   x &\rightarrow x \\
@@ -923,7 +928,7 @@ La traduction de nos termes bidirectionnels vers les termes non typés
 est transparente, il suffit d'effacer les annotations de type.
 
 \begin{example}
-  Faire un exemple ou avec l'ancien cela ne marchait pas et maintenant ça marche
+  Faire un exemple où avec l'ancien cela ne marchait pas et maintenant ça marche
 \end{example}
 
 \subsection{Extensions} 
@@ -936,8 +941,8 @@ Nous introduirons aussi un nouveau type, le produit cartésien.
 
 Commençons cette fois ci par les entiers étant donné que le type \emph{Nat}
 est déja présent dans notre language.
-Les constructeurs sont les memes que dans le \(\lambda\) calcul non typé 
-cependant maintenant que nous disposons de termes bi directionnel il est important
+Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé 
+cependant maintenant que nous disposons de termes bi-directionnel il est important
 de préciser où les placer.
 
 %alors la il me faut une justification peut etre plus précise car j'en vois une pour les types dépendants mais pas pour ici
@@ -1015,7 +1020,10 @@ Règle de typages des paires:
 
 \subsection{Implémentation}
 
-Voici donc une implémentation du $\lambda$-calcule simplement typé.
+Certaines implémentations sont redondantes avec la précédente, nottament les 
+entiers, les booléens ect.. seul leur intération au sein du vérificateur de type
+est nouvelle. Nous regrouperons donc tout cela dans la section \ref{extensions_implem}.
+Voici une implémentation du $\lambda$-calcule simplement typé.
 
 \subsubsection{Représentation des termes et des types}
 
@@ -1120,9 +1128,6 @@ Elle a aussi pour effet d'évaluer complètement les termes, on peut le constate
 que les fonctions prenenent des \emph{inTermes} ou des \emph{exTermes} en entrée et retourne des valeurs.
 Les valeurs ne sont plus réinterprétées par la suite.
 
-On utilise la flèche \(\Downarrow\) pour signifie que l'on evalue complètement 
-les termes. Nous n'obtenons plus de \emph{inTermes} ni de \emph{exTermes} mais
-des valeurs et des termes neutres.
 \begin{align*}
   v &::= &\mbox{Valeurs} \\
   &| \lambda x \rightarrow v &\mbox{Abstraction} \\
@@ -1220,6 +1225,18 @@ Il nous faut maintenant implémenter les règles de typage au sein de notre algo
 \codefrom{typed}{lambda}{synth_pair}
 
 Rien à commenter,
+
+\subsubsection{Extensions}
+\label{extensions_implem}
+
+\todo{je ne pense pas que je devrais faire cette section je n'ai rien à dire dessus}
+Voici l'ensemble des intégration dans le vérificateurs de type pour les termes
+n'ayant pas encore été présentée
+
+\emph{check} 
+\codefrom{typed}{lambda}{inTm_extensions}
+\emph{synth} 
+\codefrom{typed}{lambda}{exTm_extensions}
 
 
 

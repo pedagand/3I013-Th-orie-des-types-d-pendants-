@@ -467,10 +467,12 @@ let rec check contexte inT ty
        tyT = ty
        end 
 (*=End *)
+(*=inTm_extensions *)
     | True -> if ty = Bool then true else false
     | False -> if ty = Bool then true else false
     | Zero -> if ty = Nat then true else false 
     | Succ x -> if ty = Nat then check contexte x Nat else false
+(*=End *)
 (*=check_pair *)
     | Pair(x,y) -> 
        begin 
@@ -503,6 +505,7 @@ and synth contexte exT
          | _ -> failwith "Function type invalid"
        end
 (*=End *)
+(*=exTm_extensions *)
     | Ifte(x,y,z) -> if check contexte x Bool then 
 		       begin 
 			 let ttrue = synth contexte y in 
@@ -519,6 +522,7 @@ and synth contexte exT
 			 else failwith "Iter 2nd arg must be of type_a -> type_a"
 		       end 
 		     else failwith "Iter first arg must be a Nat"
+(*=End *)
 (*=synth *)
     | P0(x) -> 
        begin 
