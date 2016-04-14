@@ -279,14 +279,34 @@ En voici une définition formelle:
 \subsubsection{Stratégie de réduction : appel par nom}
 
 \label{reduction:call_by_name}
-Un terme est dit en \emph{forme normale} si on ne peut plus lui
-appliquer de réduction. La normalisation consiste donc à reduire
-autant que possible notre terme. Cependant il existe tout de meme deux 
-formes normales, la faible qui considère qu'un lambda est une valeur 
-finale, et la forte où meme les redex à l'intérieure d'une \emph{abstraction}
-doivent etre évaluées.
-Il existe donc plusieurs stratégies de réduction qui permettent d'atteindre 
-différents type de forme normale.
+Un terme est dit en \emph{forme
+  normale}~\citep{krivine:lambda-calculus} si on ne peut plus lui
+appliquer de réduction: il ne contient aucun redex. La normalisation
+consiste donc à reduire autant que possible notre terme. En
+particulier, on caractérise inductivement les formes normales de la
+façon suivante :
+%
+\begin{itemize}
+\item Une variable \(\Var{x}\) est en forme normale ;
+\item Si \(t\) est en forme normale, alors \(\Lam{\Var{x}}{t}\) est en
+  forme normale ;
+\item Si \(t\) et \(u\) sont en formes normales et que \(u\) n'est pas
+  une abstraction, alors \(\App{t}{u}\) est en forme normale.
+\end{itemize}
+
+On en déduit qu'un terme est en forme normale si et seulement s'il est
+de la forme
+\(\Lam{\Var{x_0}}\ldots\Lam{\Var{x_k}}\App{\App{\App{x_i}{t_0}}{\ldots}}{t_l}\)
+où les \(t_j\) sont eux-mêmes des termes normaux.
+
+
+
+\attention{Pas vraiment :} Cependant il
+existe tout de meme deux formes normales, la faible qui considère
+qu'un lambda est une valeur finale, et la forte où meme les redex à
+l'intérieure d'une \emph{abstraction} doivent etre évaluées.  Il
+existe donc plusieurs stratégies de réduction qui permettent
+d'atteindre différents type de forme normale.
 
 \begin{example}
   Le terme 
