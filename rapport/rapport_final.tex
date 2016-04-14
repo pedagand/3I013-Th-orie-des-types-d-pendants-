@@ -314,9 +314,67 @@ de la forme
 \(\Lam{\Var{x_0}}\ldots\Lam{\Var{x_k}}\App{\App{\App{x_i}{t_0}}{\ldots}}{t_l}\)
 où les \(t_j\) sont eux-mêmes des termes normaux.
 
+\begin{example}[Terme en forme normale]
+  \todo{\(\Lam{\Var{x}}{\Var{x}}\)}
+\end{example}
+
+On dira qu'un terme \(t\) est \emph{normalisable} s'il existe un terme
+normal \(t'\) tel que \(t \Conv t'\). Un terme \(t\) est
+\emph{fortement normalisable} s'il n'existe aucune suite infinie de
+réduction à partir de \(t\). Un terme fortement normalisable est,
+\textit{a fortiori}, un terme normalisable.
+
+\begin{example}[Terme non normalisable]
+  \todo{\(\omega = \Lam{\Var{x}}{\App{(\App{x}{x})}{(\App{x}{x})}}\)}
+\end{example}
+
+\begin{example}[Terme normalisable mais pas fortement normalisable]
+  \todo{\(\App{(\Lam{\Var{x}}{0})}{\omega}\)}
+\end{example}
+
+Un terme normalisable (mais pas \emph{fortement} normalisable) pourra
+donc diverger ou retourner une forme normale selon les réductions
+effectuées lors de la conversion : l'ordre dans lequel sont effectuées
+ces réductions est donc important. Nous considérons ici une
+\emph{stratégie} de réduction qui est assurée d'obtenir la forme
+normale, pour tout terme normalisable : il s'agit de la réduction en
+appel par nom.
+
+On remarque tout d'abord que tout terme \(t\) du \(\lambda\)-calcul
+est de la forme
+%
+\[
+\Lam{\Var{x_0}}\Lam{\Var{x_m}}\App{\App{\App{k}{t_0}}{\ldots}}{t_n}
+\]
+%
+où \(k\) est soit une variable soit un redex (le \emph{redex de tête})
+tandis que les \(t_i\) sont des termes quelconques (et donc eux-même
+de cette forme).
 
 
-\attention{Pas vraiment :} Cependant il
+Un terme est en \emph{forme normale de tête} lorsque \(k\) est
+nécessairement une variable : le redex le plus à gauche du terme est
+``bloqué'' sur une variable et ne peut donc réduire.
+
+La stratégie d'\emph{appel par nom} consiste à contracter
+successivement le redex de tête (et uniquement ce redex). 
+
+\todo{Donner la réduction en appel par nom ici.}
+
+Crucialement, nous avons la propriété suivante~\citep[th.3,
+  p.62]{krivine:lambda-calculus} :
+%
+\begin{proposition}
+  Un terme \(t\) normalise vers une forme normale de tête si et
+  seulement la stratégie d'appel par nom termine (donnant un terme en
+  forme normale de tête).
+\end{proposition}
+
+Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
+pas fortement normalisable, on privilégiera ici la réduction en appel
+par nom.
+
+\attention{Ceci n'est pas correct :} Cependant il
 existe tout de meme deux formes normales, la faible qui considère
 qu'un lambda est une valeur finale, et la forte où meme les redex à
 l'intérieure d'une \emph{abstraction} doivent etre évaluées.  Il
