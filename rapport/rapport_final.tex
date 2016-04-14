@@ -250,17 +250,32 @@ un tel terme s'appelle un
   \(\App{x}{u}\) n'en est pas un.
 \end{example}
 
-En voici une définition formelle:
-\begin{align*}
-    Reduction(x) &\triangleq \Var{x} \\
-    Reduction(\Lam{x}{t}) &\triangleq \Lam{x}{t} \\
-    Reduction(\App{\Var{x}}{\Var{u}}) &\triangleq \App{\Var{x}}{\Var{u}} \\
-    Reduction(\App{\Lam{x}{\Var{t}}}{\Var{u}}) &\triangleq \subst{t}{x}{u} \\
-\end{align*}
+\newcommand{\Red}{\leadsto}
+\newcommand{\Conv}{\leadsto^{*}}
 
+Formellement, on définit la \(\beta\)-réduction par induction sur les
+termes :
+\[\begin{array}{c}
+  \inferrule{{}}
+            {\App{\Lam{\Var{x}}{t}}{u} \Red \subst{t}{x}{u}}
+  \medskip\\
+  \inferrule{t \Red t'}%
+            {\Lam{\Var{x}}{t} \Red \Lam{\Var{x}}{t'}}
+  \medskip\\
+  \inferrule{t \Red t'}
+            {\App{t}{u} \Red \App{t'}{u}}
+  \medskip\\
+  \inferrule{u \Red u'}
+            {\App{t}{u} \Red \App{t}{u'}}
+\end{array}\]
+
+On obtient la \(\beta\)-conversion en prenant la clôture reflexive et
+transitive \(t \Conv t'\) de la \(\beta\)-réduction : on a \(t \Conv
+t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
+\ldots \Red t'\).
 
 \begin{example}
-  Soit le terme \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
+  Soit le terme \attention{problème de parenthèse} \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
   sous la forme d'une application ayant une abstraction comme membre
   de gauche. La réduction consiste à substituer la variable liée par
   l'abstraction par le membre droit de l'application. On obtient donc 
