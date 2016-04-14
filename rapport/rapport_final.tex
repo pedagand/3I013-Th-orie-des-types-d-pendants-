@@ -238,12 +238,16 @@ Définition formelle de la substitution:
 
 
 \label{reduction}
-Seules les applications dont le membre de gauche est une abstraction
-peuvent être réduites, on appelle cela une \emph{redex}.
+Seules les applications de la forme \(\App{(\Lam{\Var{x}}{t})}{u}\),
+dont le membre de gauche est une abstraction, peuvent être réduites :
+un tel terme s'appelle un
+\emph{redex}~\citep{krivine:lambda-calculus}. Le terme
+\(\subst{t}{x}{u}\), obtenu après réduction, est appelé son
+\emph{contracté}.
 
 \begin{example}
-  Le terme \(\App{\Lam{x}{x}}{u}\) est une redex tandisque le terme
-  \(\App{x}{u}\) n'en est pas une.
+  Le terme \(\App{\Lam{x}{x}}{u}\) est \attention{``un'' redex, pas ``une''} un redex tandis que le terme
+  \(\App{x}{u}\) n'en est pas un.
 \end{example}
 
 En voici une définition formelle:
