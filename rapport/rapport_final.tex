@@ -238,25 +238,44 @@ Définition formelle de la substitution:
 
 
 \label{reduction}
-Seules les applications dont le membre de gauche est une abstraction
-peuvent être réduites, on appelle cela une \emph{redex}.
+Seules les applications de la forme \(\App{(\Lam{\Var{x}}{t})}{u}\),
+dont le membre de gauche est une abstraction, peuvent être réduites :
+un tel terme s'appelle un
+\emph{redex}~\citep{krivine:lambda-calculus}. Le terme
+\(\subst{t}{x}{u}\), obtenu après réduction, est appelé son
+\emph{contracté}.
 
 \begin{example}
-  Le terme \(\App{\Lam{x}{x}}{u}\) est une redex tandisque le terme
-  \(\App{x}{u}\) n'en est pas une.
+  Le terme \(\App{\Lam{x}{x}}{u}\) est \attention{``un'' redex, pas ``une''} un redex tandis que le terme
+  \(\App{x}{u}\) n'en est pas un.
 \end{example}
 
-En voici une définition formelle:
-\begin{align*}
-    Reduction(x) &\triangleq \Var{x} \\
-    Reduction(\Lam{x}{t}) &\triangleq \Lam{x}{t} \\
-    Reduction(\App{\Var{x}}{\Var{u}}) &\triangleq \App{\Var{x}}{\Var{u}} \\
-    Reduction(\App{\Lam{x}{\Var{t}}}{\Var{u}}) &\triangleq \subst{t}{x}{u} \\
-\end{align*}
+\newcommand{\Red}{\leadsto}
+\newcommand{\Conv}{\leadsto^{*}}
 
+Formellement, on définit la \(\beta\)-réduction par induction sur les
+termes :
+\[\begin{array}{c}
+  \inferrule{{}}
+            {\App{\Lam{\Var{x}}{t}}{u} \Red \subst{t}{x}{u}}
+  \medskip\\
+  \inferrule{t \Red t'}%
+            {\Lam{\Var{x}}{t} \Red \Lam{\Var{x}}{t'}}
+  \medskip\\
+  \inferrule{t \Red t'}
+            {\App{t}{u} \Red \App{t'}{u}}
+  \medskip\\
+  \inferrule{u \Red u'}
+            {\App{t}{u} \Red \App{t}{u'}}
+\end{array}\]
+
+On obtient la \(\beta\)-conversion en prenant la clôture reflexive et
+transitive \(t \Conv t'\) de la \(\beta\)-réduction : on a \(t \Conv
+t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
+\ldots \Red t'\).
 
 \begin{example}
-  Soit le terme \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
+  Soit le terme \attention{problème de parenthèse} \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
   sous la forme d'une application ayant une abstraction comme membre
   de gauche. La réduction consiste à substituer la variable liée par
   l'abstraction par le membre droit de l'application. On obtient donc 
@@ -275,14 +294,92 @@ En voici une définition formelle:
 \subsubsection{Stratégie de réduction : appel par nom}
 
 \label{reduction:call_by_name}
-Un terme est dit en \emph{forme normale} si on ne peut plus lui
-appliquer de réduction. La normalisation consiste donc à reduire
-autant que possible notre terme. Cependant il existe tout de meme deux 
-formes normales, la faible qui considère qu'un lambda est une valeur 
-finale, et la forte où meme les redex à l'intérieure d'une \emph{abstraction}
-doivent etre évaluées.
-Il existe donc plusieurs stratégies de réduction qui permettent d'atteindre 
-différents type de forme normale.
+Un terme est dit en \emph{forme
+  normale}~\citep{krivine:lambda-calculus} si on ne peut plus lui
+appliquer de réduction: il ne contient aucun redex. La normalisation
+consiste donc à reduire autant que possible notre terme. En
+particulier, on caractérise inductivement les formes normales de la
+façon suivante :
+%
+\begin{itemize}
+\item Une variable \(\Var{x}\) est en forme normale ;
+\item Si \(t\) est en forme normale, alors \(\Lam{\Var{x}}{t}\) est en
+  forme normale ;
+\item Si \(t\) et \(u\) sont en formes normales et que \(u\) n'est pas
+  une abstraction, alors \(\App{t}{u}\) est en forme normale.
+\end{itemize}
+
+On en déduit qu'un terme est en forme normale si et seulement s'il est
+de la forme
+\(\Lam{\Var{x_0}}\ldots\Lam{\Var{x_k}}\App{\App{\App{x_i}{t_0}}{\ldots}}{t_l}\)
+où les \(t_j\) sont eux-mêmes des termes normaux.
+
+\begin{example}[Terme en forme normale]
+  \todo{\(\Lam{\Var{x}}{\Var{x}}\)}
+\end{example}
+
+On dira qu'un terme \(t\) est \emph{normalisable} s'il existe un terme
+normal \(t'\) tel que \(t \Conv t'\). Un terme \(t\) est
+\emph{fortement normalisable} s'il n'existe aucune suite infinie de
+réduction à partir de \(t\). Un terme fortement normalisable est,
+\textit{a fortiori}, un terme normalisable.
+
+\begin{example}[Terme non normalisable]
+  \todo{\(\omega = \Lam{\Var{x}}{\App{(\App{x}{x})}{(\App{x}{x})}}\)}
+\end{example}
+
+\begin{example}[Terme normalisable mais pas fortement normalisable]
+  \todo{\(\App{(\Lam{\Var{x}}{0})}{\omega}\)}
+\end{example}
+
+Un terme normalisable (mais pas \emph{fortement} normalisable) pourra
+donc diverger ou retourner une forme normale selon les réductions
+effectuées lors de la conversion : l'ordre dans lequel sont effectuées
+ces réductions est donc important. Nous considérons ici une
+\emph{stratégie} de réduction qui est assurée d'obtenir la forme
+normale, pour tout terme normalisable : il s'agit de la réduction en
+appel par nom.
+
+On remarque tout d'abord que tout terme \(t\) du \(\lambda\)-calcul
+est de la forme
+%
+\[
+\Lam{\Var{x_0}}\Lam{\Var{x_m}}\App{\App{\App{k}{t_0}}{\ldots}}{t_n}
+\]
+%
+où \(k\) est soit une variable soit un redex (le \emph{redex de tête})
+tandis que les \(t_i\) sont des termes quelconques (et donc eux-même
+de cette forme).
+
+
+Un terme est en \emph{forme normale de tête} lorsque \(k\) est
+nécessairement une variable : le redex le plus à gauche du terme est
+``bloqué'' sur une variable et ne peut donc réduire.
+
+La stratégie d'\emph{appel par nom} consiste à contracter
+successivement le redex de tête (et uniquement ce redex). 
+
+\todo{Donner la réduction en appel par nom ici.}
+
+Crucialement, nous avons la propriété suivante~\citep[th.3,
+  p.62]{krivine:lambda-calculus} :
+%
+\begin{proposition}
+  Un terme \(t\) normalise vers une forme normale de tête si et
+  seulement la stratégie d'appel par nom termine (donnant un terme en
+  forme normale de tête).
+\end{proposition}
+
+Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
+pas fortement normalisable, on privilégiera ici la réduction en appel
+par nom.
+
+\attention{Ceci n'est pas correct :} Cependant il
+existe tout de meme deux formes normales, la faible qui considère
+qu'un lambda est une valeur finale, et la forte où meme les redex à
+l'intérieure d'une \emph{abstraction} doivent etre évaluées.  Il
+existe donc plusieurs stratégies de réduction qui permettent
+d'atteindre différents type de forme normale.
 
 \begin{example}
   Le terme 
@@ -688,11 +785,16 @@ La vérification de type s'effectue dans un \emph{contexte} qui assigne
 à chaque variable d'un programme son type. Le contexte est donc une
 liste ordonnée de paires variable/type :
 %
-\begin{align*}
-  \Gamma &::= &\mbox{(contexte)} \\
-         &\quad . & \mbox{(contexte vide)} \\
-         &\quad \Gamma, x : * & \mbox{(type de variable)} 
-\end{align*}
+\newenvironment{bnf}
+               {\[\begin{array}{lclr}}
+               {\end{array}\]}
+
+\begin{bnf}
+  \Gamma &::=& &\mbox{(contexte)} \\
+         &|& . & \mbox{(contexte vide)} \\
+         &|& \Gamma, x : * & \mbox{(type de variable)} 
+\end{bnf}
+
 
 Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 
@@ -1293,6 +1395,12 @@ n'ayant pas encore été présentée
 
 %Dans les types dépendants on pourra dire que l'on considère que nos termes sont des programmes 
 
+%% * Outro
+
+\clearpage
+
+\bibliographystyle{abbrvnat}
+\bibliography{prerapport.bib,rapport.bib}  
 
 \end{document}
 
