@@ -726,11 +726,16 @@ La vérification de type s'effectue dans un \emph{contexte} qui assigne
 à chaque variable d'un programme son type. Le contexte est donc une
 liste ordonnée de paires variable/type :
 %
-\begin{align*}
-  \Gamma &::= &\mbox{(contexte)} \\
-         &\quad . & \mbox{(contexte vide)} \\
-         &\quad \Gamma, x : * & \mbox{(type de variable)} 
-\end{align*}
+\newenvironment{bnf}
+               {\[\begin{array}{lclr}}
+               {\end{array}\]}
+
+\begin{bnf}
+  \Gamma &::=& &\mbox{(contexte)} \\
+         &|& . & \mbox{(contexte vide)} \\
+         &|& \Gamma, x : * & \mbox{(type de variable)} 
+\end{bnf}
+
 
 Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 
