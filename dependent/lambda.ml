@@ -26,12 +26,15 @@ type inTm =
   | DNil of inTm
   | DCons of inTm * inTm 
   | What
+  | Id of inTm * inTm * inTm
+  | Refl of inTm 
 and exTm = 
   | Ann of inTm * inTm 
   | BVar of int 
   | FVar of name 
   | Appl of exTm * inTm
   | Iter of inTm * inTm * inTm * inTm  
+  | Trans of inTm * inTm * inTm * inTm * inTm * inTm 
   | P0 of exTm
   | P1 of exTm 
   | DFold of inTm * inTm * inTm * inTm * inTm * inTm 
@@ -53,10 +56,14 @@ type value =
   | VDNil of value
   | VDCons of value * value 
 (*=End*)
+  | VId of value * value * value 
+  | VRefl of value
 and neutral = 
   | NFree of name 
   | NApp of neutral * value 
-  | VDFold of value * value * value * value * value * value 
+  | NIter of value * value * value * value
+  | NDFold of value * value * value * value * value * value 
+  | NTrans of value * value * value * value * value * value  
 
 
 type debug = 
@@ -116,6 +123,10 @@ let rec parse_term env t =
       | Sexp.Atom "?" -> What
       | Sexp.List [Sexp.Atom "succ"; n] -> 
 	 Succ(parse_term env n)
+      | Sexp.List [Sexp.Atom "id";gA;a;b] -> 
+	 Id((parse_term env gA),(parse_term env a),(parse_term env b))
+      | Sexp.List[Sexp.Atom "refl";a] -> 
+	 Refl(parse_term env a)
       | Sexp.List [Sexp.Atom "lambda"; Sexp.Atom var; body] -> 
 	 Abs(Global(var),(parse_term (Global(var)::env) body))
       | Sexp.List [Sexp.Atom "lambda"; Sexp.List vars ; body] -> 
@@ -156,6 +167,9 @@ let rec parse_term env t =
 	 DNil(parse_term env alpha)
       | Sexp.List [Sexp.Atom "dcons";a;xs] -> 
 	 DCons((parse_term env a),(parse_term env xs))
+(* ----------------------termes librairie-------------------------------- *)
+      | Sexp.List [Sexp.Atom "+";n;a] -> 
+	 Inv(Appl(Appl(Ann((parse_term env (Sexp.of_string "(lambda n (lambda a (iter (lambda x N) n (lambda ni (lambda x (succ x))) a)))")),Nat),(parse_term env n)),(parse_term env a)))
       | _ -> Inv(parse_exTm env t)
 and parse_exTm env t = 
   let rec lookup_var env n v
@@ -175,6 +189,8 @@ and parse_exTm env t =
      Ann((parse_term env x),(parse_term env t))
   | Sexp.List [Sexp.Atom "dfold";alpha;p;n;xs;f;a] -> 
      DFold((parse_term env alpha),(parse_term env p),(parse_term env n),(parse_term env xs),(parse_term env f),(parse_term env a))
+  | Sexp.List [Sexp.Atom "trans"; gA;p;a;b;q;x] ->
+     Trans((parse_term env gA),(parse_term env p),(parse_term env a),(parse_term env b),(parse_term env q),(parse_term env x))
   | Sexp.Atom v -> lookup_var env 0 (Global(v))
   | Sexp.List (f::args) -> 
      List.fold_left 
@@ -205,12 +221,14 @@ let rec pretty_print_inTm t l =
   | DNil(alpha) -> "(dnil " ^ pretty_print_inTm alpha l ^ ")"
   | DCons(a,xs) -> "(dcons " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm xs l ^ ")"
   | What -> "?"
+  | Id(bA,a,b) -> "(id " ^ pretty_print_inTm bA l ^ " " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm b l ^ ")"
+  | Refl(a) -> "(refl " ^ pretty_print_inTm a l ^ ")"
 and pretty_print_exTm t l =
   match t with 
   | Ann(x,y) ->  "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
   | BVar(x) -> begin 
       try List.nth l x with 
-	| Failure("nth") ->  failwith ("Pretty_print_exTm BVar: something goes wrong list is to short BVar de " ^ string_of_int x)
+	| Failure("nth") ->  failwith ("Pretty_print_exTm BVar: something goes wrong list is to short BVar de " ^ string_of_int x) 
 	| _ -> List.nth l x
     end
   | FVar (Global x) ->  x
@@ -222,7 +240,8 @@ and pretty_print_exTm t l =
   | P1(x) -> "(p1 " ^ pretty_print_exTm x l ^ ")"
   | DFold(alpha,p,n,xs,f,a) -> "(dfold " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm p l ^ " " ^pretty_print_inTm n l ^ 
 				 " " ^ pretty_print_inTm xs l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm a l ^ ")"
-
+  | Trans(bA,p,a,b,q,x) -> "(trans " ^ pretty_print_inTm bA l ^ " " ^pretty_print_inTm p l ^ " " ^pretty_print_inTm a l ^ " " ^
+			     pretty_print_inTm b l ^ " " ^pretty_print_inTm q l ^ " " ^pretty_print_inTm x l ^ ")"
 
 
 let rec substitution_inTm t tsub var = 
@@ -243,6 +262,8 @@ let rec substitution_inTm t tsub var =
   | DNil(alpha) -> DNil(substitution_inTm alpha tsub var)
   | DCons(a,xs) -> DCons((substitution_inTm a tsub var),(substitution_inTm a tsub var))
   | What -> What
+  | Id(gA,a,b) -> Id((substitution_inTm gA tsub var),(substitution_inTm a tsub var),(substitution_inTm b tsub var))
+  | Refl(a) -> Refl(substitution_inTm a tsub var)
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -255,6 +276,8 @@ and substitution_exTm  t tsub var =
   | P1(x) -> P1(substitution_exTm x tsub var)
   | DFold(alpha,p,n,xs,f,a) -> DFold((substitution_inTm alpha tsub var),(substitution_inTm p tsub var),(substitution_inTm n tsub var),
 				     (substitution_inTm xs tsub var),(substitution_inTm f tsub var),(substitution_inTm a tsub var))
+  | Trans(gA,p,a,b,q,x) -> Trans((substitution_inTm gA tsub var),(substitution_inTm p tsub var),(substitution_inTm a tsub var),
+				 (substitution_inTm b tsub var),(substitution_inTm q tsub var),(substitution_inTm x tsub var))
 
 
 
@@ -272,26 +295,28 @@ let rec big_step_eval_inTm t envi =
   | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
   | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
   | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
+  | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "TBD"
-and vitter (n,f,a) =
+and vitter (p,n,f,a) =
   match n with
   | VZero -> a
-  | VSucc(x) -> vapp(f,(vitter (x,f,a)))
-  | _ -> failwith "vitter n must be VZero or VSucc"
+  | VSucc(x) -> vapp(f,(vitter (p,x,f,a)))
+  | _ -> VNeutral(NIter(p,n,f,a))
 and big_step_eval_exTm t envi = 
   match t with 
   | Ann(x,_) -> big_step_eval_inTm x envi 
   | FVar(v) -> vfree v 
   | BVar(v) -> List.nth envi v 
   | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
-  | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm n envi),
-			    (big_step_eval_inTm f envi),
-			    (big_step_eval_inTm a envi))
+  | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm p envi),
+			     (big_step_eval_inTm n envi),
+			     (big_step_eval_inTm f envi),
+			     (big_step_eval_inTm a envi))
   | _ -> failwith "Chaques choses en son temps nottamment DFold"
 
 
@@ -319,12 +344,17 @@ let rec value_to_inTm i v =
   | VVec(alpha,n) -> Vec((value_to_inTm i alpha),(value_to_inTm i n))
   | VDNil(alpha) -> DNil(value_to_inTm i alpha)
   | VDCons(a,xs) -> DCons((value_to_inTm i a),(value_to_inTm i xs)) 
+  | VId(gA,a,b) -> Id((value_to_inTm i gA),(value_to_inTm i a),(value_to_inTm i b))
+  | VRefl(a) -> Refl(value_to_inTm i a) 
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> boundfree i x
   | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
-  | VDFold(alpha,p,n,xs,f,a) -> DFold((value_to_inTm i alpha),(value_to_inTm i p),(value_to_inTm i n),
+  | NDFold(alpha,p,n,xs,f,a) -> DFold((value_to_inTm i alpha),(value_to_inTm i p),(value_to_inTm i n),
 				      (value_to_inTm i xs),(value_to_inTm i f),(value_to_inTm i a))
+  | NIter(p,n,f,a) -> Iter((value_to_inTm i p),(value_to_inTm i n),(value_to_inTm i f),(value_to_inTm i a))
+  | NTrans(gA,p,a,b,q,x) -> Trans((value_to_inTm i gA),(value_to_inTm i p),(value_to_inTm i a),
+				  (value_to_inTm i b),(value_to_inTm i q),(value_to_inTm i x))
 
 
 let rec equal_inTm t1 t2 = 
@@ -443,6 +473,36 @@ let rec check contexte inT ty steps =
        | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
      end 
   | What -> create_report false (contexte_to_string contexte) steps ("What : we try to push this terme " ^ (pretty_print_inTm (value_to_inTm 0 ty)  []))
+  | Id(gA,a,b) -> let check_gA = check contexte gA VStar (pretty_print_inTm inT [] ^ ";"^ steps) in 		  
+		  let eval_gA = big_step_eval_inTm gA [] in 
+		  let check_a = check contexte a eval_gA (pretty_print_inTm inT [] ^ ";"^ steps) in 
+		  let check_b = check contexte b eval_gA (pretty_print_inTm inT [] ^ ";"^ steps) in 
+		  if res_debug(check_gA) 
+		  then 
+		    begin 
+		      if res_debug(check_a) 
+		      then 
+			begin 
+			  if res_debug(check_b) 
+			  then create_report true (contexte_to_string contexte) steps "NO"
+			  else create_report false (contexte_to_string contexte) steps "Id : b must be of type gA"
+			end 
+		      else create_report false (contexte_to_string contexte) steps "Id : a must be of type gA"
+		    end  
+		  else create_report false (contexte_to_string contexte) steps "Id : gA must be of type Star"
+  | Refl(a) -> 
+     begin
+       match ty with 
+       | VId(gA,ta,ba) -> let quote_ta = value_to_inTm 0 ta in 
+			  let quote_ba = value_to_inTm 0 ba in
+			  if equal_inTm a quote_ta && equal_inTm a quote_ba
+			  then
+			    begin 
+			      check contexte a gA (pretty_print_inTm inT [] ^ ";"^ steps)
+			    end 
+			  else create_report false (contexte_to_string contexte) steps "Refl : a and ta must be equal"	       
+       | _ -> create_report false (contexte_to_string contexte) steps "Refl : ty must be of type Id"
+     end
   | _ -> failwith "HEHEHEHEHE"
 and synth contexte exT steps =
   match exT with 
@@ -490,11 +550,7 @@ and synth contexte exT steps =
 			   end 
 			 else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : p is not of type (-> N *)") VStar
 		       end 
-		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : n is not of type VNat") VStar
-
-
-
-     
+		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : n is not of type VNat") VStar     
   | _ -> failwith "HAHAHAHAHAHAHA"
 
 

@@ -29,6 +29,9 @@ let inputs =
     (Vec(Nat,Succ(Zero)),"(vec N (succ zero))");
     (What,"?");
     (Abs(Global"x",What),"(lambda x ?)");
+    (Id(Nat,Zero,Succ(Zero)),"(id N zero (succ zero))");
+    (Refl(Zero),"(refl zero)");
+    (Inv(Trans(Nat,Nat,Nat,Nat,Nat,Nat)),"(trans N N N N N N)");
   ]
 
 let tests = List.map (fun (term, res) -> "test" >:: fun ctxt -> assert_equal (compare_term (pretty_print_inTm term []) res) true) inputs

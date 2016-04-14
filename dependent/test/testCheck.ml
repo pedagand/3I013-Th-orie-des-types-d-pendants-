@@ -8,19 +8,11 @@ let testcheck3x = "(pi A * (pi B (pi x A *) *))"
 
 let testcheck4x = "(pi F (-> * *) (pi X * (-> (F X) *)))"   
 
-
-(* let testcheckPositive inputTerm inputType =
-  assert_bool "Not type correct" (check [] (read inputTerm) inputType "" [])
-
-let testcheckNegative inputTerm inputType =
-  assert_bool "Unexpectedly type correct" (not (check [] (read inputTerm) inputType "" [])) *)
-
 let eq = "(lambda A (lambda a (lambda b (pi P (-> A *) (-> (P a) (P b))))))"
 
 
 let inputs =   
-  [
-    
+  [    
     ("(lambda x x)","(-> * *)",true);  
     ("(lambda x x)","(-> (-> * *) *)",false); 
     ("(pi x * *)","*",true);
@@ -44,7 +36,7 @@ let inputs =
     ("zero","N",true);
     ("(succ zero)","N",true);
     ("(lambda x N)","(-> N *)",true);
-(*    ("(iter (lambda x N) (succ (succ zero)) (lambda x (lambda y (succ x))) zero)","N",true); *)
+    ("(iter (lambda x N) (succ (succ zero)) (lambda n (lambda x (succ x))) zero)","N",true); 
     (testcheck4x,"*",true); 
     ("(vec N (succ (succ zero)))","*",true);
     ("(dnil N)","(vec N zero)",true);			      
@@ -52,19 +44,15 @@ let inputs =
     ("(dcons zero (dnil N))","(vec N (succ zero))",true);	  
     ("(dcons zero (dcons zero (dnil N)))","(vec N (succ (succ zero)))",true);
 								      ("(lambda x ?)","(-> * *)",false);								      
-								      
+										   ("(id N zero (succ zero))","*",true);
+   ("(refl zero)","(id N zero zero)",true);				
 (*
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);
     ("(cons N zero (nil N))","(list N)",true);
     ("(cons N zero (nil *))","(list N)",false);
-    ("(cons * zero (nil N))","(list N)",false); *)
-				       
-    
-
+    ("(cons * zero (nil N))","(list N)",false); *)  
   ]
-
-(* let () = Printf.printf "%s" (print_report(check [] (read "(dcons zero (dnil N))") (big_step_eval_inTm (VVec(VNat,VSucc(VZero))) []) ""))  *)
 
     
 let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (big_step_eval_inTm (read chek) []) "")) res) inputs 

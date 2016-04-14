@@ -23,6 +23,7 @@ let inputs
        ("(succ (succ zero))",Succ(Succ(Zero)));
        ("(: (succ zero) N)",Inv(Ann(Succ(Zero),Nat)));
        ("(iter N N N N)",Inv(Iter(Nat,Nat,Nat,Nat)));
+       ("(iter (lambda x N) (succ (succ zero)) (lambda n (lambda x (succ x))) zero)",Inv(Iter(Abs(Global "x",Nat),Succ(Succ Zero),Abs(Global "n",Abs(Global "x",Succ (Inv (BVar 0)))),Zero)));
        ("(pi P (-> A *) (-> (P a) (P b)))", 
 	Pi(Global "P",Pi(Global "NO",Inv(FVar (Global "A")),Star),Pi(Global "NO",Inv(Appl(BVar 0,Inv(FVar (Global"a")))),Inv(Appl(BVar 1,Inv(FVar (Global"b")))))));
        ("(lambda A (lambda a (lambda b (pi P (-> A *) (-> (P a) (P b))))))",
@@ -44,6 +45,10 @@ let inputs
        ("(dfold alpha P m xs f a)",Inv(DFold(Inv(FVar(Global "alpha")),Inv(FVar(Global "P")),Inv(FVar(Global "m")),Inv(FVar(Global "xs")),Inv(FVar(Global "f")),Inv(FVar(Global "a")))));
        ("?",What);      
        ("(lambda x ?)",Abs(Global("x"),What));
+       ("(id N zero (succ zero))", Id(Nat,Zero,Succ(Zero)));
+       ("(refl zero)",Refl(Zero));
+       ("(trans N N N N N N)",Inv(Trans(Nat,Nat,Nat,Nat,Nat,Nat)));
+       ("(+ (succ (succ zero)) (succ (succ zero)))", Inv(Appl(Appl(Ann((read "(lambda n (lambda a (iter (lambda x N) n (lambda ni (lambda x (succ x))) a)))"),Nat),(Succ(Succ Zero))),(Succ(Succ Zero)))));
        
       (* ( (pretty_print_inTm test1x []),(test1x)); *)
       (* (test1y),(test1x) ;*)]
@@ -53,3 +58,4 @@ let inputs
 
 let tests
     = List.map (fun (term, res) -> term >:: fun ctxt -> assert_equal (read term) res) inputs
+
