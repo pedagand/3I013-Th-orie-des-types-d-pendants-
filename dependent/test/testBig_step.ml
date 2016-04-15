@@ -3,14 +3,13 @@ open Sexplib
 open Lambda
 
 
-(* let () = 
-  Printf.printf "%s" (pretty_print_inTm (value_to_inTm 0 (big_step_eval_inTm (read ("(iter (lambda x N) (succ (succ zero)) (lambda x (lambda y (succ x))) zero)")) [])) []) *)
 
 let inputs = 
 [
   ("((: (lambda x x) (-> N N)) y)","y");
   ("(iter P zero (lambda x (succ x)) zero)","zero");
   ("(iter P (succ (succ (succ zero))) (lambda n (lambda x (succ x))) zero)","(succ (succ (succ zero)))"); 
+  ("(dfold N (lambda n (lambda xs N)) (succ (succ zero)) (dcons (succ zero) (dcons (succ (succ zero)) (dnil N))) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","(succ (succ (succ zero)))");
   
 ]
 

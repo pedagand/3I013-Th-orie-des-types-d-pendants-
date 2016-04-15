@@ -169,7 +169,7 @@ let rec parse_term env t =
 	 DCons((parse_term env a),(parse_term env xs))
 (* ----------------------termes librairie-------------------------------- *)
       | Sexp.List [Sexp.Atom "+";n;a] -> 
-	 Inv(Appl(Appl(Ann((parse_term env (Sexp.of_string "(lambda n (lambda a (iter (lambda x N) n (lambda ni (lambda x (succ x))) a)))")),
+	 Inv(Appl(Appl(Ann((parse_term env (Sexp.of_string "(lambda n_plus (lambda a_plus (iter (lambda x_plus N) n_plus (lambda ni_plus (lambda x_plus (succ x_plus))) a_plus)))")),
 			   parse_term env (Sexp.of_string "(-> N (-> N N))")),(parse_term env n)),(parse_term env a)))
       | _ -> Inv(parse_exTm env t)
 and parse_exTm env t = 
@@ -244,13 +244,6 @@ and pretty_print_exTm t l =
   | Trans(bA,p,a,b,q,x) -> "(trans " ^ pretty_print_inTm bA l ^ " " ^pretty_print_inTm p l ^ " " ^pretty_print_inTm a l ^ " " ^
 			     pretty_print_inTm b l ^ " " ^pretty_print_inTm q l ^ " " ^pretty_print_inTm x l ^ ")"
 
-
-let () = Printf.printf "!!!!!!%s!!!!" (pretty_print_inTm (read "(dfold N N N lol N N)") [])
-let () = Printf.printf "---------%s------------" (pretty_print_inTm (read "(dfold N N (lambda n n) N N N)") [])
-let () = Printf.printf "---------%s------------" (pretty_print_inTm (read "(dfold N (succ zero) (lambda n (lambda xs N)) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a a))) zero)") [])
-
-
-
 let rec substitution_inTm t tsub var = 
   match t with 
   | Inv x -> Inv(substitution_exTm x tsub var)
@@ -290,7 +283,6 @@ and substitution_exTm  t tsub var =
 
 let vfree n = VNeutral(NFree n)
   
-(*
 let rec big_step_eval_inTm t envi = 
   match t with 
   | Inv(i) -> big_step_eval_exTm i envi
@@ -309,14 +301,19 @@ and vapp v =
   match v with 
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
-  | _ -> failwith (pretty_print_inTm (value_to_inTm 0 v) []) 
+  | _ -> failwith "must not append" 
 and vitter (p,n,f,a) =
   match n,f with
   | (VZero,VLam fu) -> a
   | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
   | _ -> VNeutral(NIter(p,n,f,a))
+and vfold(alpha,p,n,xs,f,a) = 
+  match xs,f,n with
+  | (VDNil(alphi),VLam fu,VZero) -> a
+  | (VDCons(elem,y),VLam fu,VSucc(ni)) -> vapp(vapp(vapp(fu n,xs),elem),vfold(alpha,p,ni,y,f,a))
+  | _ -> VNeutral(NDFold(alpha,p,n,xs,f,a))
 and big_step_eval_exTm t envi = 
-  match t with 
+  match t with
   | Ann(x,_) -> big_step_eval_inTm x envi 
   | FVar(v) -> vfree v 
   | BVar(v) -> List.nth envi v 
@@ -325,13 +322,10 @@ and big_step_eval_exTm t envi =
 			     (big_step_eval_inTm n envi),
 			     (big_step_eval_inTm f envi),
 			     (big_step_eval_inTm a envi))
-  | DFold(alpha,p,n,xs,f,a) -> VNeutral(NDFold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
+  | DFold(alpha,p,n,xs,f,a) -> vfold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
 				      (big_step_eval_inTm n envi),(big_step_eval_inTm xs envi),
-				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi)))
-				      
-  | _ -> failwith "Chaques choses en son temps nottamment DFold"
-
-	 *)
+				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi))				      
+  | _ -> failwith "Chaques choses en son temps nottamment DFold"			    
 
 let boundfree i n = 
   match n with 
@@ -368,50 +362,6 @@ and neutral_to_exTm i v =
   | NIter(p,n,f,a) -> Iter((value_to_inTm i p),(value_to_inTm i n),(value_to_inTm i f),(value_to_inTm i a))
   | NTrans(gA,p,a,b,q,x) -> Trans((value_to_inTm i gA),(value_to_inTm i p),(value_to_inTm i a),
 				  (value_to_inTm i b),(value_to_inTm i q),(value_to_inTm i x))
-
-
-
-let rec big_step_eval_inTm t envi = 
-  match t with 
-  | Inv(i) -> big_step_eval_exTm i envi
-  | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
-  | Star -> VStar
-  | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
-  | Nat -> VNat
-  | Zero -> VZero
-  | Succ(n) -> VSucc(big_step_eval_inTm n envi)
-  | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
-  | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
-  | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
-  | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
-  | _ -> failwith "a faire plus tard"
-and vapp v = 
-  match v with 
-  | ((VLam f),v) -> f v
-  | ((VNeutral n),v) -> VNeutral(NApp(n,v))
-  | (x,y) -> failwith ("X" ^ (pretty_print_inTm (value_to_inTm 0 x) []) ^ "Y" ^ (pretty_print_inTm (value_to_inTm 0 y) []))
-and vitter (p,n,f,a) =
-  match n,f with
-  | (VZero,VLam fu) -> a
-  | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
-  | _ -> VNeutral(NIter(p,n,f,a))
-and big_step_eval_exTm t envi = 
-  match t with 
-  | Ann(x,_) -> big_step_eval_inTm x envi 
-  | FVar(v) -> vfree v 
-  | BVar(v) -> List.nth envi v 
-  | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
-  | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm p envi),
-			     (big_step_eval_inTm n envi),
-			     (big_step_eval_inTm f envi),
-			     (big_step_eval_inTm a envi))
-  | DFold(alpha,p,n,xs,f,a) -> VNeutral(NDFold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
-				      (big_step_eval_inTm n envi),(big_step_eval_inTm xs envi),
-				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi)))
-				      
-  | _ -> failwith "Chaques choses en son temps nottamment DFold"
-
-
 
 
 let rec equal_inTm t1 t2 = 
@@ -516,11 +466,10 @@ let rec check contexte inT ty steps =
 		  else create_report false (contexte_to_string contexte) steps "Vec : alpha must be of type star"
        | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be VStar"
      end 
-       (* ici c'est toujours pareil je ne sais pas si je dois matcher une FVar ou pas *)
   | DNil(alpha) -> 
      begin
        match ty with
-       | VVec(alpha_vec,zero) -> if equal_inTm (value_to_inTm 0 (big_step_eval_inTm alpha [])) 
+       | VVec(alpha_vec,VZero) -> if equal_inTm (value_to_inTm 0 (big_step_eval_inTm alpha [])) 
 					       (value_to_inTm 0 alpha_vec)
 				then create_report true (contexte_to_string contexte) steps "NO"
 				else create_report false (contexte_to_string contexte) steps "DNil : Alpha must be the sames"

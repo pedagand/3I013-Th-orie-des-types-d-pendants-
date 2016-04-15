@@ -41,28 +41,27 @@ let inputs =
     ("(vec N (succ (succ zero)))","*",true);
     ("(dnil N)","(vec N zero)",true);			      
     ("(dnil zero)","(vec N zero)",false);
+    ("(dnil N)","(vec N (succ zero))",false);
     ("(dcons zero (dnil N))","(vec N (succ zero))",true);	  
     ("(dcons zero (dcons zero (dnil N)))","(vec N (succ (succ zero)))",true);
+    ("(dcons zero (dcons zero (dnil N)))","(vec N (succ zero))",false);
+    ("(dcons zero (dcons zero (dcons zero (dnil N))))","(vec B (succ (succ (succ zero))))",false);
+    ("(dcons zero (dnil N))","(vec N (succ (succ zero)))",false);
+    ("(dcons zero (dcons zero (dcons zero (dnil N))))","(vec N (succ (succ zero)))",false);
     ("(lambda x ?)","(-> * *)",false);								      
 										   ("(id N zero (succ zero))","*",true);
    ("(refl zero)","(id N zero zero)",true);				
    ("(+ (succ (succ zero)) (succ (succ zero)))","N",true);
-   ("(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (succ x))))) zero)","N",true); 
-(*
+   ("(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (succ a))))) zero)","N",true); 
+   ("(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",true);			   ("(dfold N (lambda n (lambda xs N)) (succ (succ zero)) (dcons (succ zero) (dcons (succ (succ zero)) (dnil N))) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",true);										
+   ("(dfold N (lambda n (lambda xs N)) (succ (succ zero)) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",false);
+(* 
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);
     ("(cons N zero (nil N))","(list N)",true);
     ("(cons N zero (nil *))","(list N)",false);
     ("(cons * zero (nil N))","(list N)",false); *)  
   ]
-
-
-let test = print_report(check [] (read "(lambda n (lambda xs N))") (big_step_eval_inTm (read "(pi n N (pi xs (vec N zero) *))") []) "")
-
-let () = Printf.printf "%s" test 
-
-let x = check [] (read "(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (succ x))))) zero)") VNat "" 
-let () = Printf.printf "%s" (print_report x) 
 
 (* let () = Printf.printf "%s" (print_report (check [] (read "(dfold N (lambda n (lambda xs N)) (dcons zero (dnil N)) 
 	    (lambda n (lambda xs (lambda a a))) zero)") VNat "")) *)
