@@ -239,10 +239,16 @@ and pretty_print_exTm t l =
   | Iter(p,n,f,z) -> "(iter " ^ pretty_print_inTm p l ^ " " ^ pretty_print_inTm n l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm z l ^ ")"
   | P0(x) -> "(p0 " ^ pretty_print_exTm x l ^ ")"
   | P1(x) -> "(p1 " ^ pretty_print_exTm x l ^ ")"
-  | DFold(alpha,p,n,xs,f,a) -> "(dfold " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm p l ^ " " ^pretty_print_inTm n l ^ 
+  |  DFold(alpha,p,n,xs,f,a) -> "(dfold " ^ pretty_print_inTm alpha l ^ " " ^ pretty_print_inTm p l ^ " " ^pretty_print_inTm n l ^ 
 				 " " ^ pretty_print_inTm xs l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm a l ^ ")"
   | Trans(bA,p,a,b,q,x) -> "(trans " ^ pretty_print_inTm bA l ^ " " ^pretty_print_inTm p l ^ " " ^pretty_print_inTm a l ^ " " ^
 			     pretty_print_inTm b l ^ " " ^pretty_print_inTm q l ^ " " ^pretty_print_inTm x l ^ ")"
+
+
+let () = Printf.printf "!!!!!!%s!!!!" (pretty_print_inTm (read "(dfold N N N lol N N)") [])
+let () = Printf.printf "---------%s------------" (pretty_print_inTm (read "(dfold N N (lambda n n) N N N)") [])
+let () = Printf.printf "---------%s------------" (pretty_print_inTm (read "(dfold N (succ zero) (lambda n (lambda xs N)) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a a))) zero)") [])
+
 
 
 let rec substitution_inTm t tsub var = 
@@ -284,6 +290,7 @@ and substitution_exTm  t tsub var =
 
 let vfree n = VNeutral(NFree n)
   
+(*
 let rec big_step_eval_inTm t envi = 
   match t with 
   | Inv(i) -> big_step_eval_exTm i envi
@@ -302,7 +309,7 @@ and vapp v =
   match v with 
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
-  | _ -> failwith "TBD"
+  | _ -> failwith (pretty_print_inTm (value_to_inTm 0 v) []) 
 and vitter (p,n,f,a) =
   match n,f with
   | (VZero,VLam fu) -> a
@@ -318,8 +325,13 @@ and big_step_eval_exTm t envi =
 			     (big_step_eval_inTm n envi),
 			     (big_step_eval_inTm f envi),
 			     (big_step_eval_inTm a envi))
+  | DFold(alpha,p,n,xs,f,a) -> VNeutral(NDFold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
+				      (big_step_eval_inTm n envi),(big_step_eval_inTm xs envi),
+				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi)))
+				      
   | _ -> failwith "Chaques choses en son temps nottamment DFold"
 
+	 *)
 
 let boundfree i n = 
   match n with 
@@ -356,6 +368,50 @@ and neutral_to_exTm i v =
   | NIter(p,n,f,a) -> Iter((value_to_inTm i p),(value_to_inTm i n),(value_to_inTm i f),(value_to_inTm i a))
   | NTrans(gA,p,a,b,q,x) -> Trans((value_to_inTm i gA),(value_to_inTm i p),(value_to_inTm i a),
 				  (value_to_inTm i b),(value_to_inTm i q),(value_to_inTm i x))
+
+
+
+let rec big_step_eval_inTm t envi = 
+  match t with 
+  | Inv(i) -> big_step_eval_exTm i envi
+  | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
+  | Star -> VStar
+  | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
+  | Nat -> VNat
+  | Zero -> VZero
+  | Succ(n) -> VSucc(big_step_eval_inTm n envi)
+  | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
+  | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
+  | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
+  | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
+  | _ -> failwith "a faire plus tard"
+and vapp v = 
+  match v with 
+  | ((VLam f),v) -> f v
+  | ((VNeutral n),v) -> VNeutral(NApp(n,v))
+  | (x,y) -> failwith ("X" ^ (pretty_print_inTm (value_to_inTm 0 x) []) ^ "Y" ^ (pretty_print_inTm (value_to_inTm 0 y) []))
+and vitter (p,n,f,a) =
+  match n,f with
+  | (VZero,VLam fu) -> a
+  | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
+  | _ -> VNeutral(NIter(p,n,f,a))
+and big_step_eval_exTm t envi = 
+  match t with 
+  | Ann(x,_) -> big_step_eval_inTm x envi 
+  | FVar(v) -> vfree v 
+  | BVar(v) -> List.nth envi v 
+  | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
+  | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm p envi),
+			     (big_step_eval_inTm n envi),
+			     (big_step_eval_inTm f envi),
+			     (big_step_eval_inTm a envi))
+  | DFold(alpha,p,n,xs,f,a) -> VNeutral(NDFold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
+				      (big_step_eval_inTm n envi),(big_step_eval_inTm xs envi),
+				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi)))
+				      
+  | _ -> failwith "Chaques choses en son temps nottamment DFold"
+
+
 
 
 let rec equal_inTm t1 t2 = 
@@ -561,8 +617,8 @@ and synth contexte exT steps =
   | DFold(alpha,p,n,xs,f,a) -> let check_alpha = check contexte alpha VStar (pretty_print_exTm exT [] ^ ";") in
 			       let type_p = (Pi(Global"n",Nat,(Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
 			       let check_p = check contexte p (big_step_eval_inTm type_p []) (pretty_print_exTm exT [] ^ ";") in
-			       let check_n = check contexte n VNat (pretty_print_exTm exT [] ^ ";") in
-			       let check_xs = check contexte xs (big_step_eval_inTm (Vec(alpha,n)) [])  (pretty_print_exTm exT [] ^ ";") in 
+			       let check_n = check contexte n VNat (pretty_print_exTm exT [] ^ ";") in			       
+ 			       let check_xs = check contexte xs (big_step_eval_inTm (Vec(alpha,n)) [])  (pretty_print_exTm exT [] ^ ";") in 
   			       let check_f = check contexte f 
 						   (big_step_eval_inTm 
 						      (Pi(Global"n",Nat,
@@ -570,9 +626,9 @@ and synth contexte exT steps =
 							     Pi(Global"a",alpha,
 								Pi(Global"NO",Inv(Appl(Appl(Ann(p,type_p),n),xs)),
 								   Inv(Appl(Appl(Ann(p,type_p),Succ(n)),DCons(a,xs)))))))) []) 
-						   (pretty_print_exTm exT [] ^ ";") in
+						   (pretty_print_exTm exT [] ^ ";") in 
 			       let check_a = check contexte a (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) [])
-						   (pretty_print_exTm exT [] ^ ";") in
+						   (pretty_print_exTm exT [] ^ ";") in 
 			       if res_debug check_alpha 
 			       then 
 				 begin 
@@ -588,7 +644,7 @@ and synth contexte exT steps =
 					       if res_debug check_f 
 					       then 
 						 begin 
-						   if res_debug check_a
+						   if res_debug check_a 
 						   then create_retSynth (create_report true (contexte_to_string contexte) steps "DFold f must be of type ...") (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
 						   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold a must be of type alpha") VStar
 						 end 						   
@@ -600,7 +656,7 @@ and synth contexte exT steps =
 				     end 
 				   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold P must be of type") VStar
 				 end 				   
-			       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold alpha must be of type star") VStar
+			       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold alpha must be of type star") VStar 
 			       
   | _ -> failwith "HAHAHAHAHAHAHA"
 

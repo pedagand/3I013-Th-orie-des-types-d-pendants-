@@ -43,10 +43,11 @@ let inputs =
     ("(dnil zero)","(vec N zero)",false);
     ("(dcons zero (dnil N))","(vec N (succ zero))",true);	  
     ("(dcons zero (dcons zero (dnil N)))","(vec N (succ (succ zero)))",true);
-								      ("(lambda x ?)","(-> * *)",false);								      
+    ("(lambda x ?)","(-> * *)",false);								      
 										   ("(id N zero (succ zero))","*",true);
    ("(refl zero)","(id N zero zero)",true);				
    ("(+ (succ (succ zero)) (succ (succ zero)))","N",true);
+   ("(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (succ x))))) zero)","N",true); 
 (*
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);
@@ -55,6 +56,16 @@ let inputs =
     ("(cons * zero (nil N))","(list N)",false); *)  
   ]
 
+
+let test = print_report(check [] (read "(lambda n (lambda xs N))") (big_step_eval_inTm (read "(pi n N (pi xs (vec N zero) *))") []) "")
+
+let () = Printf.printf "%s" test 
+
+let x = check [] (read "(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (succ x))))) zero)") VNat "" 
+let () = Printf.printf "%s" (print_report x) 
+
+(* let () = Printf.printf "%s" (print_report (check [] (read "(dfold N (lambda n (lambda xs N)) (dcons zero (dnil N)) 
+	    (lambda n (lambda xs (lambda a a))) zero)") VNat "")) *)
     
 let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (big_step_eval_inTm (read chek) []) "")) res) inputs 
 

@@ -26,6 +26,7 @@ let inputs =
     (Inv(DFold(Inv(FVar(Global "alpha")),Inv(FVar(Global "P")),Inv(FVar(Global "m")),Inv(FVar(Global "xs")),Inv(FVar(Global "f")),Inv(FVar(Global "a")))),"(dfold alpha P m xs f a)");
     (DCons(Zero,DNil(Nat)),"(dcons zero (dnil N))");
     (DNil(Nat),"(dnil N)");
+    (Inv(DFold(Nat,Nat,Nat,Nat,Nat,Nat)),"(dfold N N N N N N)");
     (Vec(Nat,Succ(Zero)),"(vec N (succ zero))");
     (What,"?");
     (Abs(Global"x",What),"(lambda x ?)");
