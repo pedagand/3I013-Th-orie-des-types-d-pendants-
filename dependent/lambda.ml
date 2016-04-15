@@ -169,7 +169,8 @@ let rec parse_term env t =
 	 DCons((parse_term env a),(parse_term env xs))
 (* ----------------------termes librairie-------------------------------- *)
       | Sexp.List [Sexp.Atom "+";n;a] -> 
-	 Inv(Appl(Appl(Ann((parse_term env (Sexp.of_string "(lambda n (lambda a (iter (lambda x N) n (lambda ni (lambda x (succ x))) a)))")),Nat),(parse_term env n)),(parse_term env a)))
+	 Inv(Appl(Appl(Ann((parse_term env (Sexp.of_string "(lambda n (lambda a (iter (lambda x N) n (lambda ni (lambda x (succ x))) a)))")),
+			   parse_term env (Sexp.of_string "(-> N (-> N N))")),(parse_term env n)),(parse_term env a)))
       | _ -> Inv(parse_exTm env t)
 and parse_exTm env t = 
   let rec lookup_var env n v
@@ -303,9 +304,9 @@ and vapp v =
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "TBD"
 and vitter (p,n,f,a) =
-  match n with
-  | VZero -> a
-  | VSucc(x) -> vapp(f,(vitter (p,x,f,a)))
+  match n,f with
+  | (VZero,VLam fu) -> a
+  | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
   | _ -> VNeutral(NIter(p,n,f,a))
 and big_step_eval_exTm t envi = 
   match t with 
@@ -369,6 +370,9 @@ let rec equal_inTm t1 t2 =
   | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
   | (Cross(x1,y1),Cross(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
   | (What,What) -> true
+  | (Vec(x1,y1),Vec(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (DNil x1,DNil x2) -> equal_inTm x1 x2
+  | (DCons(x1,y1),DCons(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2 
   | _ -> false
 and equal_exTm t1 t2 = 
   match (t1,t2) with 
@@ -380,6 +384,9 @@ and equal_exTm t1 t2 =
      equal_inTm w1 w2 = equal_inTm x1 x2 = equal_inTm y1 y2 = equal_inTm z1 z2
   | (P0(x1),P0(x2)) -> equal_exTm x1 x2
   | (P1(x1),P1(x2)) -> equal_exTm x1 x2
+  | (DFold(alpha1,p1,n1,xs1,f1,a1),DFold(alpha2,p2,n2,xs2,f2,a2)) -> equal_inTm alpha1 alpha2 = equal_inTm p1 p2 
+								     = equal_inTm p1 p2 = equal_inTm n1 n2 
+								     = equal_inTm xs1 xs2 = equal_inTm f1 f2 = equal_inTm a1 a2
   | _ -> false
 
 
@@ -551,6 +558,50 @@ and synth contexte exT steps =
 			 else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : p is not of type (-> N *)") VStar
 		       end 
 		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Iter : n is not of type VNat") VStar     
+  | DFold(alpha,p,n,xs,f,a) -> let check_alpha = check contexte alpha VStar (pretty_print_exTm exT [] ^ ";") in
+			       let type_p = (Pi(Global"n",Nat,(Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
+			       let check_p = check contexte p (big_step_eval_inTm type_p []) (pretty_print_exTm exT [] ^ ";") in
+			       let check_n = check contexte n VNat (pretty_print_exTm exT [] ^ ";") in
+			       let check_xs = check contexte xs (big_step_eval_inTm (Vec(alpha,n)) [])  (pretty_print_exTm exT [] ^ ";") in 
+  			       let check_f = check contexte f 
+						   (big_step_eval_inTm 
+						      (Pi(Global"n",Nat,
+							  Pi(Global"xs",Vec(alpha,Inv(BVar 0)),
+							     Pi(Global"a",alpha,
+								Pi(Global"NO",Inv(Appl(Appl(Ann(p,type_p),n),xs)),
+								   Inv(Appl(Appl(Ann(p,type_p),Succ(n)),DCons(a,xs)))))))) []) 
+						   (pretty_print_exTm exT [] ^ ";") in
+			       let check_a = check contexte a (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) [])
+						   (pretty_print_exTm exT [] ^ ";") in
+			       if res_debug check_alpha 
+			       then 
+				 begin 
+				   if res_debug check_p
+				   then 
+				     begin 
+				       if res_debug check_n 
+				       then 
+					 begin 
+					   if res_debug check_xs 
+					   then
+					     begin 
+					       if res_debug check_f 
+					       then 
+						 begin 
+						   if res_debug check_a
+						   then create_retSynth (create_report true (contexte_to_string contexte) steps "DFold f must be of type ...") (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
+						   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold a must be of type alpha") VStar
+						 end 						   
+					       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold f must be of type ...") VStar
+					     end 
+					   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold xs must be of type Vec alpha n") VStar
+					 end
+				       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold n not a Nat") VStar
+				     end 
+				   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold P must be of type") VStar
+				 end 				   
+			       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold alpha must be of type star") VStar
+			       
   | _ -> failwith "HAHAHAHAHAHAHA"
 
 

@@ -46,6 +46,7 @@ let inputs =
 								      ("(lambda x ?)","(-> * *)",false);								      
 										   ("(id N zero (succ zero))","*",true);
    ("(refl zero)","(id N zero zero)",true);				
+   ("(+ (succ (succ zero)) (succ (succ zero)))","N",true);
 (*
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);

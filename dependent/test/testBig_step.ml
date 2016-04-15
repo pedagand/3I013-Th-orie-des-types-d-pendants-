@@ -10,7 +10,7 @@ let inputs =
 [
   ("((: (lambda x x) (-> N N)) y)","y");
   ("(iter P zero (lambda x (succ x)) zero)","zero");
-  ("(iter P (succ (succ (succ zero))) (lambda x (succ x)) zero)","(succ (succ (succ zero)))"); 
+  ("(iter P (succ (succ (succ zero))) (lambda n (lambda x (succ x))) zero)","(succ (succ (succ zero)))"); 
   
 ]
 
