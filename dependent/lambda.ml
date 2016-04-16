@@ -594,7 +594,7 @@ and synth contexte exT steps =
 					       then 
 						 begin 
 						   if res_debug check_a 
-						   then create_retSynth (create_report true (contexte_to_string contexte) steps "DFold f must be of type ...") (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
+						   then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
 						   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold a must be of type alpha") VStar
 						 end 						   
 					       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold f must be of type ...") VStar
@@ -606,6 +606,43 @@ and synth contexte exT steps =
 				   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold P must be of type") VStar
 				 end 				   
 			       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold alpha must be of type star") VStar 
+			 
+  | Trans(gA,p,a,b,q,x) -> let check_gA = check contexte gA VStar (pretty_print_exTm exT [] ^ ";") in
+			   let check_a = check contexte a (big_step_eval_inTm gA []) (pretty_print_exTm exT [] ^ ";") in
+			   let check_b = check contexte b (big_step_eval_inTm gA []) (pretty_print_exTm exT [] ^ ";") in
+			   let check_q = check contexte q (big_step_eval_inTm (Id(gA,a,b)) [])(pretty_print_exTm exT [] ^ ";") in
+			   let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
+			   let check_p = check contexte p (big_step_eval_inTm type_p []) (pretty_print_exTm exT [] ^ ";") in
+			   let check_x = check contexte x (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) (pretty_print_exTm exT [] ^ ";") in
+			   if res_debug check_gA 
+			   then
+			     begin 
+			       if res_debug check_a 
+			       then 
+				 begin 
+				   if res_debug check_b 
+				   then 
+				     begin 
+				       if res_debug check_q 
+				       then
+					 begin 
+					   if res_debug check_p
+					   then 
+					     begin 
+					       if res_debug check_x
+					       then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
+					       else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: x wrong type") VStar 
+					     end 
+					   else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: p wrong type") VStar 
+					 end 
+				       else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: q wrong type") VStar 
+				     end 
+				   else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: b must be of type gA") VStar 
+				 end
+			       else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: a must be of type gA") VStar 
+			     end
+			   else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: gA must be of type Star") VStar 
+    
 			       
   | _ -> failwith "HAHAHAHAHAHAHA"
 
