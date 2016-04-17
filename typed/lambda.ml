@@ -449,7 +449,7 @@ let gensym =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
-(*=check *)
+(*=check_abs *)
 let rec check contexte inT ty
     = match inT with
     | Abs(x, b) -> 
@@ -461,6 +461,8 @@ let rec check contexte inT ty
             check ((freshVar, s) :: contexte) (substitution_inTm b (FVar freshVar) 0) t
          | _ -> failwith "SAbstraction forced into a non-functional type"
        end
+(*=End *)
+(*=check_inv *)
     | Inv(t) -> 
        let tyT = synth contexte t in
        begin 
@@ -483,7 +485,7 @@ let rec check contexte inT ty
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
 (*=End *)
-(*=synth *)
+(*=synth_ann *)
 and synth contexte exT 
     = match exT with
     | Ann(tm, ty) ->
@@ -491,8 +493,12 @@ and synth contexte exT
          ty 
        else
          failwith "Wrong annotation"
+(*=End *)
+(*=synth_var *)
     | FVar(x) -> List.assoc x contexte
     | BVar x -> failwith "Bvar is not possible at this moment"
+(*=End *)
+(*=synth_appl *)
     | Appl(f, s) -> 
        let fTy = synth contexte f in
        begin

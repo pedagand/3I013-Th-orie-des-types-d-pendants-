@@ -2,4 +2,4 @@ rapport_final.pdf: rapport_final.tex
 	rubber --pdf rapport_final.tex
 
 clean: 
-	rm *.aux *.out *.pdf *.toc *.log
+	rm *.aux *.out *.pdf *.toc *.log *.bbl *.blg
