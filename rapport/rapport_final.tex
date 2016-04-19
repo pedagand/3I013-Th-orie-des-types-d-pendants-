@@ -1034,6 +1034,7 @@ nous verrons ici la façon de les représenters ainsi que leurs règles de typag
 Nous introduirons aussi un nouveau type, le produit cartésien.
 
 \subsubsection{Les entiers}
+\label{entier_type}
 
 Commençons cette fois-ci par les entiers étant donné que le type \emph{Nat}
 est déja présent dans notre language.
@@ -1467,6 +1468,7 @@ section suivante.
 %présentation formelle 
 
 \subsubsection{Equivalence entre les types et les termes}
+\label{presentation_type_dependants}
 
 Jusqu'a présent nous avions d'une part l'ensemble des types et l'ensemble des termes. Cette séparation 
 avait un sens car les termes et les types ne se comportaient pas de la meme façon. La plus grande différence 
@@ -1496,6 +1498,7 @@ logique, le quatifieur $\forall$ pourrait nous permettre d'écrire ce type de te
 Avec des variables au sein de nos types nous pouvons désormais introduire un ensemble de termes, 
 comme par exemple les vecteurs de taille \emph{n}.
 \begin{example}  
+  \label{example vecteur}
   Voici des vecteurs d'éléments de type $\alpha$ et de taille \emph{n}:
   \begin{align*}
     &[e] &: Vec\: 1\: \alpha \\
@@ -1542,46 +1545,142 @@ en figure~\ref{fig:typage dependant}
   \begin{align*}
     &\cfrac{x:T \in \Gamma}
     {\Gamma \vdash x \in T }\mbox{(Var)} \\
-    &\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-    {\Gamma\vdash f\:s\in B}\mbox{(App)} \\
-    &\cfrac{\Gamma\vdash T \ni t}
+    &\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
+    {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)} \\
+    &\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
     {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} \\
   \end{align*}
   \caption{Typage Dépendant}
   \label{fig:typage dependant} 
 \end{figure}
 
+Les deux nouvelles constructions \emph{Pi} et \emph{Star} sont des \emph{termes inférables} étant donné
+que l'on possède toute l'information nécéssaire pour les vérifier. De manière générale les types seront 
+des \emph{termes inférables}.
 
-En général dans les types dépendants le terme $\forall$ et appelé \emph{Pi} nous garderons cette convention.
+Si l'introduction d'un système bi-directionnel dans le $\lambda$-calcul pouvait ne pas etre indispensable, elle prend tout son 
+sens avec les types dépendants.
+Cependant nous ne pouvons pas parler de types dépendants sans un système bi-directionnel, ce sont dans les 
+\emph{termes inférables} que nous allons définir la dépendances que nous allons utilisé dans les 
+\emph{termes synthétisables}.
+Mis à part la dépendance introduite dans l'abstraction notre language ne comporte pas de termes exploitant 
+l'expressivité des types dépendants. Nous verrons au fur et à mesur des extensions toute leur richesse.
+
+En général le connecteur $\forall$ est appelé \emph{Pi} nous garderons cette convention.
 Les deux notations suivantes sont équivalentes: 
 \begin{align*}  
   \forall x:S.T \Leftrightarrow Pi\: x\: S\: T
 \end{align*}
+Afin d'alléger la syntaxe si l'on veut crée un \emph{Pi} anonyme on peut utiliser la notation suivante:
+\begin{align*}
+  & \forall x:Nat.Nat \Leftrightarrow Pi\: x\: Nat\: Nat \Leftrightarrow (Nat \rightarrow Nat) \\
+\end{align*}
 
-
-
-
-
-
-
-
-
-%a mettre après avoir présenté le système formelle
+Avant de poursuivre il est important de nous convaincre que l'ensemble des termes exprimables avec un système 
+de typage simple est inclus dans l'ensemble des termes des types dépendants.
 \begin{example}
-  L'ensemble des termes exprimables avec un système de typage simple est inclus dans l'ensemble des termes des types dépendants.
   On peut toujours exprimé une fonction identité applicable uniquement aux entiers de la manière suivante:
   \begin{align*}
     &\Lam{x}{x}\:\forall x:Int\:Int \\
   \end{align*}
 \end{example}
 
+\subsection{Extensions}
+
+Comme nous l'avons vu dans l'exemple précédent \ref{example vecteur} nous pouvons typé de nouveaux termes inexistants au paravant.
+Nous commencerons par mettre a niveau les encodages précédents. Nous présenterons ensuite les vecteurs ainsi que l'égalité.
+
+\subsubsection{Les entiers}
+
+Il nous faut maintenant introduire de la dépendance au sein des entiers. 
+Voici leurs nouvelles règles de typage:
+
+\todo{roman:mieux présenter iter dans la spec} 
+\begin{align*}
+  &\cfrac{}
+  {\Gamma\vdash * \ni Nat}&\mbox{(Nat)} \\
+  &\cfrac{}
+  {\Gamma\vdash Nat \ni Zero}&\mbox{(Zero)} \\
+  &\cfrac{\Gamma\vdash Nat \ni n}
+  {\Gamma\vdash Nat \ni Succ\:n}&\mbox{(Succ)} \\
+  &\cfrac{\Gamma\vdash Nat\rightarrow *\ni P\: \Gamma\vdash Nat\ni n\: \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\:
+  \Gamma\vdash P\:Zero\ni a}
+  {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}&\mbox{(Iter)}\\
+\end{align*}
+Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
+
+Dans le $\lambda$-calcul simplement typé \ref{entier_type} nous avions besoin que l'argument \emph{a} soit un \emph{terme synthétisable}
+afin de déterminer le type de retour de cette construction.
+Maintenant l'ensemble des arguments de iter sont des termes inférables car l'introduction d'un prédicat
+\emph{P} nous permet de connaitre le type de retour de iter et donc de vérifier les autres termes. 
+Ce prédicat nous permet d'une part de crée de la dépendance et d'autre part de rajouter de l'information.
+
+Pour continuer l'analogie avec la logique propositionnelle, on constate que la règle de typage de iter correspond à un raisonnement par
+\emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de zero. 
+Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
+
+\subsubsection{Les booléens}
+
+\todo{Nous n'avons pas vu les booléens dans les types dépendants donc à voir si il y à un réel ajout}
+
 \subsubsection{Les vecteurs}
 
-C'est un très bon exemple pour présenter les types dépendants 
+Les vecteurs sont un très bon exemple d'encodage où l'on peut introduire de la dépendance. Nous avions vu une présentation assez informelle
+des vecteurs afin de présenter les types dépendants, il sera donc question ici formaliser l'intuition de la
+la section \ref{presentation_type_dependants}. 
+
+Tout d'abord commençons par introduire le type des vecteurs:
+\begin{align*}
+  &\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
+  {\Gamma\vdash * \ni Vec\: \alpha\:n }&\mbox{(Vec)} \\
+\end{align*}
+
+Ici $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
+Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
+de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants dans 
+l'utilisation des types dépendants. Si l'on possédait ce genre de constructions dans un language comme Java par exemple, nous
+pourrions crée une surchage sur des fonctions qui permettrait de traiter différement les vecteurs de grande taille pour le tri par exemple.
+Certains tris étant beaucoup plus efficaces sur de grands vecteurs et inversements. 
+Voici maintenant deux constructeurs pour les vecteurs:
+\begin{align*}
+  &\cfrac{}
+  {\Gamma\vdash Vec\:\alpha\:n\ni dnil\:\alpha}&\mbox{(dnil)} \\
+  &\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
+  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
+\end{align*}
+
+Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
+\begin{example}
+  Voici un vecteur de taille trois et dont les éléments sont des entiers:
+  \begin{align*}
+    dcons\:zero\:(dcons\:(succ\:zero)\:(dcons\:zero\:(dnil\:Nat)))
+  \end{align*}  
+\end{example}
+
+Nous pouvons maintenant crée des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utilisers. Nous allons 
+implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold}.
+
+
+
+
+
+
+
+
+
+\subsubsection{L'egalite} 
+
 
 \subsection{Implémentation}
 
-\subsection{Type Checker}
+\subsubsection{Type Checker}
+
+
+
+%parler du fait que dans la règle inv on à maintenant
+\subsubsection{Normalisation}
+
+
 
 
 \subsection{Exemples de preuves}
