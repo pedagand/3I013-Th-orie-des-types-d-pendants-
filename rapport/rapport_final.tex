@@ -78,6 +78,8 @@
 \newenvironment{bnf}
                {\[\begin{array}{lclr}}
                {\end{array}\]}
+
+\newcommand{\fun}[1]{\lstinline!#1!}
 %% ** Title
 
 \title{Implémentation de la théorie des types dépendants}
@@ -582,7 +584,7 @@ la représentation ``locally nameless''.
 
 
 \subsubsection{Analyse syntaxique}
-
+\label{arsing}
 \todo{Je ne vois pas trop l'intérêt de cette section. Soit tu définis
   formellement le parser (sans donner le code), soit tu dis juste dans
   une phrase, quelque part que ta syntaxe de haut niveau est celle de
@@ -1619,6 +1621,15 @@ Pour continuer l'analogie avec la logique propositionnelle, on constate que la r
 \emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de zero. 
 Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
 
+Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide de notre syntaxe
+lispienne présentée en section \ref{parsing}:
+\begin{align*}
+  plus\:=\: (lambda\:n\:(lambda\:a\:(iter\:(lambda\:x\:N)\:n\:(lambda\:ni\:(lambda\:x\:(succ\:x)))\:a)))
+\end{align*}
+Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à iterer \emph{n} fois la fonction successeur sur \emph{m}.
+Afin d'aléger la syntaxe nous utiliserons dorénavant ``(+ n m'' correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
+\emph{m}.
+
 \subsubsection{Les booléens}
 
 \todo{Nous n'avons pas vu les booléens dans les types dépendants donc à voir si il y à un réel ajout}
@@ -1658,17 +1669,42 @@ Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui n
 \end{example}
 
 Nous pouvons maintenant crée des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utilisers. Nous allons 
-implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold}.
+implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold} dont voici une définition intuitive:
+\fun{fold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
+Définissons maintenant l'éliminateur \emph{dfold} comme un \emph{terme synthétisable}:
+\todo{modifier la présentation aussi}
+\begin{align*}
+  &\cfrac{\Gamma\vdash *\ni\alpha\:
+    \Gamma\vdash Nat \ni n \: 
+    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P\:
+    \Gamma\vdash Vec\:\alpha\:n\ni v\:
+    \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
+  {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}&\mbox{(dfold)}
+\end{align*}
+
+De la meme manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
+de rendre le type de retour dépendant des différents arguments.
+
+Il existe de nombreuses façon d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
+Voici le terme correspondant à cette utilisation:
+\begin{align*}
+  somme_liste\:=\:(lambda\:v (lambda n(dfold\:N\:(lambda\:n\:(lambda\:xs\:N))\:n\:v\:(lambda\:n(lambda\:xs\:(lambda\:a\:(lambda\:x\:(+\:a\:x)))))\:zero)))
+\end{align*}
+
+\subsubsection{L'égalite} 
+
+Pour implémenter l'égalité au sein de notre language il faut nous tourner vers la logique. 
+Leibniz philosophe du XVII siècle énonça que deux éléments sont identiques si elles ont les memes propriétés.
+\todo{expliquer plus en détail en faisant un parallèle avec la logique}
+
+On peut maintenant introduire le type de l'identité:
+\begin{align*}
+  &\cfrac{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
+  {\Gamma\vdash * \ni Id\:A\:a\:b}&\mbox{(Id)}
+\end{align*}
 
 
 
-
-
-
-
-
-
-\subsubsection{L'egalite} 
 
 
 \subsection{Implémentation}
