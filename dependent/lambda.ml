@@ -1,19 +1,18 @@
 open Sexplib
 
 
-(* je garde la représentation que l'on avait de l'abstraction, avec la variable en string au début *)
-
 type name =
   | Global of string 
   | Bound of int 
   | Quote of int
 
-
+(*=inTm *) 
 type inTm = 
   | Abs of name * inTm
   | Inv of exTm
   | Pi of name * inTm * inTm 
   | Star
+(*=End *)
   | Zero
   | Succ of inTm
   | Nat
@@ -28,11 +27,13 @@ type inTm =
   | What
   | Id of inTm * inTm * inTm
   | Refl of inTm 
+(*=exTm *) 
 and exTm = 
   | Ann of inTm * inTm 
   | BVar of int 
   | FVar of name 
   | Appl of exTm * inTm
+(*=End *)
   | Iter of inTm * inTm * inTm * inTm  
   | Trans of inTm * inTm * inTm * inTm * inTm * inTm 
   | P0 of exTm

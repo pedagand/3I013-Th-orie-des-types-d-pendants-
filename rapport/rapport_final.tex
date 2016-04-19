@@ -1143,6 +1143,10 @@ ainsi que celle des \emph{exTermes}
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
 
+Le type name permet ci dessous nous permettra de mettre des entiers à la place 
+d'un string, nous en reparlerons dans l'implémentation de l'évaluation.
+\codefrom{typed}{lambda}{name}
+
 De la meme façon que nous avons représenté nos termes voici la 
 représentation de nos types 
 
@@ -1235,6 +1239,10 @@ et le terme. Son code est assez triviale nous ne le présenterons donc pas ici.
 Les autres règles ne nécéssitent pas de commentaires particuliers.
 
 \subsubsection{Réduction forte à grands pas}
+
+\todo{expliquer plus en détail l'utilisation du type name}
+%le type name prend tous son sens dans cette section car il nous permet....
+
 
 Nous allons maintenant implémenté une nouvelle réduction. 
 Comme nous l'avons vu dans la section \ref{reduction_forte} %peut etre dans la partie safety je ne me souviens plus a voir 
@@ -1697,29 +1705,65 @@ Pour implémenter l'égalité au sein de notre language il faut nous tourner ver
 Leibniz philosophe du XVII siècle énonça que deux éléments sont identiques si elles ont les memes propriétés.
 \todo{expliquer plus en détail en faisant un parallèle avec la logique}
 
-On peut maintenant introduire le type de l'identité:
+On peut maintenant introduire le type identité:
 \begin{align*}
   &\cfrac{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
   {\Gamma\vdash * \ni Id\:A\:a\:b}&\mbox{(Id)}
 \end{align*}
 
+refl
+\begin{align*}
+  &\cfrac{\Gamma\vdash A \ni a}
+  {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}&\mbox{(refl)}
+\end{align*}
 
+et trans
+\begin{align*}
+  &\cfrac{
+    \Gamma\vdash * \ni A
+    \Gamma\vdash A\ni a
+    \Gamma\vdash A \ni b
+    \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *)
+    \Gamma\vdash Id\:A\:a\:b \ni q
+    \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
+    {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}&\mbox{(trans)}
+\end{align*}
 
-
+AFINIR
 
 \subsection{Implémentation}
+
+Etant donné que nous allons présenté l'implémentation finale de ce projet, nous verrons l'ensemble du code.
+Nous ne rentrerons pas dans les détails pour l'explication des parties redondantes, mais il sera plus facile 
+pour la lecture de disposer de l'intégralité des fonctions.
+
+
+\subsubsection{Noyau du language}
+
+Voici l'ensemble des termes formants le noyau de notre language.
+\codefrom{dependent}{lambda}{inTm}
+\codefrom{dependent}{lambda}{exTm}
+
+
+
+\subsubsection{Substitution et Normalisation}
+
+
+
+
 
 \subsubsection{Type Checker}
 
 
 
-%parler du fait que dans la règle inv on à maintenant
-\subsubsection{Normalisation}
+%parler du fait que dans la règle inv on à maintenant une égalité qui n'est plus celle de Ocaml
 
 
 
 
 \subsection{Exemples de preuves}
+
+
 
 
 
