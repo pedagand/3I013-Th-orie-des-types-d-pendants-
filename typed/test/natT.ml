@@ -3,7 +3,7 @@ open OUnit2
 open Lambda
 open Nat
 
-let testsucc = Appl(Ann(succ,(Fleche (Nat,(Fleche (Nat,(Fleche (Nat,Nat))))))),(value_to_inTm 0 (int_to_value 0)))
+(* let testsucc = Appl(Ann(succ,(Fleche (Nat,(Fleche (Nat,(Fleche (Nat,Nat))))))),(value_to_inTm 0 (int_to_value 0))) *)
 
 (*
 let () = Printf.printf "test eval derniere chance \n";
@@ -13,20 +13,15 @@ let () = Printf.printf "test eval derniere chance \n";
 
 (* test de relie libre *)
 let test1 test_ctxt = assert_equal 
-(Abs("y",(relie_libre_inTm 0 0 (Abs("x",Inv(Appl(BVar 0,Inv(FVar "0"))))))))
-(Abs("y",Abs("x",Inv(Appl(BVar 0,Inv(BVar 1))))))
+(Abs(Global "y",(relie_libre_inTm 0 0 (Abs(Global "x",Inv(Appl(BVar 0,Inv(FVar (Global "0")))))))))
+(Abs(Global "y",Abs(Global "x",Inv(Appl(BVar 0,Inv(BVar 1))))))
 
 
 
 (* let test2 test_ctxt = assert_equal (big_step_eval_exTm testsucc [] ) (int_to_value 1) poser la question de ce test qui ne marche pas *)
 (* test de check *)
-let test2 test_ctxt = assert_equal (check [] (Inv(Iter((Succ(Zero)),(Abs("x",Succ(Inv(BVar 0)))),(Ann(Zero,Nat))))) Nat) (true)
+let test2 test_ctxt = assert_equal (check [] (Inv(Iter((Succ(Zero)),(Abs(Global "x",Succ(Inv(BVar 0)))),(Ann(Zero,Nat))))) Nat) (true)
 
-
-(*test de inTm_to_string *)
-let test3 test_ctxt = assert_equal 
-			(inTm_to_string(Abs("f",Abs("a",Inv(Appl(BVar 1,Inv(BVar 0)))))) [] ) 
-			("([]f.([]a.f a))")
 
 
 
@@ -34,7 +29,7 @@ let test3 test_ctxt = assert_equal
 let tests = 
 ["test 1">:: test1;
  "test 2">:: test2;
- "test 3">:: test3]
+]
 
 (* XXX: turn those 'printf's into actual tests. Cf. [booleanT] for examples *)
 

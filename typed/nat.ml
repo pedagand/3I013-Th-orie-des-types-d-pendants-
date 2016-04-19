@@ -1,8 +1,8 @@
 open Lambda
 
 (** * Les entiers de church *)
-let zero = Abs("x",Abs("y",Inv(BVar 0)))
-let succ = Abs("n",Abs("f",Abs("x",Inv(Appl(BVar 1,(Inv(Appl(Appl(BVar 2,Inv(BVar 1)),Inv(BVar 0)))))))))
+let zero = Abs(Global "x",Abs(Global "y",Inv(BVar 0)))
+let succ = Abs(Global "n",Abs(Global "f",Abs(Global "x",Inv(Appl(BVar 1,(Inv(Appl(Appl(BVar 2,Inv(BVar 1)),Inv(BVar 0)))))))))
 
 
 (* Fonctions de manipulation *)

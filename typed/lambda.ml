@@ -1,22 +1,29 @@
 open Sexplib
 
-(*=Type *)
-type typ = 
-| Bool
-| Nat 
-| Fleche of typ * typ
-(*=End *)
-(*=type_pair *)
-| Croix of typ * typ 
+(*=name *)
+type name =
+  | Global of string 
+  | Bound of int 
+  | Quote of int
 (*=End *)
 
+(*=Type *)
+type typ = 
+  | Bool
+  | Nat 
+  | Fleche of typ * typ
+  (*=End *)
+  (*=type_pair *)
+  | Croix of typ * typ 
+(*=End *)
+		     
 (* Correspondance avec le papier 
 Abs = Lam
 Inf = Inv *)
 
 (*=inTm *)
 type inTm = 
-  | Abs of string * inTm
+  | Abs of name * inTm
   | Inv of exTm
 (*=End *)
   | True | False 
@@ -27,7 +34,7 @@ type inTm =
 (*=End *)
 (*=exTm *)
 and exTm = 
-  | FVar of string
+  | FVar of name
   | BVar of int
   | Appl of exTm * inTm
 (*=End *)
@@ -64,7 +71,7 @@ type value =
 (*=End *)
 (*=neutral *)
 and neutral = 
-  | NFree of string 
+  | NFree of name
   | NApp of neutral * value 
 (*=End *)
 
@@ -82,7 +89,7 @@ let rec typ_to_string t =
 let rec parse_term env t = 
       match t with   
       | Sexp.List [Sexp.Atom "lambda"; Sexp.Atom var; body] -> 
-	 Abs(var,(parse_term (var::env) body)) 
+	 Abs(Global(var),(parse_term ((Global(var))::env) body)) 
       | Sexp.List [Sexp.Atom "lambda"; Sexp.List vars ; body] -> 
 	 let vars = List.map (function 
 			       | Sexp.Atom v -> v
@@ -90,8 +97,8 @@ let rec parse_term env t =
 	 in 
 	 List.fold_right 
            (fun var b -> Abs(var,b))
-           vars
-           (parse_term (List.append (List.rev vars) env) body)      
+           (List.map (fun x -> Global(x)) vars)
+           (parse_term (List.append (List.rev ((List.map (fun x -> Global(x)) vars))) env) body)      
       | Sexp.Atom "zero" -> Zero
       | Sexp.Atom "true" -> True 
       | Sexp.Atom "false" -> False 
@@ -116,7 +123,7 @@ and parse_exTm env t =
      Ifte((parse_term env b),(parse_exTm env thens),(parse_exTm env elses))
   | Sexp.List [Sexp.Atom ":" ;x; t] -> 
      Ann((parse_term env x),(parse_type [] t))
-  | Sexp.Atom v -> lookup_var env 0 v 
+  | Sexp.Atom v -> lookup_var env 0 (Global(v)) 
   | Sexp.List [Sexp.Atom "iter"; n ; f ; a] -> 
      Iter((parse_term env n),(parse_term env f),(parse_exTm env a))
   | Sexp.List (f::args) -> 
@@ -140,7 +147,8 @@ let read t = parse_term [] (Sexp.of_string t)
 					     		 	
 let rec pretty_print_inTm t l = 
   match t with 
-  | Abs (x,y) -> "(lambda " ^ x ^ " " ^ pretty_print_inTm y (x :: l) ^ ")"
+  | Abs (Global(x),y) -> "(lambda " ^ x ^ " " ^ pretty_print_inTm y (x :: l) ^ ")"
+  | Abs(_,x) -> failwith "Pretty print Abs first arg must be a global"
   | Inv x -> pretty_print_exTm x l
   | True -> "true"
   | False -> "false"
@@ -149,7 +157,9 @@ let rec pretty_print_inTm t l =
   | Pair (x,y) -> "(, " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
 and pretty_print_exTm t l =
   match t with 
-  | FVar x -> x 
+  | FVar (Global x) -> x 
+  | FVar (Quote x) -> string_of_int x 
+  | FVar (Bound x) -> string_of_int x
   | BVar x -> List.nth l x	      
   | Appl(x,y) -> "( " ^ pretty_print_exTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
   | Ann(x,y) -> "(: " ^ pretty_print_inTm x l ^ " " ^ pretty_print_type y l ^ ")"
@@ -164,28 +174,6 @@ and pretty_print_type t l =
   | Fleche(x,y) -> "(-> " ^ pretty_print_type x l ^ " " ^ pretty_print_type y l ^ ")" 
   | Croix(x,y) ->  "(* " ^ pretty_print_type x l ^ " " ^ pretty_print_type y l ^ ")" 
     
-
-
-let rec exTm_to_string t l = 
-match t with
-| FVar x -> x 
-| BVar x -> List.nth l x	      
-| Appl(x,y) -> exTm_to_string x l ^ " " ^ inTm_to_string y l 
-| Ann(x,y) -> inTm_to_string x l ^ ":" ^ typ_to_string y
-| Ifte(x,y,z) -> "if " ^ inTm_to_string x l ^ " then " ^ exTm_to_string y l ^ " else " ^ exTm_to_string z l
-| Iter(n,f,a) -> "(iter " ^ inTm_to_string n l ^ inTm_to_string f l ^ exTm_to_string a l ^ ")" 
-| P0(x) -> "P0(" ^ exTm_to_string x l ^ ")"
-| P1(x) -> "P0(" ^ exTm_to_string x l ^ ")"
-and inTm_to_string t l = 
-match t with 
-| Abs (x,y) -> "([]" ^ x  ^ "." ^ inTm_to_string y (x::l) ^ ")"
-| Inv x -> exTm_to_string x l
-| True -> "true"
-| False -> "false"
-| Zero -> "zero"
-| Succ x -> "succ(" ^ inTm_to_string x l ^ ")"
-| Pair (x,y) -> "(" ^ inTm_to_string x l ^ "," ^ inTm_to_string y l ^ ")"
-
 
 let rec lambda_term_to_string t = 
   match t with
@@ -211,12 +199,16 @@ let gensym2 =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
+let boundfree i n = 
+  match n with 
+  | Quote k -> BVar (i - k - 1)
+  | x -> FVar x
 (*=value_to_inTm *)
 let rec value_to_inTm i v =
   match v with 
   | VLam(f) -> let var = gensym2 () in 
 	       begin 
-		 Abs(var,(value_to_inTm (i+1) (f(vfree(string_of_int (-i))))))
+		 Abs(Global(var),(value_to_inTm (i+1) (f(vfree(Quote i)))))
 	       end 
   | VNeutral(x) -> Inv(neutral_to_exTm i x)
 (*=End *)
@@ -228,9 +220,7 @@ let rec value_to_inTm i v =
 (*=neutral_to_exTm *)
 and neutral_to_exTm i v = 
   match v with 
-  | NFree x -> let k = int_of_string x in
-	       if k <= 0 then BVar(i + k - 1)
-	       else FVar x
+  | NFree x -> boundfree i x	       	       
   | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
 (*=End *)
 		     
@@ -306,7 +296,7 @@ let rec relie_libre_inTm i bv t =
 and relie_libre_exTm  i bv t = 
   match t with 
   | BVar v -> BVar v 
-  | FVar v when v = string_of_int i -> BVar bv
+  | FVar (Global v) when v = string_of_int i -> BVar bv
   | FVar v -> FVar v 
   | Appl(x,y) -> Appl((relie_libre_exTm i bv x),(relie_libre_inTm i bv y))
 (*=End*)
@@ -436,7 +426,8 @@ let rec typed_to_simple_inTm t =
 and typed_to_simple_exTm t = 
   match t with 
     | BVar x -> SBVar x 
-    | FVar x -> SFVar x
+    | FVar (Global x) -> SFVar x
+    | FVar x -> failwith "not possible at this time" 
     | Appl(x,y) -> SAppl((typed_to_simple_exTm x),(typed_to_simple_inTm y))
     | Ann(x,y) -> typed_to_simple_inTm x 
     | Ifte(x,y,z) -> SIfte((typed_to_simple_inTm x),(typed_to_simple_exTm y),(typed_to_simple_exTm z))
@@ -458,7 +449,7 @@ let rec check contexte inT ty
          | Fleche(s, t) -> 
             (* XXX: open the de Bruijn binder *)
             let freshVar = gensym () in
-            check ((freshVar, s) :: contexte) (substitution_inTm b (FVar freshVar) 0) t
+            check ((Global(freshVar), s) :: contexte) (substitution_inTm b (FVar (Global(freshVar))) 0) t
          | _ -> failwith "SAbstraction forced into a non-functional type"
        end
 (*=End *)
