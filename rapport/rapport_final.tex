@@ -192,6 +192,7 @@ Un des problèmes introduit par cette représentation des variables est qu'il de
 d'$\alpha$-équivalence.
 
 \subsubsection{$\alpha$-équivalence}
+\label{alpha_equiv}
 
 \newcommand{\equivAlpha}{\mathop{\equiv_\alpha}}
 
@@ -1841,9 +1842,9 @@ Nous aurons aussi besoin des fonctions suivantes:
 -\fun{res_debug}: qui retourne le booléens présent dans le rapport.    
 -\fun{create_report}: qui crée un rapport en prenant un argument pour chaque champs du \fun{report}
 L'équivalent de ces fonctions pour le type \emph{debug synth} sont suivis de \fun{_synth}.
-
+Cette assistance est nécéssaire pour aider les programmeurs à connaitre la source de l'erreur,
 tout comme le font les compilateurs modernes. Cela nous aide aussi pour tester la validité de celui 
-ci car 
+ci car on peut maintenant tester si la vérification d'un terme est fausse.
 
 Nous avons désormais une forme normale pour les types, il est donc intérressant de 
 fournire cette forme normale directement au type-checker. La fonction \fun{check} prend donc maintenat
@@ -1860,10 +1861,20 @@ $\cfrac{\Gamma,x:S\vdash T \ni t}
 $\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
     {\Gamma\vdash T \ni inv(t)}$
 
+Le principal changement de cette implémentation est le changement d'égalité. 
+En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut 
+tester l'égalité avec la simple fonction d'ocaml. Il nous faut donc d'abord transformer 
+nos \emph{value} en \emph{termes inférables}. Le second problème est que le nom associé 
+aux différents binder tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
+meme nom. Comme nous l'avons vu dans la section \ref{alpha_equiv}sur l'$\alpha$-équivalence 
+deux termes sont égaux meme si le nom de leur variables est différents. 
+La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
+du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les memes.
 
 \codefrom{dependent}{lambda}{check_star}
 $\cfrac{}
     {\Gamma \vdash * \ni *}$
+
 
 
 \codefrom{dependent}{lambda}{check_pi}
@@ -1873,25 +1884,27 @@ $\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
 
 
 
+
 \codefrom{dependent}{lambda}{synth_var}
 $\cfrac{x:T \in \Gamma}
     {\Gamma \vdash x \in T }$
+Tout comme dans l'implémentation précédente il n'est pas possible de rencontrer de variable 
+liée lors de la vérification de type.
 
 \codefrom{dependent}{lambda}{synth_app}
 
 $\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
     {\Gamma\vdash f\:s\in \subst{T}{s}{x}}$
 
+
+
 \codefrom{dependent}{lambda}{synth_ann}
 
 $\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
     {\Gamma\vdash (t:T) \in T}$
 
-
-
-
-
-
+Etant donné que nos termes et nos types sont équivalents il faut maintenant vérifier que 
+\emph{T} est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
 
 
 
