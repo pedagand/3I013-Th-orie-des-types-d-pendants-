@@ -21,9 +21,11 @@ type inTm =
   | List of inTm 
   | Nil of inTm 
   | Cons of inTm * inTm * inTm 
+(*=terme_vector *)
   | Vec of inTm * inTm
   | DNil of inTm
   | DCons of inTm * inTm 
+(*=End *)
   | What
   | Id of inTm * inTm * inTm
   | Refl of inTm 
@@ -38,25 +40,27 @@ and exTm =
   | Trans of inTm * inTm * inTm * inTm * inTm * inTm 
   | P0 of exTm
   | P1 of exTm 
+(*=terme_dfold *)
   | DFold of inTm * inTm * inTm * inTm * inTm * inTm 
+(*=End *)
  
-(*= Value*)
+(*=Value *)
 type value = 
   | VLam of (value -> value)
   | VNeutral of neutral 
   | VStar 
   | VPi of value * (value -> value)
-(*= End*)
-(*= Value_Nat*)
+(*=End *)
+(*=Value_Nat *)
   | VNat
   | VZero
   | VSucc of value
 (*=End*)
-(*= Value_Vector*)
+(*=Value_Vector *)
   | VVec of value * value 
   | VDNil of value
   | VDCons of value * value 
-(*=End*)
+(*=End *)
   | VId of value * value * value 
   | VRefl of value
 and neutral = 
@@ -288,18 +292,22 @@ and substitution_exTm  t tsub var =
 
 let vfree n = VNeutral(NFree n)
   
+(*=big_step_inv *) 
 let rec big_step_eval_inTm t envi = 
   match t with 
   | Inv(i) -> big_step_eval_exTm i envi
+(*=End *)
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
   | Star -> VStar
   | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
   | Nat -> VNat
   | Zero -> VZero
   | Succ(n) -> VSucc(big_step_eval_inTm n envi)
+(*=big_step_vec *) 
   | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
   | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
   | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
+(*=End *)
   | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
   | Refl(a) -> VRefl(big_step_eval_inTm a envi)
   | _ -> failwith "a faire plus tard"
@@ -313,11 +321,13 @@ and vitter (p,n,f,a) =
   | (VZero,VLam fu) -> a
   | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
   | _ -> VNeutral(NIter(p,n,f,a))
+(*=vfold *) 
 and vfold(alpha,p,n,xs,f,a) = 
   match xs,f,n with
   | (VDNil(alphi),VLam fu,VZero) -> a
   | (VDCons(elem,y),VLam fu,VSucc(ni)) -> vapp(vapp(vapp(fu n,xs),elem),vfold(alpha,p,ni,y,f,a))
   | _ -> VNeutral(NDFold(alpha,p,n,xs,f,a))
+(*=End *)
 and big_step_eval_exTm t envi = 
   match t with
   | Ann(x,_) -> big_step_eval_inTm x envi 
@@ -470,6 +480,7 @@ let rec check contexte inT ty steps =
 	 | VNat -> check contexte x VNat (pretty_print_inTm inT [] ^ ";"^ steps)
 	 | _ -> create_report false (contexte_to_string contexte) steps "Succ : ty must be VNat"
      end 
+(*=check_vec *)
   | Vec(alpha,n) -> 
      begin        
        match ty with 
@@ -478,7 +489,9 @@ let rec check contexte inT ty steps =
 		  then check contexte n VNat (pretty_print_inTm inT [] ^ ";"^ steps)
 		  else create_report false (contexte_to_string contexte) steps "Vec : alpha must be of type star"
        | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be VStar"
-     end 
+     end
+(*=End *)
+(*=check_dnil *)
   | DNil(alpha) -> 
      begin
        match ty with
@@ -488,6 +501,8 @@ let rec check contexte inT ty steps =
 				else create_report false (contexte_to_string contexte) steps "DNil : Alpha must be the sames"
        | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be a VVec"       
      end 
+(*=End *)
+(*=check_dcons *)
   | DCons(a,xs) -> 
      begin 
        match ty with 
@@ -497,6 +512,7 @@ let rec check contexte inT ty steps =
 				 else create_report false (contexte_to_string contexte) steps "DCons : xs must be of type (VVec alpha n)"
        | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
      end 
+(*=End *)
   | What -> create_report false (contexte_to_string contexte) steps ("What : we try to push this terme " ^ (pretty_print_inTm (value_to_inTm 0 ty)  []))
   | Id(gA,a,b) -> let check_gA = check contexte gA VStar (pretty_print_inTm inT [] ^ ";"^ steps) in 		  
 		  let eval_gA = big_step_eval_inTm gA [] in 

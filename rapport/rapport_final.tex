@@ -107,7 +107,24 @@
 
 \section{Introduction}
 
-blablawsdsdfsdf
+Les languages de programmation sont des outils d'abstraction de plus en plus répandus. Cependant leur utilisation n'est pas possible 
+sans un certains nombres de logiciels. Le compilateur est le logicielle centrale car c'est lui qui définit l'ensemble des 
+composantes du language.
+Il sera donc question dans ce rapport de comprendre le typage, une des étapes de la chaine de compilation.
+Pour résumé brievement le compilateur 
+traduit d'abord le texte écris par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite analysable 
+par un programme. %bof
+Si le compilateur ne génère pas d'erreur durant cette étape on dit que le programme est syntaxiquement correcte. Cependant 
+le programmeur à pu écrire des instructions tels que ``x = 2 + true''. Meme si cette instruction est syntaxiquement correcte, celle ci 
+n'a aucun sens. Il lui faut maintenant à partir de l'arbre de syntaxe abstraite générer du code assembleur, un code compréhensible 
+par les microprocesseurs. Le compilateur peut très bien générer une suite d'instructions assembleurs correspondant à l'expression 
+précédente, c'est durant l'execution du programme que le processeur va interompre le programme. Lorsque ces erreurs surviennent il est 
+très compliqué de trouver la source de celle ci car l'instruction fautive ne correspond pas au code écrit par le programmeur. 
+Pour évitez ce genre d'erreurs qui peuvent survenirs très longtemps après le lancement du programme (les serveurs par exemple), 
+il nous faut donc vérifier la validité de celui ci. Il faut donc rajouter une étape dans la chaine de compilation grace au typage 
+assuré par le type-checker.
+L'intéret du typage est donc de vérifier que le programme s'executera correctement, sans avoir besoins d'éxecuter celui ci. 
+Il permet aussi d'obtenir des informations très précises sur la sources des erreurs.
 
 \section{$\lambda$-calcul non typé}
 
@@ -732,8 +749,9 @@ Si \emph{n} est un \emph{Succ(num)} alors il faut d'abord evaluer l'application
 
 \section{Le $\lambda$-calcul simplement typé}
 
-%je ne sais pas si je met ça ici ou dans l'introduction du debut à voir
-En gros dire que ça ne sert a rien de compiler du code qui ne peut pas marcher
+Il nous faut maintenant définir un système formelle permettant de determiner si l'éxecution du programme,
+c'est à dire la réduction de nos termes vas bien se dérouler. Dans un premier temps nous introduirons les 
+types, puis nous verrons comment les utiliser en définissant des règles de typage pour nos termes.
 
 \subsection{Les types}
 \label{simple_type}
@@ -1811,7 +1829,7 @@ et trans
 
 Etant donné que nous allons présenté l'implémentation finale de ce projet, nous verrons l'ensemble du code.
 Nous ne rentrerons pas dans les détails pour l'explication des parties redondantes, mais il sera plus facile 
-pour la lecture de disposer de l'intégralité des fonctions.
+pour la lecture de disposer de l'intégralité des fonctions. 
 
 \todo{je ne sais pas si c'est une bonne idée}
 
@@ -1918,6 +1936,40 @@ Désormais nous utiliserons seulement la réduction à grand pas
 
 
 %parler du fait que dans la règle inv on à maintenant une égalité qui n'est plus celle de Ocaml
+
+
+\subsubsection{Les entiers}
+
+\subsubsection{Les vecteurs}
+
+Pour cette implémentation nous avons besoin d'intégrer les termes ainsi que les \emph{value} suivant:
+
+\codefrom{dependent}{lambda}{terme_vector}
+\codefrom{dependent}{lambda}{terme_dfold}
+\codefrom{dependent}{lambda}{Value_Vector}
+
+
+Passons à l'implémentation au sein du type checker:
+
+\codefrom{dependent}{lambda}{check_vec}
+\codefrom{dependent}{lambda}{check_dnil}
+\codefrom{dependent}{lambda}{check_dcons}
+
+\todo{Gros problème mes implémentations sont claires mais pas adaptables au format papier ....}
+
+
+Commençons par implémenter l'évaluation des vecteurs.
+\codefrom{dependent}{lambda}{big_step_vec}
+Rien de plus classique en ce qui concerne nos trois constructeurs. 
+En revanche l'évaluation de vfold nécéssite 
+
+
+
+\codefrom{dependent}{lambda}{vfold}
+
+Commençons tout d'abord par voir
+
+\subsubsection{L'égalité}
 
 
 
