@@ -66,7 +66,7 @@ and neutral =
   | NDFold of value * value * value * value * value * value 
   | NTrans of value * value * value * value * value * value  
 
-
+(*=debug *) 
 type debug = 
   | Report of debug * debug * debug * debug
   | Success of bool
@@ -75,7 +75,7 @@ type debug =
   | Error of string
 and debug_synth = 
   | RetSynth of debug * value
-
+(*=End *)
 (* fonction pour les rapports d'erreurs *)
 let create_report s c e er= 
   Report(Success(s),Contexte(c),Steps(e),Error(er))
@@ -410,7 +410,7 @@ let rec contexte_to_string contexte =
   | _ -> failwith "Must not append"
 
 
-
+(*=check_abs *)
 let rec check contexte inT ty steps = 
   match inT with 
   | Abs(x,y) -> 
@@ -420,6 +420,8 @@ let rec check contexte inT ty steps =
 		     check (((Global freshVar),s)::contexte) (substitution_inTm y (FVar(Global(freshVar))) 0) (t (vfree (Global freshVar))) (pretty_print_inTm inT [] ^ ";"^ steps) 
        | _ -> create_report false (contexte_to_string contexte) steps "Abs type must be a Pi"
      end 
+(*=End *)
+(*=check_inv *)
   | Inv(x) -> 
      let ret = synth contexte x (pretty_print_inTm inT [] ^ ";" ^ steps) in 
      if res_debug_synth ret
@@ -430,12 +432,16 @@ let rec check contexte inT ty steps =
 	 else create_report false (contexte_to_string contexte) steps "Inv: ret and ty are not equal"
        end
      else create_report false (contexte_to_string contexte) steps ("Inv: Synth of x goes wrong \n ----Rapport du Inv---\n" ^ print_report_synth ret ^ "\n------Fin Rapport Inv---\n")
+(*=End *)
+(*=check_star *)
   | Star -> 
      begin 
       match ty with 
 	| VStar -> create_report true (contexte_to_string contexte) steps "No"
 	| _ -> create_report false (contexte_to_string contexte) steps "Star : ty must be of type Star"
      end
+(*=End *)
+(*=check_pi *)
   | Pi (v,s,t) -> 
      begin 
        match ty with 
@@ -445,6 +451,7 @@ let rec check contexte inT ty steps =
 		  else create_report false (contexte_to_string contexte) steps "Pi : S is not of type Star"
        | _ -> create_report false (contexte_to_string contexte) steps "Pi : ty must be of type Star"
      end 
+(*=End *)
   | Nat -> 
      begin 
        match ty with
@@ -522,10 +529,13 @@ let rec check contexte inT ty steps =
        | _ -> create_report false (contexte_to_string contexte) steps "Refl : ty must be of type Id"
      end
   | _ -> failwith "HEHEHEHEHE"
+(*=synth_var *) 
 and synth contexte exT steps =
   match exT with 
   | BVar x -> create_retSynth (create_report false (contexte_to_string contexte) steps "BVar : not possible during type checking") VStar
   | FVar x -> create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (List.assoc x contexte)
+(*=End *)
+(*=synth_ann *) 
   | Ann(x,t) -> let ret = check contexte t VStar (pretty_print_exTm exT [] ^ ";"^ steps) in 
 		let eval_t = big_step_eval_inTm t [] in
 		if res_debug(ret)
@@ -536,6 +546,8 @@ and synth contexte exT steps =
 		    else create_retSynth (create_report false (contexte_to_string contexte) steps "Ann : x is not of type t") VStar
 		  end
 		else create_retSynth (create_report false (contexte_to_string contexte) steps "Ann : t is not of type VStar") VStar
+(*=End *)
+(*=synth_app *) 
   | Appl(f,s) -> 
      let synth_f = synth contexte f (pretty_print_exTm exT [] ^ ";"^ steps) in 
      begin
@@ -545,6 +557,7 @@ and synth contexte exT steps =
 		     else create_retSynth (create_report false (contexte_to_string contexte) steps "Appl : s is not of type S") VStar
        | _ -> create_retSynth (create_report false (contexte_to_string contexte) steps "Appl : f is not of type Pi") VStar
      end
+(*=End *) 
   | Iter(p,n,f,a) -> let big_p = big_step_eval_inTm p [] in
 		     let big_n = big_step_eval_inTm n [] in 
  		     let check_p = check contexte p (big_step_eval_inTm (read "(-> N *)") []) (pretty_print_exTm exT [] ^ ";") in    

@@ -1826,6 +1826,70 @@ Les value et tout
 
 \subsubsection{Type Checker}
 
+Nous n'avons rajouter que deux nouveaux termes dans le noyeau de notre language mais 
+le fait de ne plus faire la distinction entre les termes et les types change beaucoup de
+choses dans l'architecture du programme. 
+
+Dans l'implémentation du \fun{type_checker} du $\lambda$-calcul simplement typé lorsqu'un terme n'était pas
+correctement typé la fonction stopait l'execution du programme en levant une exeption.
+Nos programmes devenant de plus en plus complexe il peut etre intérressant de renvoyer un rapport detaillé
+de l'echec. Voici la structure que nous allons utilisé:
+
+\codefrom{dependent}{lambda}{debug}
+
+Nous aurons aussi besoin des fonctions suivantes: 
+-\fun{res_debug}: qui retourne le booléens présent dans le rapport.    
+-\fun{create_report}: qui crée un rapport en prenant un argument pour chaque champs du \fun{report}
+L'équivalent de ces fonctions pour le type \emph{debug synth} sont suivis de \fun{_synth}.
+
+tout comme le font les compilateurs modernes. Cela nous aide aussi pour tester la validité de celui 
+ci car 
+
+Nous avons désormais une forme normale pour les types, il est donc intérressant de 
+fournire cette forme normale directement au type-checker. La fonction \fun{check} prend donc maintenat
+un contexte, un \emph{terme inférable} ainsi qu'une value.
+
+
+\codefrom{dependent}{lambda}{check_abs}
+$\cfrac{\Gamma,x:S\vdash T \ni t}
+    {\Gamma \vdash \forall x:S.T \ni \lambda x. t}$
+
+
+
+\codefrom{dependent}{lambda}{check_inv}
+$\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+    {\Gamma\vdash T \ni inv(t)}$
+
+
+\codefrom{dependent}{lambda}{check_star}
+$\cfrac{}
+    {\Gamma \vdash * \ni *}$
+
+
+\codefrom{dependent}{lambda}{check_pi}
+$\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
+    {\Gamma\vdash * \ni \forall x:S.T}$
+
+
+
+
+\codefrom{dependent}{lambda}{synth_var}
+$\cfrac{x:T \in \Gamma}
+    {\Gamma \vdash x \in T }$
+
+\codefrom{dependent}{lambda}{synth_app}
+
+$\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
+    {\Gamma\vdash f\:s\in \subst{T}{s}{x}}$
+
+\codefrom{dependent}{lambda}{synth_ann}
+
+$\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
+    {\Gamma\vdash (t:T) \in T}$
+
+
+
+
 
 
 
