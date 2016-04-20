@@ -199,10 +199,12 @@ let gensym2 =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
+(*=boundfree *)
 let boundfree i n = 
   match n with 
   | Quote k -> BVar (i - k - 1)
-  | x -> FVar x
+  | x -> FVar x  
+(*=End *)
 (*=value_to_inTm *)
 let rec value_to_inTm i v =
   match v with 
@@ -357,12 +359,16 @@ let rec reduction_forte t i  =
 	 | _ -> SP1(reduction_forte x i)
        end
 
-(*=big_step_eval_exTm *)
+(*=big_step_eval_exTm_ann *)
 let rec big_step_eval_exTm t envi = 
   match t with
     | Ann(x,_) -> big_step_eval_inTm x envi
+(*=End *)
+(*=big_step_eval_exTm_var *) 
     | FVar v -> vfree v 
     | BVar v -> List.nth envi v
+(*=End *)
+(*=big_step_eval_exTm_app *)
     | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))
 (*=End *)
     | Iter(n,f,a) -> viter(big_step_eval_inTm n envi, 
@@ -400,10 +406,12 @@ and vapp v =
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "Impossible (vapp)"
 (*=End *)
-(*=big_step_eval_inTm *)
+(*=big_step_eval_inTm_inv *)
 and big_step_eval_inTm t envi = 
   match t with 
   | Inv(i) -> big_step_eval_exTm i envi
+(*=End *)
+(*=big_step_eval_inTm_abs *)
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg :: envi)))
 (*=End *)
   | Zero -> VZero

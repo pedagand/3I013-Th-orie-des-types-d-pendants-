@@ -245,12 +245,14 @@ and pretty_print_exTm t l =
   | Trans(bA,p,a,b,q,x) -> "(trans " ^ pretty_print_inTm bA l ^ " " ^pretty_print_inTm p l ^ " " ^pretty_print_inTm a l ^ " " ^
 			     pretty_print_inTm b l ^ " " ^pretty_print_inTm q l ^ " " ^pretty_print_inTm x l ^ ")"
 
+(*=substitution_inTm *)
 let rec substitution_inTm t tsub var = 
   match t with 
   | Inv x -> Inv(substitution_exTm x tsub var)
   | Abs(x,y) -> Abs(x,(substitution_inTm y tsub (var+1)))
   | Star -> Star
   | Pi(v,x,y) -> Pi(v,(substitution_inTm x tsub var),(substitution_inTm y tsub (var+1)))
+  (*=End *)
   | Zero -> Zero 
   | Succ n -> Succ(substitution_inTm n tsub var)
   | Nat -> Nat
@@ -265,6 +267,7 @@ let rec substitution_inTm t tsub var =
   | What -> What
   | Id(gA,a,b) -> Id((substitution_inTm gA tsub var),(substitution_inTm a tsub var),(substitution_inTm b tsub var))
   | Refl(a) -> Refl(substitution_inTm a tsub var)
+(*=substitution_exTm *)
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -272,6 +275,7 @@ and substitution_exTm  t tsub var =
   | BVar x -> BVar x
   | Appl(x,y) -> Appl((substitution_exTm x tsub var),(substitution_inTm y tsub var))
   | Ann(x,y) -> Ann((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  (*=End *)
   | Iter(p,n,f,a) -> Iter((substitution_inTm p tsub var),(substitution_inTm n tsub var),(substitution_inTm f tsub var),(substitution_inTm a tsub var))
   | P0(x) -> P0(substitution_exTm x tsub var)
   | P1(x) -> P1(substitution_exTm x tsub var)
@@ -297,6 +301,7 @@ let rec big_step_eval_inTm t envi =
   | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
   | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
   | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
+  | Refl(a) -> VRefl(big_step_eval_inTm a envi)
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 

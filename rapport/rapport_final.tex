@@ -861,13 +861,27 @@ type $A\rightarrow B$ .De plus on vérifie que \emph{s} est bien du type
   \label{probleme:type_simple}
   Voici donc quelques exemples de dérivations de type.
   Ces dérivations se lisent du bas vers le haut.
-  
- 
+  \begin{align*}
+    \cfrac{
+      \cfrac{
+        \cfrac{
+          \cfrac{x:Int\rightarrow Bool \in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash x:Int\rightarrow Bool}\:\:\:\:%level3gaucheApp
+          \cfrac{y:Int\in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash y:Int}%level3droitApp
+        }{\Gamma,x:Int\rightarrow Bool,y:Int\vdash \App{x}{y} : bool}%level2
+      }{\Gamma,x:Int\rightarrow Bool\vdash \Lam{y}{\App{x}{y}}:Int \rightarrow Bool}%level1
+    }{\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(Int\rightarrow Bool) \rightarrow Int \rightarrow Bool} %level0
+  \end{align*}
 
-  je vais faire le typage du terme $\lambda x. \lambda y. x y$ avec le type (int -> bool) -> int -> bool 
-  %faire une application basique avec le lambda terme de l'identité a gauche appliqué a un truc nul et le tout de type entier cela 
-  % va nous permettre de montrer que l'on doit faire de la magie sur le type de A
-  et après juste une application sans $\lambda$ par dessus
+  Ce terme est donc correctement typé.
+
+  Tentons maintenant de type checker le terme suivant:
+  \begin{align*}
+    \cfrac{
+      \cfrac{}{\Gamma,y:Int\vdash x:A\rightarrow B}%level1DroitApp
+      \cfrac{}{\Gamma,y:Int\vdash y:A}%level1GaucheApp
+    }{\Gamma,y:Int\vdash\App{x}{y}:Bool}%level0
+  \end{align*}
+  Nous ne parvenons pas à type checker ce terme pourtant celui ci est un terme de notre language.
 \end{example}
 
 %ici je pourrais dire que l'on doit annoter tous les termes mais que c'est trop lourd
@@ -915,8 +929,16 @@ mais en demandant de l'information quand à son type, l'annotation.
 
 
 \begin{example}
-Voici maintenant la dérivation qui nous possait problème précédement.
-FAIRE LA DERIVATION ET CA MARCHE !!
+  Voici maintenant la dérivation qui nous possait problème précédement.
+  \begin{align*}
+    \cfrac{
+      \cfrac{
+      }{\Gamma,y:Int\vdash (x:Int\rightarrow Bool) \in Int\rightarrow Bool}\:\:\:\:%level1GaucheApp
+      \cfrac{
+        \cfrac{y:Int \in \Gamma}{\Gamma,y:Int\vdash y \in Bool}%level2Droit
+      }{\Gamma,y:Int\vdash Bool \ni y}%level1DroitApp
+    }{\Gamma,y:Int\vdash \App{(x:Int\rightarrow Bool)}{y} \in Bool}%level0
+  \end{align*}
 \end{example}
 
 Nous avons donc résolu ce problème grace à l'introduction d'un système bi-directionnel
@@ -1275,16 +1297,34 @@ la réduction à petit pas.
 Commençons par donner le code de celle ci, nous le commenterons après.
 
 
-\codefrom{typed}{lambda}{big_step_eval_exTm}
+\codefrom{typed}{lambda}{big_step_eval_exTm_ann}
+$\cfrac{t \Downarrow t'}
+  {t:T \Downarrow t'}$
+
+\codefrom{typed}{lambda}{big_step_eval_exTm_var}
+
+$\cfrac{}
+{x \Downarrow x}$
+
+\codefrom{typed}{lambda}{big_step_eval_exTm_app}
 \codefrom{typed}{lambda}{vapp}
-\codefrom{typed}{lambda}{big_step_eval_inTm}
+$\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
+{t\:t'\Downarrow \: v'}$
+
+$\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
+{t\:t'\Downarrow \: n \: v'}$
+  
+
+\codefrom{typed}{lambda}{big_step_eval_inTm_inv}
+
+\codefrom{typed}{lambda}{big_step_eval_inTm_abs}
+
+$\cfrac{e \Downarrow \: v}
+  {\lambda x.t \Downarrow \: \lambda x.v}$
 
 
-
-La règle de l'annotation \emph{Ann} ne nécéssite pas d'explications particulières car
-elle est conforme à la spécification. 
-L'évaluation de l'abstraction \emph{Abs} se traduit par la création d'une \emph{VLam}
-dont le corps est une fonction anonyme. 
+La règle d'abstraction consiste donc à crée une fonction anonyme Ocaml puis évaluons 
+le terme sous le $\lambda$
 
 %revoir ce paragraphe.
 Cette représentation nous permet de reconsidérer la façon de voir la 
@@ -1305,15 +1345,17 @@ variable.
   \emph{function arg $\rightarrow$ arg} ce qui appliqué à \emph{u} nous renvoi bien celui ci.
 \end{example}
 
-Pour l'application nous faisons appelle à une fonction vapp. Dans le cas ou l'on atch une 
-\emph{VLam} on applique directement la fonction, sinon on crée un \emph{NApp} contenant les 
-deux arguments. 
+Pour évaluer l'application d'un coup il est nécéssaire de crée une fonction externe \emph{vapp}.
+Nous appelons donc cette fonction avec le couple formé de l'évaluation des deux membres de l'application.
+Si le membre de gauche est une \emph{VLam}, il nous suffit d'appliquer celle ci avec l'application d'Ocaml
+étant donné que c'est une fonction anonyme.
 
 La fonction \emph{VFree} permet simplement à partir d'un nom de crée une \emph{NFree}
 à l'intérieure d'un \emph{VNeutral}.
 Elle permet simplement d'alléger le code de la fonction.
 
 \codefrom{typed}{lambda}{vfree}
+
 
 
 Une fois nos termes normalisés il nous faut maintenant un moyen de repasser nos termes
@@ -1323,11 +1365,15 @@ faire cette association, voici son code:
 \codefrom{typed}{lambda}{value_to_inTm}
 \codefrom{typed}{lambda}{neutral_to_exTm}
 
+Revenons sur le type \emph{name} que nous avions introduit. Jusqu'a présent 
+celui ci n'était pas utile. Maintenant il va nous permettre de faire la distinction 
+entre les variables réellement libre et celles que nous souhaitons liée.
 Afin de transformer une value \emph{VLam} en \emph{Abs} il nous faut 
-appliquer la fonction \emph{f} à une variable libre. Ici il y a un choix d'implémentation 
-au niveau de la valeur de cette variable, on met une valeur négative ce qui va nous permettre
-par la suite de les reconaitres lors de l'évaluation des variables libres. Ainsi nous pourrons les
-transformer en variables liées et non libre avec le bon indice de de Bruijn.
+appliquer la fonction \emph{f} à une variable libre, et celle ci se distinguera des
+autres variables libres car celle ci possède un indice. 
+Nous allons pouvoir exploiter ceci avec l'aide de la fonction \fun{boundfree} dont 
+voici le code:
+\codefrom{typed}{lambda}{boundfree}
 
 \subsubsection{Produit cartésien}
 
@@ -1401,8 +1447,7 @@ n'ayant pas encore été présentée
 Maintenant que les bases du $\lambda$-calcul ainsi que du typage à été présenté 
 nous allons découvrir les types dépendants. 
  
-\subsection{correspondance de Curry-Howard}
-
+\subsection{Automatisation de démonstration de preuve}
 Durant les deux premières parties du rapport nous avons présenté le $\lambda$-calcul
 qui nous à permis d'introduire un système de type. Cependant nous avions une vision 
 informatique des type. En effet notre seul but était de vérifier que nos $\lambda$-termes
@@ -1411,6 +1456,7 @@ Un des aspects primordiale des système de type est la correspondance de Curry-H
 Celle ci permet de d'établire des relations entre la logique propositionnelle et les systèmes 
 de type. Nous verrons que ``t est une preuve de P'' est équivalent à \emph{t:P} c'est à dire
 t est de type P.
+Tout d'abord intéressons nous aux bases de la logique propositionnelle.
 \subsubsection{La logique propositionnelle}
 
 Les règles de la logique propositionnelle associes à chaque constructeur 
@@ -1472,6 +1518,27 @@ Pour l'instant nous n'avons pas établie de lien réel entre ces connecteurs et 
 section suivante.
 
 \subsubsection{correspondance de Curry Howard bis}
+
+Dans la section précédente nous avons regarder quelques intuitions permettant de voir le lien entre la logique
+et l'informatique au travers des systèmes de type.
+Nous avons étudié le $\lambda$-calcul qui permet de faire le lien avec la déduction naturelle. Il existe d'autre
+modèles de calculs permettants de faire des liens similaires comme par exemple les Système à la Hilbert et 
+les systèmes de type de la logique combinatoire.
+
+Voici un tableau montrant les différents liens entre la logique et le $\lambda$-calcul.
+
+\todo{roman: mettre un tableau de correspondance (que j'ai en photo) mais je ne sais pas quelle est la meilleure présentation}
+
+
+Le fait d'avoir séparé nos termes permets de rendre ces correspondances plus aisées. En effet les constructeur
+correspondent aux \emph{termes inférables} tandis que les \emph{termes synthétisables} sont les destructeurs.
+
+
+
+
+
+
+
 
 
 \subsection{Système de type dépendant}
@@ -1740,15 +1807,22 @@ pour la lecture de disposer de l'intégralité des fonctions.
 
 \subsubsection{Noyau du language}
 
-Voici l'ensemble des termes formants le noyau de notre language.
+Les termes synthétisables et inférables enrichies pour les types dépendants:
 \codefrom{dependent}{lambda}{inTm}
 \codefrom{dependent}{lambda}{exTm}
+
+Les value et tout
 
 
 
 \subsubsection{Substitution et Normalisation}
 
+Voici le code de la substitution:
+\codefrom{dependent}{lambda}{substitution_inTm}
+\codefrom{dependent}{lambda}{substitution_exTm}
 
+Désormais nous utiliserons seulement la réduction à grand pas
+LOL
 
 
 
