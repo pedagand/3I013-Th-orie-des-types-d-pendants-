@@ -1533,6 +1533,8 @@ Voici un tableau montrant les différents liens entre la logique et le $\lambda$
 Le fait d'avoir séparé nos termes permets de rendre ces correspondances plus aisées. En effet les constructeur
 correspondent aux \emph{termes inférables} tandis que les \emph{termes synthétisables} sont les destructeurs.
 
+\todo{j'aurais des questions à posé jeudi pour finir cette partie}
+
 
 
 
@@ -1542,7 +1544,10 @@ correspondent aux \emph{termes inférables} tandis que les \emph{termes synthét
 
 
 \subsection{Système de type dépendant}
-%présentation formelle 
+
+Comme nous allons le voir dans cette section les types dépendants vont nous permettre d'exprimer 
+des termes inexistants, dans notre système précédent. Pour faire echo avec la section précédente,
+nous allons introduire un nouveau lien entre la logique et notre système de type: le quantificateur $\forall$.
 
 \subsubsection{Equivalence entre les types et les termes}
 \label{presentation_type_dependants}
@@ -1599,9 +1604,11 @@ Meme si les termes sont maintenant des types et inversement il nous faut quand m
   Si l'on considère que A est le terme $\Lam{x}{x}$ cela n'a pas de sens.
 \end{example}
 Nous allons donc dorénavant noté \emph{*} le type des types.
-Les nouveaux constructeurs introduits nous pouvons maintenant enrichire notre language, voici les nouvelles règles de typage 
-en figure~\ref{fig:typage dependant}
 
+\subsubsection{Formalisation}
+
+Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons maintenant enrichire notre language,
+voici les nouvelles règles de typage en figure~\ref{fig:typage dependant}.
 
 \begin{figure}
   \center\boxed{\Gamma\vdash T \ni t}
@@ -1796,13 +1803,14 @@ et trans
     {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}&\mbox{(trans)}
 \end{align*}
 
-AFINIR
+\todo{roman: a finir quand j'aurais mieux compris}
 
 \subsection{Implémentation}
 
 Etant donné que nous allons présenté l'implémentation finale de ce projet, nous verrons l'ensemble du code.
 Nous ne rentrerons pas dans les détails pour l'explication des parties redondantes, mais il sera plus facile 
 pour la lecture de disposer de l'intégralité des fonctions.
+
 
 
 \subsubsection{Noyau du language}
@@ -1822,11 +1830,13 @@ Voici le code de la substitution:
 \codefrom{dependent}{lambda}{substitution_exTm}
 
 Désormais nous utiliserons seulement la réduction à grand pas
-LOL
+
 
 
 
 \subsubsection{Type Checker}
+
+
 
 
 
