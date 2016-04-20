@@ -1410,6 +1410,7 @@ n'ayant pas encore été présentée
 \emph{synth} 
 \codefrom{typed}{lambda}{exTm_extensions}
 
+SI JE PEUX PEUT ETRE PARLER DE VITTER POUR LES ENTIERS MAIS CEST TOUT
 
 
 
@@ -1811,6 +1812,8 @@ Etant donné que nous allons présenté l'implémentation finale de ce projet, n
 Nous ne rentrerons pas dans les détails pour l'explication des parties redondantes, mais il sera plus facile 
 pour la lecture de disposer de l'intégralité des fonctions.
 
+\todo{je ne sais pas si c'est une bonne idée}
+
 
 
 \subsubsection{Noyau du language}
@@ -1821,25 +1824,20 @@ Les termes synthétisables et inférables enrichies pour les types dépendants:
 
 Les value et tout
 
+\subsubsection{Type Checker}
+
+
+
+
 
 
 \subsubsection{Substitution et Normalisation}
-
+\todo{roman: ...}
 Voici le code de la substitution:
 \codefrom{dependent}{lambda}{substitution_inTm}
 \codefrom{dependent}{lambda}{substitution_exTm}
 
 Désormais nous utiliserons seulement la réduction à grand pas
-
-
-
-
-\subsubsection{Type Checker}
-
-Maintenant que nous 
-
-
-
 
 
 %parler du fait que dans la règle inv on à maintenant une égalité qui n'est plus celle de Ocaml
