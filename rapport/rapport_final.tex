@@ -748,6 +748,7 @@ On étend la substitution sans difficulté :
 \codefrom{untyped}{lambda}{nat_evaluation}
 
 \subsubsection{Les paires}
+\label{paires}
 
 \todo{Introduire les paires (non typées) ici.}
 
@@ -1143,14 +1144,11 @@ Nous pouvons désormais typer nos booléens de la manière suivante: \todo{Stop 
   {\Gamma\vdash \mathrm{ifte}\: C\: c\: t\: e\in C}&\mbox{(Ifte)}
 \end{align*}
 
-On constate ici un exemple d'utilisation concrète des types. En effet 
-précédement avant evaluation de l'ensemble du terme nous ne pouvions 
-pas savoir si le terme \emph{c} était \emph{True} ou \emph{False}.
-Désormais nous avons la certitude avant execution que ce terme retourne 
-le terme correspondant à la branche \emph{then} ou \emph{else}
-
 \subsubsection{Le produit cartésien}
 \label{produit_cartesien}
+
+\todo{Extraire la partie syntaxe \& réduction et l'amener en Section~\ref{paires}}
+\todo{Définir des commandes pour écrire les paires et les 2 projections}
 
 Le produit cartésien est un objet mathématique qui est définit comme
 un ensemble composé de deux éléments.
@@ -1160,10 +1158,13 @@ les \emph{paires} sous la forme \emph{($a\,b$)}
 Nous allons aussi rajouter deux éliminateurs, les projections:
 \emph{$\pi 0$} qui appliqué à une paire 
 permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
-Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
-introduisons donc ce le type \emph{produit} de la forme \emph{($a\times b$)}.
 
-Nous allons maintenant évaluer nos termes, 
+
+
+Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
+introduisons donc un type \emph{produit} $A \times B$. \todo{Étendre formellement la grammaire des types \Var{T}}
+
+Nous allons maintenant évaluer nos termes, \todo{en dire plus}
 \begin{align*}
   &\cfrac{a \Downarrow a' \:\: b\Downarrow b'}
   {a,b \Downarrow a',b'}\\
@@ -1174,13 +1175,13 @@ Nous allons maintenant évaluer nos termes,
 \end{align*}
 
 
-Règle de typages des paires:
+Règle de typages des paires: \todo{en dire plus.}
 \begin{align*}
   &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
   {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
-  &\cfrac{\Gamma\vdash p \in (A\times B)} 
+  &\cfrac{\Gamma\vdash p \in A\times B} 
   {\Gamma\vdash p.\pi 0 \in A}&\mbox{($\pi 0$)} \\
-  &\cfrac{\Gamma\vdash p \in (A\times B)} 
+  &\cfrac{\Gamma\vdash p \in A\times B} 
   {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
 \end{align*}
 
