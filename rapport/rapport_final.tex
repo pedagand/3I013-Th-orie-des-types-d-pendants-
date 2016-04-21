@@ -217,9 +217,9 @@ Un terme ne contenant aucune occurrence de variable libre est dit \emph{clos}.
 
 \begin{example}  
   \label{example:ouvert-clos}  
-  Dans le $\lambda$-terme \(\App{\Lam{x}{\Lam{y}{\App{x}{y}}}}{\Var{y}}\), la
-  variable $Var{x}$ est liée ainsi que la première occurence de la
-  variable $Var{y}$. Cependant, la variable $Var{y}$ à l'extérieur des
+  Dans le $\lambda$-terme \App{(\Lam{x}{\Lam{y}{\App{x}{y}}})}{\Var{y}}, la
+  variable \Var{x} est liée ainsi que la première occurence de la
+  variable \Var{y}. Cependant, la variable \Var{y} à l'extérieur des
   parenthèse est libre.
 \end{example}
 
