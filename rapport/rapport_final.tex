@@ -349,9 +349,9 @@ place de celle-ci.
 
 
 \subsubsection{$\beta$-réduction}
-
-
 \label{reduction}
+
+
 Seules les applications de la forme \(\App{(\Lam{\Var{x}}{t})}{u}\),
 dont le membre de gauche est une abstraction, peuvent être réduites :
 un tel terme s'appelle un
@@ -658,12 +658,13 @@ d'analyser certaines parties du code et non sa totalité.
 
 
 \subsubsection{$\beta$-Reduction et évaluation}
-La fonction de réduction consiste donc à trouver les applications dont le membre 
-de gauche est une abstraction \ref{reduction}.
-Nous appelons la fonction de substitution  avec la
-valeur \(0\) car on souhaite substituer l'ensemble des variables du binder
-\(\lambda\) en cours.
 
+La fonction de $\beta$-réduction consiste donc à contracter une
+application dont le membre de gauche est une abstraction. Le cas
+échéant, l'opération échoue. Pour ce faire, nous appelons la fonction
+de substitution pour substituer la première variable (d'indice \(0\))
+par l'argument dans le corps de la fonction :
+%
 \codefrom{untyped}{lambda}{reduction}
 
 Nous disposons de l'ensemble des fonctions nécessaires afin de faire une évaluation 
