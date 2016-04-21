@@ -258,13 +258,10 @@ entre eux. Mais il nous faut tout d'abord définir le mécanisme de substitution
 
 La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
 à remplacer l'occurrence d'une variable liée par un \(\lambda\)-terme.
-On note généralement la substitution de la variable $\Var{x}$ dans le terme $\Var{t}$ par le 
-terme u avec la notation suivante. 
-\[ 
-\subst{t}{x}{u}
-\]
+On note \(\subst{t}{x}{u}\) la substitution de la variable $\Var{x}$ dans le terme $\Var{t}$ par le 
+terme u.
 
-Définition formelle de la substitution: 
+Formellement, la substitution est définie récursivement sur la structure du $\lambda$-terme :
 \begin{align*}
     \subst{x}{x}{u} &\triangleq u \\
     \subst{x}{y}{u} &\triangleq x \\
