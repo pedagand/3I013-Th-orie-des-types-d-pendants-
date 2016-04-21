@@ -1396,7 +1396,9 @@ fonctionnelle que l'on utilise pour \emph{implémenter} la réduction
 forte.  \attention{Ceci n'est pas clair : tu es en train de donner une
   semi-définition de ``normaliser''. Je préférerai que tu développes
   l'aspect ``hack'' où l'on exploite les fonctions de OCaml pour
-  modéliser les fonctions de notre langage.} Elle a aussi pour effet
+  modéliser les fonctions de notre langage. Idée clé : on implémente
+  un interpréteur pour nos termes en utilisant les termes OCaml pour
+  interpréter les fonctions de notre langage} Elle a aussi pour effet
 d'évaluer complètement les termes, on peut le constater du fait \if 0
 a changer \fi que les fonctions prenenent des \emph{inTermes} ou des
 \emph{exTermes} en entrée et retourne des valeurs.  Les valeurs ne
@@ -1421,55 +1423,44 @@ Voici donc le code correspondant en Ocaml: \todo{Il va falloir m'en
 
 La value \emph{VLam} est représentée par une fonction Ocaml \todo{je
   vois mais \emph{pourquoi} ?}.  Commençons par donner le code de
-celle ci, nous le commenterons après.
+celle ci, nous le commenterons après\todo{Non, commente au fil de
+  l'eau, c'est plus digeste}.
 
-
+\todo{Commenter l'annotation}
 \codefrom{typed}{lambda}{big_step_eval_exTm_ann}
-$\cfrac{t \Downarrow t'}
-  {t:T \Downarrow t'}$
-
+\todo{Commenter la variable}
 \codefrom{typed}{lambda}{big_step_eval_exTm_var}
-
-$\cfrac{}
-{x \Downarrow x}$
-
+\todo{Commenter l'application}
 \codefrom{typed}{lambda}{big_step_eval_exTm_app}
+\todo{Commenter vapp}
 \codefrom{typed}{lambda}{vapp}
-$\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
-{t\:t'\Downarrow \: v'}$
-
-$\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
-{t\:t'\Downarrow \: n \: v'}$
-  
-
+\todo{Commenter inv}
 \codefrom{typed}{lambda}{big_step_eval_inTm_inv}
+
+L'abstraction est interprétée comme une fonction anonyme Ocaml puis évaluons 
+le terme sous le $\lambda$. \todo{étoffer}
 
 \codefrom{typed}{lambda}{big_step_eval_inTm_abs}
 
-$\cfrac{e \Downarrow \: v}
-  {\lambda x.t \Downarrow \: \lambda x.v}$
-
-
-La règle d'abstraction consiste donc à crée une fonction anonyme Ocaml puis évaluons 
-le terme sous le $\lambda$
-
 %revoir ce paragraphe.
+\todo{Donner cette explication plus tôt}
 Cette représentation nous permet de reconsidérer la façon de voir la 
-réduction d'une \emph{Abstraction}. En effet lorsque l'on applique une \emph{Abstraction}
-à un terme nous avions introduit la substitution, qui consiste à remplacer les occurences 
-des variables liée à ce terme. La transformation d'une \emph{Abstraction} consiste donc à 
-crée une fonction anonyme puis à évaluer le terme contenue dans celle ci en ajoutant dans le 
+réduction d'une abstraction. En effet lorsque l'on applique une abstraction
+à un terme, nous avions introduit la substitution, qui consiste à remplacer les occurences 
+des variables liée à ce terme. La transformation d'une abstraction consiste donc à 
+créer une fonction anonyme puis à évaluer le terme contenu dans celle-ci en ajoutant dans le 
 contexte la variable liée à cette fonction. Lors de l'évaluation d'une variable liée, on va
 retrouver dans le contexte l'argument correspondant. On aura donc bien le comportement attendu
-lors de l'application de cette fonction anonyme, car cela va remplacer les occurences de la 
+lors de l'application de cette fonction anonyme car cela va remplacer les occurences de la 
 variable.
 
 \begin{example}
-  Soit le terme \(\App{\Lam{x}{\Var{x}}}{u}\), avec la méthode d'évaluation à petit pas,
-  on évalue en effectuant $\subst{x}{x}{u}$ ce qui nous donne comme résultat
-  \emph{u}. 
-  Avec l'évaluation à grands pas on évalue le terme $\Lam{x}{x}$ en 
-  \emph{function arg $\rightarrow$ arg} ce qui appliqué à \emph{u} nous renvoi bien celui ci.
+  Soit le terme \(\App{\Lam{x}{\Var{x}}}{u}\), avec la méthode
+  d'évaluation à petit pas, on évalue en effectuant $\subst{x}{x}{u}$
+  ce qui nous donne comme résultat \emph{u}.  Avec l'évaluation à
+  grands pas on évalue le terme $\Lam{x}{x}$ en la fonction OCaml
+  \lstinline!fun arg -> arg! ce qui appliqué à la traduction $v_u$ de
+  $u$, retournant ainsi $v_u$ comme souhaité.
 \end{example}
 
 Pour évaluer l'application d'un coup il est nécéssaire de crée une fonction externe \emph{vapp}.
