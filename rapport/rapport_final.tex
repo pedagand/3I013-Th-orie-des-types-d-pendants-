@@ -759,16 +759,19 @@ types, puis nous verrons comment les utiliser en définissant des règles de typ
 \subsection{Les types}
 \label{simple_type}
 
+\newcommand{\intg}{\ensuremath{\mathit{int}}}
+\newcommand{\bool}{\ensuremath{\mathit{bool}}}
+
 Il est important avant tout de définir ce qu'est un type. Les types
 que nous considérons dans cette partie sont décrits par la grammaire
 suivante :
 %
 \begin{bnf}
   T &::=& &\mbox{(type)}\\
-  &|&int &\mbox{(entiers)}\\ 
-  &|&bool &\mbox{(booléens)}\\
-  &|&T \rightarrow T &\mbox{(fonction)}\\
-  &|&T \times T &\mbox{(produit)}\\
+  &|& \intg{} &\mbox{(entiers)}\\ 
+  &|& \bool{} &\mbox{(booléens)}\\
+  &|& T \rightarrow T &\mbox{(fonction)}\\
+  &|& T \times T &\mbox{(produit)}\\
 \end{bnf}
 
 \begin{example}
