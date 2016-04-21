@@ -627,35 +627,6 @@ Cette représentation se rapproche au plus de la spécification formelle
 et les variables libres \lstinline!FreeVar! diffère.
 
 
-\subsubsection{Analyse syntaxique}
-\label{arsing}
-\todo{Je ne vois pas trop l'intérêt de cette section. Soit tu définis
-  formellement le parser (sans donner le code), soit tu dis juste dans
-  une phrase, quelque part que ta syntaxe de haut niveau est celle de
-  Lisp, sans en dire plus (parce que c'est assez commun)}
-
-\todo{Phrase très longue :}
-Afin de permettre de construire des termes rapidement et le plus lisible 
-possible la création d'un parseur s'imposait.
-La notation choisie a été la notation préfixe (notation polonaise inversée),
-une syntaxe très proche du langage lisp. En plus d'etre simple à comprendre
-elle est facile à implémenter avec l'aide des S-expressions.
-
-\begin{example}
-  Voici un exemple de correspondance entre les termes avant et après parsing
-  \begin{tabular}{ll}
-    \lstinline!(lambda x x)! & \lstinline!Abs(BoundVar 0)! \\
-    \lstinline!(x y)! & \lstinline!Appl(FreeVar "x", FreeVar "y")!
-  \end{tabular}
-\end{example}
-
-Comme on peut le constater dans l'exemple pour alléger la redaction des termes,
-on utilise une représentation des variables classiques, c'est dans le parseur que 
-l'on determine la valeur de l'indice d'une variable si celle ci est liée et son 
-nom si celle ci est libre. Les termes sont donc bien conforme à la 
-représentation ``locally nameless''
-Pour l'affichage de nos termes on effectue l'opération inverse, c'est à dire que
-les chaines de caractères en sortie seront elle memes des S-expressions.
 
 \subsubsection{Substitution}
 
