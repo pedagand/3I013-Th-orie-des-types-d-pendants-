@@ -557,6 +557,18 @@ termes acceptés par l'analyse de type sont fortement normalisants.
   programmation existants. Est-ce gênant ?}
 
 
+\paragraph{Implémentation :}
+La fonction de $\beta$-réduction consiste donc à contracter une
+application dont le membre de gauche est une abstraction. Le cas
+échéant, l'opération échoue. Pour ce faire, nous appelons la fonction
+de substitution pour substituer la première variable (d'indice \(0\))
+par l'argument dans le corps de la fonction :
+%
+\codefrom{untyped}{lambda}{reduction}
+
+\todo{Décrire ce programme}
+\codefrom{untyped}{lambda}{evaluation}
+
 
 \subsection{Encodages à la Church}
 
@@ -649,26 +661,10 @@ De la même manière, on construit l'addition de deux nombres \(m\) et
 \]
 
 
-\subsection{Implementation}
+\subsection{Extensions}
 
-Nous nous attarderons ici sur les choix d'implémentations et il sera question
-d'analyser certaines parties du code et non sa totalité.
-
-
-
-
-\subsubsection{$\beta$-Reduction et évaluation}
-
-La fonction de $\beta$-réduction consiste donc à contracter une
-application dont le membre de gauche est une abstraction. Le cas
-échéant, l'opération échoue. Pour ce faire, nous appelons la fonction
-de substitution pour substituer la première variable (d'indice \(0\))
-par l'argument dans le corps de la fonction :
-%
-\codefrom{untyped}{lambda}{reduction}
-
-\todo{Décrire ce programme}
-\codefrom{untyped}{lambda}{evaluation}
+Nous nous attardons ici sur quelques choix d'implémentation et il
+sera question d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Les booléens}
 
