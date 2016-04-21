@@ -223,6 +223,7 @@ Un terme ne contenant aucune occurrence de variable libre est dit \emph{clos}.
   parenthèse est libre.
 \end{example}
 
+\begin{remark}
 \label{problemelibreliee}
 \attention{Non, ce n'est pas ça le problème. Le problème, c'est que, a
   priori, \Lam{\Var{x}}{\Var{x}} et \Lam{\Var{y}}{\Var{y}} sont des
@@ -230,6 +231,7 @@ Un terme ne contenant aucune occurrence de variable libre est dit \emph{clos}.
   sont moralement les deux mêmes termes}
 Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). Il faut donc introduire la notion 
 d'$\alpha$-équivalence.
+\end{remark}
 
 \subsubsection{$\alpha$-équivalence}
 \label{alpha_equiv}
@@ -585,8 +587,7 @@ d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Représentation des $\lambda$-termes}
  
-Pour pallier au problème que nous énoncions précédement
-~\ref{problemelibreliee}, nous utilisons une représentation
+Pour pallier à la remarque~\ref{problemelibreliee}, nous utilisons une représentation
 particulière pour les variables liées: les indices de de Bruijn.  Nous
 allons ainsi représenter les variables liées non pas par un nom mais
 par un entier naturel. Cette valeur est determiné à partir du nombre
