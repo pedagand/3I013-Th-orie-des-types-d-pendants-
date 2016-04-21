@@ -723,28 +723,27 @@ particulière :
 
 \subsubsection{Les entiers}
 
-Tout comme pour les booléens nous allons ajouté les trois constructeurs 
-\emph{Zero},\emph{Succ} et \emph{Iter} à notre language.
+\newcommand{\zero}{\ensuremath{\mathit{zero}}}
+\newcommand{\succs}{\ensuremath{\mathit{succ}}}
+\newcommand{\iter}{\ensuremath{\mathit{iter}}}
+
+\newcommand{\NZero}{\lstinline!Zero!}
+\newcommand{\NSucc}{\lstinline!Succ!}
+\newcommand{\NIter}{\lstinline!Iter!}
+
+Tout comme pour les booléens, nous allons ajouté les trois
+constructeurs primitifs \zero{},\succs{} et \iter{} à notre
+language. \todo{Les ajouter d'abord à la grammaire formelle
+  \emph{puis} ajouter \NZero{}, \NSucc{} et \NIter{} à l'implémentation.}
 
 \codefrom{untyped}{lambda}{nat_term}
 
-Pour ce qui est de la substitution et la réduction le comportement est très
-similaire à celui des boléens et ne nécessite pas d'explications supplémentaires.
-
-Substitution:
-
+On étend la substitution sans difficulté :
 \codefrom{untyped}{lambda}{nat_substitution}
 
-Reduction:
+\todo{Définir et décrire la \(\iota\)-réduction (formelle) sur \iter.}
 
-\codefrom{untyped}{lambda}{nat_reduction}
-
-En revanche l'évaluation du terme \emph{Iter(n,f,a)} est déja plus intéressante.
-Si le premier argument est \emph{Zero} alors il faut retourner le terme \emph{a}.
-Si \emph{n} est un \emph{Succ(num)} alors il faut d'abord evaluer l'application 
-\emph{(f a)}. puis rappeler la fonction d'évaluation avec le terme 
-\emph{Iter} avec ces nouveaux arguments.
-
+\todo{Expliquer l'implem en relation avec la spec ci-dessus.}
 \codefrom{untyped}{lambda}{nat_evaluation}
 
 \section{Le $\lambda$-calcul simplement typé}
