@@ -1038,9 +1038,15 @@ bonne exécution des programmes.  Formellement, ces garanties se traduisent en d
 et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type \emph{T}
 \end{description}
 
-La conjonction de ces deux propriétés donne le slogan 
-``un programme bien typé ne plante jamais'' \todo{(citation Milner)}
-tout programme bien typé réduit vers une valeur nécessairement bien typé. 
+La conjonction de ces deux propriétés donne le slogan ``un programme
+bien typé ne plante jamais'' \todo{(citation Milner)} tout programme
+bien typé réduit vers une valeur de ce type.
+
+\begin{example}
+  Un programme de type \bool{} réduit vers une valeur de type \bool{}
+  et donc ce programme réduit \emph{nécessairement} vers le
+  constructeur \true{} ou le constructeur \false{}.
+\end{example}
 
 Nous avons désormais des garanties quant à la terminaison de nos programme.
 Cela se traduit par le fait que l'on pourra systématiquement obtenir une 
