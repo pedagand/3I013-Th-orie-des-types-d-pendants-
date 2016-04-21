@@ -189,6 +189,11 @@ argument.
 
 \newcommand{\IsFree}{\mathrm{isFree}}
 
+
+\todo{Type-setter les termes nouvellement introduits avec
+  \texttt{$\backslash$emph\{..\}}. Par exemple, ``liée'', ``libre'' et
+  ``clos''.}
+
 Une variable est liée lorsque celle ci est déclarée dans le corps d'un
 lambda, dans l'exemple~\ref{example:id}, $x$ était une variable liée.
 Si la variable n'a pas été déclarée, elle est dite
@@ -208,7 +213,7 @@ défini récursivement de la façon suivante
 \end{example}
 
 
-Un terme ne contenant aucune occurrence de variable libre est dit ``clos''.
+Un terme ne contenant aucune occurrence de variable libre est dit \emph{clos}.
 
 \begin{example}  
   \label{example:ouvert-clos}  
