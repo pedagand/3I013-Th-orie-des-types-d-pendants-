@@ -856,19 +856,17 @@ lit en partant du numérateur pour déduire le dénumérateur : supposons
 que la variable \Var{x} de type \Var{T} soit présente dans le
 contexte, alors on conclut que le type de la variable \Var{x} est
 \Var{T}.
-
 La règle (Abs) spécifie le typage des lambda
 abstractions. L'abstraction construit un type de la forme \(A
 \Rightarrow B\) : il faut donc que la variable associée au lambda
 terme soit de type \(A\) et le résultat de type \(B\).
-
 La règle (App) spécifie le typage de l'application. 
-Dans la Section~\ref{reduction:call_by_name} nous avions vu que seul les 
+Dans la Section~\ref{reduction:call_by_name}, nous avions vu que seul les 
 redex étaient réductible. Dans un language de programmation appliquer un terme n'étant 
 pas une fonction n'a pas de sens. C'est pour cette raison qu'il nous faut vérifier 
-que notre application est bien une \emph{redex} en vérifiant que \emph{f} est bien du 
-type $A\rightarrow B$ .De plus on vérifie que \emph{s} est bien du type 
-\emph{A} pour garantire l'application de \emph{s} à notre fonction \emph{f}.
+que notre application est \attention{confus : c'est quoi cette histoire de redex ?} bien une \emph{redex} en vérifiant que \emph{f} est bien du 
+type $A\rightarrow B$ . De plus on vérifie que \emph{s} est bien du type 
+\emph{A} pour \attention{qu'est-ce que l'on garanti ?} garantir l'application de \emph{s} à notre fonction \emph{f}.
 
 
 \begin{example}
