@@ -485,16 +485,6 @@ termes acceptés par l'analyse de type sont fortement normalisants.
   es strictement moins expressif que tous les langages de
   programmation existants. Est-ce gênant ?}
 
-\begin{example}
-  Voici un exemple d'évaluation avec la stratégie call by value
-  \begin{align*}
-    & ((\lambda x.\lambda y. x\: y)\: \lambda w.w)  \\
-    \leadsto & (\lambda y. (\lambda w.w)\: y) 
-  \end{align*}
-\end{example}
-
-
-
 
 
 \subsection{Encodages à la Church}
