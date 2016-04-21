@@ -327,10 +327,11 @@ t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
 
 \begin{example}
   Voici un autre exemple de réduction
+  \todo{Écrire avec les macros App, Lam, Var}
   \begin{align*}
-    & ((\lambda x .\lambda y. z) w) \leadsto \lambda x.\lambda y.z \\
+    & ((\lambda x .\lambda y. y) w) \leadsto \lambda y.y \\
   \end{align*}
-  Ici z étant une variable libre il n'y a rien à réduire.
+  \Var{x} n'étant pas utilisé dans la fonction, l'argument \Var{w} disparaît complètement.
 \end{example}
 
 
