@@ -426,12 +426,12 @@ existe donc plusieurs stratégies de réduction qui permettent
 d'atteindre différents type de forme normale.
 
 \begin{example}
-  Le terme 
+  Le terme \attention{cette réduction est fausse}
   \begin{align*}
     (((\lambda x.x) (\lambda y.y)) z) &\leadsto ((\lambda y.y) y) \\
     & \leadsto y
   \end{align*}
-  Ici y n'est plus réductible c'est donc la forme normale du terme.
+  Ici \Var{y} n'est plus réductible c'est donc la forme normale du terme.
 \end{example}
 
 Le lambda calcul étant un modèle de calcul universel, il permet de 
