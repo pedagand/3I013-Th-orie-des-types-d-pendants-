@@ -670,13 +670,6 @@ par l'argument dans le corps de la fonction :
 \todo{Décrire ce programme}
 \codefrom{untyped}{lambda}{evaluation}
 
-Si l'on trouve un redex, on reduit puis l'on evalue le resultat de la reduction,
-et si le membre de gauche n'est pas une variable on evalue celui-ci pour determiner
-si celui ci peut nous donner une abstraction afin de pouvoir effectuer une réduction.
-Conformément à la stratégie, on n'évalue jamais le membre de gauche d'une application
-pour les raisons énoncées dans la section d'évaluation ~\citep{reduction:call_by_name}.
-
-
 \subsubsection{Les booléens}
 
 Afin d'implémenter les boléens dans notre language un choix d'implémentation 
