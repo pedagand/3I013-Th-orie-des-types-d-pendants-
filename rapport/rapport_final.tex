@@ -926,37 +926,41 @@ type (et que l'on peut donc placer à gauche d'une application) et ceux
 pour lesquels il faudra fournir une annotation de type.
 
 
-Nous nomerons les termes pouvant se trouver à gauche d'une application les \emph{termes synthétisables} et les 
-autres \emph{termes inférables}.
-Le problème étant le manque d'information quant au type des \emph{termes inférables} nous allons rajouter un terme
-permettant d'ajouter cette information, \emph{l'annotation}.
+Nous nomerons les termes pouvant se trouver à gauche d'une application
+les termes \emph{synthétisables} et les autres termes
+\emph{vérifiables}.  Le problème étant le manque d'information quant
+au type des termes inférables nous allons étendre le langage des
+termes avec une \emph{annotation} permettant de spécifier cette
+information.
+
+\newcommand{\Inv}[1]{\ensuremath{\mathit{inv}(#1)}}
+\newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
+
+\todo{Utiliser l'environnement \texttt{bnf}. Utiliser les macros App, etc}
 Voici donc notre représentation des termes:
 \begin{align*}
-  ex &::= & \mbox{Termes synthétisables} \\
-  &| (ex\: in) &\mbox{Appl} \\
-  &| x &\mbox{Var} \\
-  &| (in:Type)&\mbox{Ann} \\
-  in &::= & \mbox{Termes Inférables} \\
-  &|\lambda x.in &\mbox{Abs} \\ 
-  &|inv(ex) &\mbox{Inv} \\
+  ex &::= & \mbox{(termes synthétisables)} \\
+  &| ex\: in &\mbox{(application)} \\
+  &| x &\mbox{(variable)} \\
+  &| \Ann{in}{T}&\mbox{(annotation)} \\
+  in &::= & \mbox{(termes inférables)} \\
+  &|\lambda x.in &\mbox{(abstraction)} \\ 
+  &|\Inv{ex} &\mbox{(inversion de phase)} \\
 \end{align*}
 
-Les deux nouveaux termes sont donc l'inversion \emph{Inv} qui permet d'inclure les 
+\todo{Utiliser ``vérifiable'' plutôt que ``inférable''}
+Les deux nouveaux termes sont donc l'inversion \Inv{-} qui permet d'inclure les 
 \emph{termes synhtétisables} dans le monde des \emph{termes inférables}, l'annotation 
-effectue la meme opération mais avec une contrainte: l'ajout d'information.
-
-On a maintenant résolu notre problème à savoir une application dont le membre de gauche
-est une abstraction, cependant si l'on ne peut plus écrire des termes sous cette forme
-cela retire tous les calculs de notre language.
-La principale raison pour laquel nous ne pouvions pas typechecker les abstractions 
-dans le membre gauche de l'application était du au manque d'information quand au type 
-de celle ci.
-On va donc introduire un nouveau terme permettant de passer des exTermes aux inTermes 
-mais en demandant de l'information quand à son type, l'annotation.
+effectue la meme opération en fournissant l'information de typage manquante.
 
 
 \begin{example}
-  Voici maintenant la dérivation qui nous possait problème précédement.
+  \todo{Re-phraser : il n'y avait pas vraiment de problème, la
+    différence est juste que cette dérivation peut être
+    automatiquement trouvée, sans devinettes.} \todo{Ne pas utiliser
+    de cfrac} \attention{Cet example est aussi cassé que le précédant
+    : réparer.} Voici maintenant la dérivation qui nous possait
+  problème précédement.
   \begin{align*}
     \cfrac{
       \cfrac{
@@ -968,16 +972,12 @@ mais en demandant de l'information quand à son type, l'annotation.
   \end{align*}
 \end{example}
 
-Nous avons donc résolu ce problème grace à l'introduction d'un système bi-directionnel
-cependant si nous avions introduit l'annotation directement dans notre système précédent le 
-problème ne se serait pas posé. Cependant cette solution nous à permis de savoir précisément 
-quand il était nécéssaire d'annoter nos termes. Cette améliration pourrait parraitre sans réel 
-intéret, mais en plus d'améliorer la synthaxe cela permet de réduire le nombre de calculs 
-nécéssaire au typage d'un terme. En effet nous allons maintenant présenter les règles de typage
-des différents termes et le typage d'un annotation a un cout non négligeable lorsque l'on travail
-sur des termes de grande taille.
+À partir de cette nouvelle présentation de la syntaxe, on adapte
+aisément les règles de typage
+(Figure~\ref{fig:typage-simple-bi-direct}), qui sont désormais
+entièrement dirigées par la syntaxe et donc purement algorithmique.
 
-Voici nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
+\todo{Écrire ``bidirectionnel'', pas ``bi-directionnel''}
 
 \begin{figure}
 \label{regles typage bidirectionnel}
@@ -1001,16 +1001,18 @@ Voici nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct
     {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} \\
 \end{align*}
 
-\caption{Typage (lambda calcul simplement typé Bi-directionnel)}
+\caption{Lambda calcul  bidirectionnel simplement typé}
 \label{fig:typage-simple-bi-direct} 
 \end{figure}   
 
+\todo{\textsc{Remplace les emph bizarres par du maths mode}}
 
-Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de vérification (check),
-celles de la forme \(\Gamma\vdash t \in T\) des règles de synthèse.
-Pour la vérification on connait le type \emph{T} et l'on souhaite déterminer si le terme \emph{t}
-est bien de ce type. Pour la synthèse, on ne connait pas le type de \emph{t} et l'on souhaite le
-determiner.
+Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de
+vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
+de synthèse.  Lors de la vérification, on connait le type \emph{T} et
+l'on souhaite déterminer si le terme \emph{t} est bien de ce
+type. Lors de la synthèse, on est en mesure, à partir d'un terme
+\Var{t} quelconque, de déterminer son type sans ambiguïté.
 
 Le système de type bi-directionnel que nous avons introduit est équivalent à celui de la Section~\ref{simple_type}.
 En effet si nous avions résolu le problème de l'application \ref{probleme:type_simple} nous aurions du annoter 
