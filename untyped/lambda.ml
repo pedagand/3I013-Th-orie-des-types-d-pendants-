@@ -280,7 +280,7 @@ module ChurchBooleanT =
   end
 
 
-(** * Réduction forte *)
+(** * Reduction forte *)
 
 (** Nous supposons ici que le terme est fortement normalisant. *)
 
@@ -373,7 +373,7 @@ module ChurchNatT =
     let int_to_lambda_term n =
       Abs(Abs(church_num n))
 
-    (* Défintions des termes *)
+    (* Definitions des termes *)
 
     let env = [("Z", read "(lambda (f x) x)");
                ("S", read "(lambda (n f x) (f (n f x)))");
