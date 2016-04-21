@@ -812,8 +812,6 @@ liste ordonnée de paires variable/type :
 \end{bnf}
 
 
-Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
-
 \begin{figure}
 \[
 \begin{array}{c}
@@ -850,10 +848,14 @@ Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 \label{fig:typage-simple}
 \end{figure} 
 
+\todo{\textsc{Ne pas mettre de variables mathématiques en dehors du maths mode}}
+
+Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
 La règle (Var) spécifie le typage des variables. Cette expression se
 lit en partant du numérateur pour déduire le dénumérateur : supposons
-que la variable x de type T est présente dans le contexte, alors on
-conclut que le type de la variable x est T.
+que la variable \Var{x} de type \Var{T} soit présente dans le
+contexte, alors on conclut que le type de la variable \Var{x} est
+\Var{T}.
 
 La règle (Abs) spécifie le typage des lambda
 abstractions. L'abstraction construit un type de la forme \(A
