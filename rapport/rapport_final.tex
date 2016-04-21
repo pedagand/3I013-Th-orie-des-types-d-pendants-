@@ -246,6 +246,50 @@ On considère que deux termes sont \(\alpha\)-équivalents si et seulement si il
     & \Lam{x}{\Var{x}} \equivAlpha \Lam{y}{\Var{y}} \\
   \end{align*}
 \end{example}
+
+\subsubsection{Implémentation}
+ 
+Pour pallier à la Remarque~\ref{problemelibreliee}, notre implémentation utilise une représentation
+particulière pour les variables liées: les indices de de Bruijn.  Nous
+allons ainsi représenter les variables liées non pas par un nom mais
+par un entier naturel. Cette valeur est determiné à partir du nombre
+d'abstractions entre la variable et l'abstraction qui l'introduit.
+
+\begin{example}
+  Le $\lambda$-terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
+  et le terme $\Lam{x}{\Lam{y}{x}}$ s'écrira maintenant $\lambda.\lambda.1$ 
+\end{example}
+
+Tandis que les variables \emph{liées} seront representées par des
+indices de de Bruijn, les variables \emph{libres} quant à elle seront
+représentées par un (unique) nom de variable, comme dans la
+présentation formelle. Une telle représentation est traditionnellement
+appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
+
+\begin{example}
+  \todo{Donner l'exemple de réduction sous un binder}
+  Soit \Var{x} une variable libre.
+
+  En théorie :
+  \(\App{(\Lam{\Var{y}}{\Var{y}})}{\Var{x}} \leadsto \Var{x}\)
+
+  En pratique avec des de Bruijn : \todo{montrer le problème et parler des shifts}
+
+  En pratique avec du locally nameless : \todo{montrer l'absence de problème}
+
+\end{example}
+
+Voici le code Ocaml traduisant la définition inductive des termes que
+nous avions définis :
+%
+\codefrom{untyped}{lambda}{untyped_term}
+
+Cette représentation se rapproche au plus de la spécification formelle
+: seule la distinction entre les variables liées \lstinline!BoundVar!
+et les variables libres \lstinline!FreeVar! diffère.
+
+
+
   
 \subsection{Calculer dans le lambda calcul}
 \label{calculer_dans_le_lambda_calcul}
@@ -584,48 +628,6 @@ De la même manière, on construit l'addition de deux nombres \(m\) et
 
 Nous nous attarderons ici sur les choix d'implémentations et il sera question
 d'analyser certaines parties du code et non sa totalité.
-
-\subsubsection{Représentation des $\lambda$-termes}
- 
-Pour pallier à la Remarque~\ref{problemelibreliee}, nous utilisons une représentation
-particulière pour les variables liées: les indices de de Bruijn.  Nous
-allons ainsi représenter les variables liées non pas par un nom mais
-par un entier naturel. Cette valeur est determiné à partir du nombre
-d'abstractions entre la variable et l'abstraction qui l'introduit.
-
-\begin{example}
-  Le $\lambda$-terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
-  et le terme $\Lam{x}{\Lam{y}{x}}$ s'écrira maintenant $\lambda.\lambda.1$ 
-\end{example}
-
-Tandis que les variables \emph{liées} seront representées par des
-indices de de Bruijn, les variables \emph{libres} quant à elle seront
-représentées par un (unique) nom de variable, comme dans la
-présentation formelle. Une telle représentation est traditionnellement
-appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
-
-\begin{example}
-  \todo{Donner l'exemple de réduction sous un binder}
-  Soit \Var{x} une variable libre.
-
-  En théorie :
-  \(\App{(\Lam{\Var{y}}{\Var{y}})}{\Var{x}} \leadsto \Var{x}\)
-
-  En pratique avec des de Bruijn : \todo{montrer le problème et parler des shifts}
-
-  En pratique avec du locally nameless : \todo{montrer l'absence de problème}
-
-\end{example}
-
-Voici le code Ocaml traduisant la définition inductive des termes que
-nous avions définis :
-%
-\codefrom{untyped}{lambda}{untyped_term}
-
-Cette représentation se rapproche au plus de la spécification formelle
-: seule la distinction entre les variables liées \lstinline!BoundVar!
-et les variables libres \lstinline!FreeVar! diffère.
-
 
 
 \subsubsection{Substitution}
