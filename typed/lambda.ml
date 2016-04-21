@@ -448,9 +448,11 @@ let gensym =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
-(*=check_abs *)
+(*=check_def *)
 let rec check contexte inT ty
     = match inT with
+(*=End *)
+(*=check_abs *)
     | Abs(x, b) -> 
        begin
          match ty with
@@ -484,9 +486,11 @@ let rec check contexte inT ty
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
 (*=End *)
-(*=synth_ann *)
+(*=synth_def *)
 and synth contexte exT 
     = match exT with
+(*=End *)
+(*=synth_ann *)
     | Ann(tm, ty) ->
        if check contexte tm ty then
          ty 

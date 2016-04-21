@@ -129,6 +129,7 @@ L'intéret du typage est donc de vérifier que le programme s'executera correcte
 Il permet aussi d'obtenir des informations très précises sur la sources des erreurs.
 
 \section{$\lambda$-calcul non typé}
+\label{sec:untyped}
 
 \todo{Remplacer tous les ``lambda''s par ``$\lambda$''}
 
@@ -770,6 +771,7 @@ Voici l'implémentation de l'évaluation de iter:
 Nous rappelons donc la fonction avec cette fois ci \fun{(f a)} et le prédécesseur de \fun{n}.
 
 \subsubsection{Les paires}
+\label{paires}
 
 La paire est une construction très répandue dans les languages fonctionnelles, 
 cela nous permet de crée un ensemble de deux éléments. Afin d'utiliser nos paires 
@@ -842,6 +844,12 @@ suivante :
   et le membre de droite un entier.
 \end{example}
 
+\paragraph{Implémentation :}
+
+La spécification des types se traduit naturellement en OCaml :
+%
+\codefrom{typed}{lambda}{Type}
+
 
 \subsection{Système de type}
 
@@ -898,7 +906,7 @@ liste ordonnée de paires variable/type :
 \end{array}
 \]
 
-\caption{Typage (lambda calcul simplement typé)}
+\caption{Lambda calcul simplement typé}
 \label{fig:typage-simple}
 \end{figure} 
 
@@ -970,44 +978,54 @@ membre de gauche est de type $A \rightarrow B$ alors que l'on ne
 connait que \emph{B}. Nous allons donc introduire une nouvelle
 représentation de nos termes afin de résoudre ce problème.
 
-\subsubsection{Système de type bi-directionnel}
+\subsubsection{Syntaxe bi-directionnel}
 
-Les applications dont le membre de gauche est une abstractions posent problème comme vu dans l'Exemple~\ref{probleme:type_simple}.
-Nous allons donc catégoriser nos \(\lambda\)-termes dans deux sous catégorie, 
-d'un coté les termes pouvant se trouver à gauche sans perturber la vérification de type d'une application et les autres.
+Les applications dont le membre de gauche est une abstractions posent
+problème, comme vu dans l'Exemple~\ref{probleme:type_simple}.  Nous
+allons donc partitionner les \(\lambda\)-termes en deux catégories :
+d'une part, les termes dont on peut automatiquement synthétiser le
+type (et que l'on peut donc placer à gauche d'une application) et ceux
+pour lesquels il faudra fournir une annotation de type.
 
 
-Nous nomerons les termes pouvant se trouver à gauche d'une application les \emph{termes synthétisables} et les 
-autres \emph{termes inférables}.
-Le problème étant le manque d'information quant au type des \emph{termes inférables} nous allons rajouter un terme
-permettant d'ajouter cette information, \emph{l'annotation}.
+Nous nomerons les termes pouvant se trouver à gauche d'une application
+les termes \emph{synthétisables} et les autres termes
+\emph{vérifiables}.  Le problème étant le manque d'information quant
+au type des termes inférables nous allons étendre le langage des
+termes avec une \emph{annotation} permettant de spécifier cette
+information.
+
+\newcommand{\Inv}[1]{\ensuremath{\mathit{inv}(#1)}}
+\newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
+
+\todo{Utiliser l'environnement \texttt{bnf}. Utiliser les macros App, etc}
 Voici donc notre représentation des termes:
 \begin{align*}
-  ex &::= & \mbox{Termes synthétisables} \\
-  &| (ex\: in) &\mbox{Appl} \\
-  &| x &\mbox{Var} \\
-  &| (in:Type)&\mbox{Ann} \\
-  in &::= & \mbox{Termes Inférables} \\
-  &|\lambda x.in &\mbox{Abs} \\ 
-  &|inv(ex) &\mbox{Inv} \\
+  ex &::= & \mbox{(termes synthétisables)} \\
+  &| ex\: in &\mbox{(application)} \\
+  &| x &\mbox{(variable)} \\
+  &| \Ann{in}{T}&\mbox{(annotation)} \\
+  in &::= & \mbox{(termes inférables)} \\
+  &|\lambda x.in &\mbox{(abstraction)} \\ 
+  &|\Inv{ex} &\mbox{(inversion de phase)} \\
 \end{align*}
 
-Les deux nouveaux termes sont donc l'inversion \emph{Inv} qui permet d'inclure les 
+\todo{Utiliser ``vérifiable'' plutôt que ``inférable''}
+Les deux nouveaux termes sont donc l'inversion \Inv{-} qui permet d'inclure les 
 \emph{termes synhtétisables} dans le monde des \emph{termes inférables}, l'annotation 
-effectue la meme opération mais avec une contrainte: l'ajout d'information.
+effectue la meme opération en fournissant l'information de typage manquante.
 
-On a maintenant résolu notre problème à savoir une application dont le membre de gauche
-est une abstraction, cependant si l'on ne peut plus écrire des termes sous cette forme
-cela retire tous les calculs de notre language.
-La principale raison pour laquel nous ne pouvions pas typechecker les abstractions 
-dans le membre gauche de l'application était du au manque d'information quand au type 
-de celle ci.
-On va donc introduire un nouveau terme permettant de passer des exTermes aux inTermes 
-mais en demandant de l'information quand à son type, l'annotation.
-
+\todo{Définir des macros pour les jugements de typage, synthèse de
+  type et vérification de type}.
+\todo{On ne doit pas voir apparaître le terme ``inférence de type'' dans ce rapport : attention !}
 
 \begin{example}
-  Voici maintenant la dérivation qui nous possait problème précédement.
+  \todo{Re-phraser : il n'y avait pas vraiment de problème, la
+    différence est juste que cette dérivation peut être
+    automatiquement trouvée, sans devinettes.} \todo{Ne pas utiliser
+    de cfrac} \attention{Cet example est aussi cassé que le précédant
+    : réparer.} Voici maintenant la dérivation qui nous possait
+  problème précédement.
   \begin{align*}
     \cfrac{
       \cfrac{
@@ -1019,53 +1037,151 @@ mais en demandant de l'information quand à son type, l'annotation.
   \end{align*}
 \end{example}
 
-Nous avons donc résolu ce problème grace à l'introduction d'un système bi-directionnel
-cependant si nous avions introduit l'annotation directement dans notre système précédent le 
-problème ne se serait pas posé. Cependant cette solution nous à permis de savoir précisément 
-quand il était nécéssaire d'annoter nos termes. Cette améliration pourrait parraitre sans réel 
-intéret, mais en plus d'améliorer la synthaxe cela permet de réduire le nombre de calculs 
-nécéssaire au typage d'un terme. En effet nous allons maintenant présenter les règles de typage
-des différents termes et le typage d'un annotation a un cout non négligeable lorsque l'on travail
-sur des termes de grande taille.
+\paragraph{Implémentation :}
 
-Voici nos nouvelles règles de typage en Figure~\ref{fig:typage-simple-bi-direct}.
+\todo{Introduire ces définitions :} 
+\codefrom{typed}{lambda}{inTm}
+\codefrom{typed}{lambda}{exTm}
+
+Le type \lstinline!name! permet ci dessous nous permettra de mettre des entiers à la place 
+d'une chaîne de caractère, nous en reparlerons dans l'implémentation de l'évaluation.
+\codefrom{typed}{lambda}{name}
+
+
+\subsubsection{Système de type bi-directionnel}
+
+À partir de cette nouvelle présentation de la syntaxe, on adapte
+aisément les règles de typage
+(Figure~\ref{fig:typage-simple-bi-direct}), qui sont désormais
+entièrement dirigées par la syntaxe et donc purement algorithmique.
+
+\todo{Écrire ``bidirectionnel'', pas ``bi-directionnel''}
 
 \begin{figure}
 \label{regles typage bidirectionnel}
-\center\boxed{\Gamma\vdash T \ni t}
 
-\begin{align*}
-  &\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-  {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}&\: \\
-  &\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-  {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} \\
-\end{align*}
+\todo{Arrêter les cfracs. Utiliser les macros de construction de termes.}
 
-\center\boxed{\Gamma\vdash t \in T}
+\[\begin{array}{c}
+\boxed{\Gamma\vdash T \ni t}
+\bigskip\\
+\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
+      {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}
+\medskip\\
+\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+      {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} 
+\bigskip\\
+\boxed{\Gamma\vdash t \in T}
+\bigskip\\
+\cfrac{x:T \in \Gamma}
+      {\Gamma \vdash x \in T }\mbox{(Var)}
+\medskip\\
+\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
+      {\Gamma\vdash f\:s\in B}\mbox{(App)} 
+\medskip\\
+\cfrac{\Gamma\vdash T \ni t}
+      {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} 
+\end{array}\]
 
-\begin{align*}
-  &\cfrac{x:T \in \Gamma}
-  {\Gamma \vdash x \in T }\mbox{(Var)}&\: \\
-  &\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-  {\Gamma\vdash f\:s\in B}\mbox{(App)} \\
-  &\cfrac{\Gamma\vdash T \ni t}
-    {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} \\
-\end{align*}
 
-\caption{Typage (lambda calcul simplement typé Bi-directionnel)}
+\caption{Lambda calcul  bidirectionnel simplement typé}
 \label{fig:typage-simple-bi-direct} 
 \end{figure}   
 
+\todo{\textsc{Remplace les emph bizarres par du maths mode}}
 
-Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de vérification (check),
-celles de la forme \(\Gamma\vdash t \in T\) des règles de synthèse.
-Pour la vérification on connait le type \emph{T} et l'on souhaite déterminer si le terme \emph{t}
-est bien de ce type. Pour la synthèse, on ne connait pas le type de \emph{t} et l'on souhaite le
-determiner.
+Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de
+vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
+de synthèse.  Lors de la vérification, on connait le type \emph{T} et
+l'on souhaite déterminer si le terme \emph{t} est bien de ce
+type. Lors de la synthèse, on est en mesure, à partir d'un terme
+\Var{t} quelconque, de déterminer son type sans ambiguïté.  On vérifie
+aisément que ce système de type bi-directionnel est équivalent à celui
+présenté en Figure~\ref{fig:typage-simple}.
 
-Le système de type bi-directionnel que nous avons introduit est équivalent à celui de la Section~\ref{simple_type}.
-En effet si nous avions résolu le problème de l'application \ref{probleme:type_simple} nous aurions du annoter 
-l'ensemble des termes de gauche dans une application.
+\paragraph{Implémentation :}
+
+\todo{Dans cette section, importer le code du type-checker ``rapide'', ie. sans traitement des erreurs.}
+
+\begin{itemize}
+
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni t}}\\
+
+Nous disposons d'une fonction de vérification \lstinline!check!
+\todo{ne pas lister mécaniquement les arguments : donner une
+  spécification informelle de la fonction en nommant les arguments (et
+  leur type) en passant} ayant pour paramètres: un contexte qui est
+une liste de paires de la forme \emph{(var,type)}, un \emph{inTerme}
+ainsi qu'un type. Elle retourne un booléen indiquant
+si le terme est correctement typé ou non. \label{check}
+%
+\todo{Permuter \lstinline!inT! et \lstinline!ty! dans la définition de
+  \lstinline!check! de telle sorte que cela corresponde à l'ordre du
+  jugement de typage.}
+%
+\codefrom{typed}{lambda}{check_def} 
+
+\item[$\bullet$] \boxed{\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
+       {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}} \\
+
+\attention{Ce n'est pas la raison : c'est juste que l'on va sous des abstractions. Quand on va sous une abstraction, la variable autrefois liée devient libre et notre représentation nous impose donc de lui donner un nom explicite.} Afin de pouvoir associé une variable à son type dans le contexte il nous faut un nom pour celle ci.
+En effet avec notre représentation avec les indices de de Bruijn il est difficile de faire l'association entre 
+une variable et son type étant donné que nous ne nommons plus les variables.
+C'est pour cette raison que l'on génère une nouvelle variable libre et que l'on substitue les variables liées 
+au $\lambda$ par celle ci. On peut donc insérer dans le contexte l'association variable type.
+La fonction de synthèse \lstinline!synth! prend un contexte et un
+\emph{exTerme} et renvoie le type de celui-ci.
+La fonction gensym utilisée ici permet de crée un nom de variable frais, garantissant que celui n'a encore jamais
+été utilisé. 
+%
+ \codefrom{typed}{lambda}{check_abs}
+
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+                              {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}} \\
+
+
+Afin de tester l'égalité de type, l'égalité structurelle de OCaml est
+suffisante puisque les types sont purement statiques (contrairement
+aux types dépendants qui, eux, calculent).
+%
+\codefrom{typed}{lambda}{check_inv}
+  
+
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash t \in T}}\\
+
+La fonction de synthèse \lstinline!synth! prend un contexte, un
+terme synthétisable et renvoie le type de celui-ci.
+
+ \codefrom{typed}{lambda}{synth_def}
+
+\item[$\bullet$] \boxed{\cfrac{\Gamma\vdash T \ni t}
+                              {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}} \\
+\todo{Commenter}
+\codefrom{typed}{lambda}{synth_ann}
+
+\item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
+                               {\Gamma \vdash x \in T }\mbox{(Var)}}\\
+
+Dans la spécification formelle on ne fait pas de distinction entre une variable libre ou liée.
+Cependant il \attention{texte pas clair : tu veux dire que ce cas est impossible.} n'est pas possible de synthétiser une variable liée étant donné qu'elles sont libérés lors
+de la vérification de l'abstraction.
+
+\codefrom{typed}{lambda}{synth_var}
+
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
+         {\Gamma\vdash f\:s\in B}\mbox{(App)}}\\
+
+\todo{Commenter}
+\codefrom{typed}{lambda}{synth_appl}
+
+\end{itemize}
+
+Pour cette implémentation nous avons choisi de générer des exceptions lorsque le terme
+n'était pas correctement typé. Cela permet de terminer le programme directement car de toute
+façon le terme serait refusé. Nous reviendrons cependant sur certains points négatifs de cette
+méthode dans l'implémentation des types dépendants.
+
+
 
 \subsection{Normalisation} %en gros calculer dans le lambda calcul non typé
 
@@ -1078,15 +1194,21 @@ rapport à la Section~\ref{calculer_dans_le_lambda_calcul}.
 Le typage permet d'obtenir, à la compilation, des garanties quant à la
 bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés complementaires d'un système de type :
 \begin{description}
-\item[``Progress'':] soit \(t\) un terme correctement typé alors \(t\) est une valeur ou il
+\item[Progrès :] si un terme \(t\) est correctement typé alors soit \(t\) est une valeur, soit il
  existe une réduction telle que \(t \leadsto t'\)
-\item[``Preservation'':] si un terme \emph{t} a le type \emph{T}
+\item[Préservation :] si un terme \emph{t} a le type \emph{T}
 et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type \emph{T}
 \end{description}
 
-La conjonction de ces deux propriétés donne le slogan 
-``un programme bien typé ne plante jamais'' (citation Milner)  
-tout programme bien typé réduit vers une valeur nécessairement bien typé. 
+La conjonction de ces deux propriétés donne le slogan ``un programme
+bien typé ne plante jamais'' \todo{(citation Milner)} tout programme
+bien typé réduit vers une valeur de ce type.
+
+\begin{example}
+  Un programme de type \bool{} réduit vers une valeur de type \bool{}
+  et donc ce programme réduit \emph{nécessairement} vers le
+  constructeur \true{} ou le constructeur \false{}.
+\end{example}
 
 Nous avons désormais des garanties quant à la terminaison de nos programme.
 Cela se traduit par le fait que l'on pourra systématiquement obtenir une 
@@ -1096,22 +1218,15 @@ forme normale forte pour nos termes contrairement au \(\lambda\)-calcul non typ�
 \subsubsection{Reduction forte}
 
 \label{reduction_forte}
-Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Appel par nom}
-car nous souhaitions évaluer les termes vers une forme normale faible. Nous ne pouvions pas implémenter 
+Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation en appel par nom
+car nous \attention{ce n'était pas un souhait mais une obligation : les termes ne terminaient pas nécessairement.} souhaitions évaluer les termes vers une forme normale faible. Nous ne pouvions pas implémenter 
 une stratégie de réduction forte car dans certains cas cela aurait pu provoquer la non terminaison du 
 programme.
-D'après les propriétés de la section précédente nous disposons de la certitude que une fois 
-acceptés par le type-checker nos termes réduisent tous vers une forme normale forte.
-Nous allons donc implémenter une stratégie de réduction forte.
+D'après les propriétés de la section précédente nous disposons de la certitude que les termes acceptés  par le type-checker sont fortement normalisants. De plus, les types ne sont plus utiles lors de l'évaluation. 
+Nous allons donc implémenter une stratégie de réduction forte sur les \(\lambda\)-termes non typés de la Section~\ref{sec:untyped}.
 
-Les types ne sont pas utiles lors de l'évaluation. Nous allons donc tout d'abord implémenter
-une fonction de réduction forte sur les \(\lambda\)-termes non typés.
-
-Voici la spécification de notre réduction forte :
-Voici donc les règles d'évaluations:
+\attention{faire converger avec l'implémentation}\todo{Cela manque d'explication. En particulier, il faudrait expliquer la différence entre les neutres et les valeurs.} Voici la spécification de notre réduction forte : \todo{arrêter les cfracs}
 \begin{align*}
-  &\cfrac{t \Downarrow t'}
-  {t:T \Downarrow t'}&\mbox{(Ann)}&\: \\
   &\cfrac{}
   {x \Downarrow x}&\mbox{Var} \\
   &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
@@ -1123,204 +1238,18 @@ Voici donc les règles d'évaluations:
 \end{align*}
 
 La traduction de nos termes bidirectionnels vers les termes non typés
-est transparente, il suffit d'effacer les annotations de type.
+est transparente : il suffit d'effacer les annotations de type.
 
 \begin{example}
-  Faire un exemple où avec l'ancien cela ne marchait pas et maintenant ça marche
+  \todo{Prendre un des exemples d'opération sur les entiers de Church
+    où la réduction faible ``s'arrête trop tôt'' à notre goût et où la
+    réduction forte donne ``ce que l'on veut''.}
 \end{example}
 
-\subsection{Extensions} 
-
-Dans notre précédent language nous avions introduit les booléens ainsi que les entiers,
-nous verrons ici la façon de les représenters ainsi que leurs règles de typage.
-Nous introduirons aussi un nouveau type, le produit cartésien.
-
-\subsubsection{Les entiers}
-\label{entier_type}
-
-Commençons cette fois-ci par les entiers étant donné que le type \emph{Nat}
-est déja présent dans notre language.
-Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé 
-cependant maintenant que nous disposons de termes bi-directionnel il est important
-de préciser où les placer.
-
-%alors la il me faut une justification peut etre plus précise car j'en vois une pour les types dépendants mais pas pour ici
-%Pour les types dépendants je dirais que ceux dans les exTm c'est parceque on veut pouvoir avoir de la dépendance
-%sur eux mais je sais pas si ici je peux en parler
-\emph{Succ} et \emph{Zero} sont des \emph{termes inférables} étant donné que l'on peut determiner leur 
-type sans le synthétiser contrairement à \emph{Iter}.
-Les règles d'évaluations restent inchangés depuis la précédente spécification.
-Regardons maintenant les règles de typage de ces différents constructeurs:
-\begin{align*}
-  &\cfrac{\:}
-  {\Gamma\vdash Nat \ni \mathrm{Zero}}&\mbox{(Zero)} \\
-  &\cfrac{\Gamma\vdash Nat \ni t}
-  {\Gamma\vdash Nat \ni \mathrm{Succ(t)}}&\mbox{(Succ)} \\
-  &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash a \in A \:\: \Gamma\vdash A\rightarrow A \ni f}
-  {\Gamma\vdash \mathrm{iter}\: n\: f\: a \in A}&\mbox{(Iter)} \\
-\end{align*}
-
-
-\subsubsection{Les booléens}
-
-Afin de pouvoir typer nos termes il nous faut introduire le type \emph{Bool}.
-
-
-En suivant la meme demarche que  pour les entiers les 
-constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes inférables}
-et le constructeur \emph{Ifte} un \emph{terme synthétisable}
-
-
-
-Nous pouvons désormais typer nos booléens de la manière suivante:
-\begin{align*}
-  &\cfrac{}
-  {\Gamma\vdash Bool \ni true}&\mbox{(True)} \\
-  &\cfrac{}
-  {\Gamma\vdash Bool \ni false}&\mbox{(False)} \\
-  &\cfrac{\Gamma\vdash Bool \ni c \:\: \Gamma\vdash t \in C \:\: \Gamma\vdash e \in C}
-  {\Gamma\vdash \mathrm{ifte}\: c\: t\: e\in C}&\mbox{(Ifte)}
-\end{align*}
-
-On constate ici un exemple d'utilisation concrète des types. En effet 
-précédement avant evaluation de l'ensemble du terme nous ne pouvions 
-pas savoir si le terme \emph{c} était \emph{True} ou \emph{False}.
-Désormais nous avons la certitude avant execution que ce terme retourne 
-le terme correspondant à la branche \emph{then} ou \emph{else}
-
-\subsubsection{Le produit cartésien}
-\label{produit_cartesien}
-
-Le produit cartésien est un objet mathématique qui est définit comme
-un ensemble composé de deux éléments.
-Cela nous permettra de crée des collections d'éléments. 
-Pour ce faire nous allons implémenter un nouveau constructeur:
-les \emph{paires} sous la forme \emph{($a\,b$)}
-Nous allons aussi rajouter deux éliminateurs, les projections:
-\emph{$\pi 0$} qui appliqué à une paire 
-permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
-Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
-introduisons donc ce le type \emph{produit} de la forme \emph{($a\times b$)}.
-
-Nous allons maintenant évaluer nos termes, 
-\begin{align*}
-  &\cfrac{a \Downarrow a' \:\: b\Downarrow b'}
-  {a,b \Downarrow a',b'}\\
-  &\cfrac{a\Downarrow a'}
-  {p.\pi0(a,b)\Downarrow a'}\\
-  &\cfrac{b\Downarrow b'}
-  {p.\pi1(a,b)\Downarrow b'}\\
-\end{align*}
-
-
-Règle de typages des paires:
-\begin{align*}
-  &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
-  {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
-  &\cfrac{\Gamma\vdash p \in (A\times B)} 
-  {\Gamma\vdash p.\pi 0 \in A}&\mbox{($\pi 0$)} \\
-  &\cfrac{\Gamma\vdash p \in (A\times B)} 
-  {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
-\end{align*}
-
-%on peut parler du fait que de faire des paires de paires c'est long a checker c'est mieux de faire des vecteurs pour ça?
-
-\subsection{Implémentation}
-
-Certaines implémentations sont redondantes avec la précédente, nottament les 
-entiers, les booléens ect.. seul leur intération au sein du vérificateur de type
-est nouvelle. Nous regrouperons donc tout cela dans la Section~\ref{extensions_implem}.
-Voici une implémentation du $\lambda$-calcule simplement typé.
-
-\subsubsection{Représentation des termes et des types}
-
-Comme nous précédement nous allons  
-présenter l'implémentation du noyau de notre language, nous introduirons 
-les différents extensions dans les sections suivantes.
-Commençons tout d'abord par donné la représentation des \emph{inTermes}
-ainsi que celle des \emph{exTermes}
-
-\codefrom{typed}{lambda}{inTm}
-\codefrom{typed}{lambda}{exTm}
-
-Le type name permet ci dessous nous permettra de mettre des entiers à la place 
-d'un string, nous en reparlerons dans l'implémentation de l'évaluation.
-\codefrom{typed}{lambda}{name}
-
-De la meme façon que nous avons représenté nos termes voici la 
-représentation de nos types 
-
-\codefrom{typed}{lambda}{Type}
-
-
-\subsubsection{Type checker}
-
-Le point centrale de cette nouvelle implémentation est le type-checker, 
-il sera ici question de l'implémentation des règles bi-directionnelles.
-Il nous faut donc traduire nos règles \ref{regles typage bidirectionnel} 
-de façon algorithmique. Voici donc la correpondance entre l'implémentation et la spécification formelle.
-
-Nous disposons d'une fonction de vérification \emph{Check} ayant pour 
-paramètres: un contexte qui est une liste de paires de la forme \emph{(var,type)},
-un \emph{inTerme} ainsi qu'un type. Elle retourne un booléens permettant de déterminer
-si le terme est correctement typé.
-La fonction de synthèse \emph{synth} prend un contexte et un \emph{exTerme} 
-et renvoi le type de celui ci.
-
-La fonction gensym utilisée ici permet de crée un nom de variable assurant que celui n'a encore jamais
-été utilisé. 
-
-\label{check}
-
-\codefrom{typed}{lambda}{check_abs}
-$\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-         {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}$
-Afin de pouvoir associé une variable à son type dans le contexte il nous faut un nom pour celle ci.
-En effet avec notre représentation avec les indices de de Bruijn il est difficile de faire l'association entre 
-une variable et son type étant donné que nous ne nommons plus les variables.
-C'est pour cette raison que l'on génère une nouvelle variable libre et que l'on substitue les variables liées 
-au $\lambda$ par celle ci. On peut donc insérer dans le contexte l'association variable type.
-  
-\codefrom{typed}{lambda}{check_inv}
-$\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-         {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}$
-Ici pour l'égalité nous utilisons l'égalité d'ocaml car il s'agit d'un égalité syntaxique entre les temrmes.
-
-
-\codefrom{typed}{lambda}{synth_ann}
-$\cfrac{\Gamma\vdash T \ni t}
-         {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}$
-
-\codefrom{typed}{lambda}{synth_var}
-$\cfrac{x:T \in \Gamma}
-         {\Gamma \vdash x \in T }\mbox{(Var)}$
-Dans la spécification formelle on ne fait pas de distinction entre une variable libre ou liée.
-Cependant il n'est pas possible de synthétiser une variable liée étant donné qu'elles sont libérés lors
-de la vérification de l'abstraction.
-
-\codefrom{typed}{lambda}{synth_appl}
-$\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-         {\Gamma\vdash f\:s\in B}\mbox{(App)}$
-
-
-Pour cette implémentation nous avons choisis générer des exeptions lorsque le terme
-n'était pas correctement typé. Cela permet de terminer le programme directement car de toute
-façon le terme serait refusé. Nous reviendrons cependant sur certains points négatifs de cette
-méthode dans l'implémentation des types dépendants.
-
-
-\subsubsection{Réduction forte à petits pas}
+\paragraph{Implémentation:}
 \label{reduction_petits_pas}
 
-
-Nous allons donc implémenté une fonction de réduction 
-On appelle cette implémentation de réduction ``à petits pas'' car 
-on effectue les réductions étapes par étape. Cela se raproche fortement 
-de l'implémentation que nous avons donné de la réduction dans le $\lambda$-calcul
-non typé du point de vue de l'implémentation.
-
-Les termes préfixés d'un \emph{S} sont équivalents aux $\lambda$-termes 
-du $\lambda$-calcul non typé, l'annotation n'est donc plus présente.
+\todo{Transférer le code dans \texttt{untyped} et mettre à jour le texte.}
 
 \codefrom{typed}{lambda}{reduction_forte}
 
@@ -1338,7 +1267,129 @@ et le terme. Son code est assez triviale nous ne le présenterons donc pas ici.
 
 Les autres règles ne nécéssitent pas de commentaires particuliers.
 
-\subsubsection{Réduction forte à grands pas}
+\subsection{Extensions} 
+
+Dans notre précédent language nous avions introduit les booléens ainsi que les entiers,
+nous verrons ici la façon de les représenter ainsi que leurs règles de typage.
+Nous introduirons aussi un nouveau type, le produit cartésien.
+
+\subsubsection{Les entiers}
+\label{entier_type}
+
+Commençons cette fois-ci par les entiers étant donné que \attention{ce n'est pas vrai, si ?} le type \emph{Nat}
+est déja présent dans notre language. \attention{si ce n'est en effet pas justifié, commencer la présentation par les booléens, qui sont plus simples.}
+Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé 
+cependant, maintenant que nous disposons de termes bi-directionnels, il est important
+de préciser leur phase.
+
+%alors la il me faut une justification peut etre plus précise car j'en vois une pour les types dépendants mais pas pour ici
+%Pour les types dépendants je dirais que ceux dans les exTm c'est parceque on veut pouvoir avoir de la dépendance
+%sur eux mais je sais pas si ici je peux en parler
+\emph{Succ} et \emph{Zero} sont des termes inférables étant donné que
+l'on peut aisément vérifier qu'ils appartiennent au type des
+entiers. \todo{Dire quelque chose sur \iter{}. Remarque : j'ai décidé
+  de mettre le type de retour \Var{A} dans la définition de \iter{},
+  pour être raccord avec ce que l'on fait avec les types
+  dépendants. Et plus de question de ``pourquoi on synthétise ?''}.
+Les règles de typage bidirectionnelles sont donc:
+\begin{align*}
+  &\cfrac{\:}
+  {\Gamma\vdash Nat \ni \mathrm{Zero}}&\mbox{(Zero)} \\
+  &\cfrac{\Gamma\vdash Nat \ni t}
+  {\Gamma\vdash Nat \ni \mathrm{Succ(t)}}&\mbox{(Succ)} \\
+  &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A\rightarrow A \ni f}
+  {\Gamma\vdash \mathrm{iter}\: A\: n\: f\: a \in A}&\mbox{(Iter)} \\
+\end{align*}
+
+Les règles d'évaluations restent inchangés.
+
+\subsubsection{Les booléens}
+
+Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
+En suivant la meme demarche que  pour les entiers les 
+constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes inférables}
+et le constructeur \emph{Ifte} un \emph{terme synthétisable}
+
+
+
+Nous pouvons désormais typer nos booléens de la manière suivante: \todo{Stop les cfracs}
+\begin{align*}
+  &\cfrac{}
+  {\Gamma\vdash Bool \ni true}&\mbox{(True)} \\
+  &\cfrac{}
+  {\Gamma\vdash Bool \ni false}&\mbox{(False)} \\
+  &\cfrac{\Gamma\vdash Bool \ni c \:\: \Gamma\vdash t \in C \:\: \Gamma\vdash e \in C}
+  {\Gamma\vdash \mathrm{ifte}\: C\: c\: t\: e\in C}&\mbox{(Ifte)}
+\end{align*}
+
+\subsubsection{Le produit cartésien}
+\label{produit_cartesien}
+
+\todo{Extraire la partie syntaxe \& réduction et l'amener en Section~\ref{paires}}
+\todo{Définir des commandes pour écrire les paires et les 2 projections}
+
+Le produit cartésien est un objet mathématique qui est définit comme
+un ensemble composé de deux éléments.
+Cela nous permettra de crée des collections d'éléments. 
+Pour ce faire nous allons implémenter un nouveau constructeur:
+les \emph{paires} sous la forme \emph{($a\,b$)}
+Nous allons aussi rajouter deux éliminateurs, les projections:
+\emph{$\pi 0$} qui appliqué à une paire 
+permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
+
+
+
+Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
+introduisons donc un type \emph{produit} $A \times B$. \todo{Étendre formellement la grammaire des types \Var{T}}
+
+Nous allons maintenant évaluer nos termes, \todo{en dire plus}
+\begin{align*}
+  &\cfrac{a \Downarrow a' \:\: b\Downarrow b'}
+  {a,b \Downarrow a',b'}\\
+  &\cfrac{a\Downarrow a'}
+  {p.\pi0(a,b)\Downarrow a'}\\
+  &\cfrac{b\Downarrow b'}
+  {p.\pi1(a,b)\Downarrow b'}\\
+\end{align*}
+
+
+Règle de typages des paires: \todo{en dire plus.}
+\begin{align*}
+  &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
+  {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
+  &\cfrac{\Gamma\vdash p \in A\times B} 
+  {\Gamma\vdash p.\pi 0 \in A}&\mbox{($\pi 0$)} \\
+  &\cfrac{\Gamma\vdash p \in A\times B} 
+  {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
+\end{align*}
+
+%on peut parler du fait que de faire des paires de paires c'est long a checker c'est mieux de faire des vecteurs pour ça?
+
+\paragraph{Implémentation :}
+Nous allons maintenant implémenté le produit cartésien afin d'enrichir
+notre language. Tout d'abord, il nous faut introduire trois nouveaux
+termes ainsi qu'un nouveau constructeurs de type. \todo{c'est (trop !) brut de
+  décoffrage !}
+\emph{Type}
+\codefrom{typed}{lambda}{type_pair}
+\emph{inTermes}
+\codefrom{typed}{lambda}{inTm_pair}
+\emph{exTermes}
+\codefrom{typed}{lambda}{exTm_pair}
+\emph{value}
+\codefrom{typed}{lambda}{value_pair}
+
+Il nous faut maintenant implémenter les règles de typage au sein de notre algotithme:
+
+\emph{check}
+\codefrom{typed}{lambda}{check_pair}
+\emph{synth}
+\codefrom{typed}{lambda}{synth_pair}
+
+Rien à commenter, \todo{ha bon ? Très bien alors}
+
+
+\subsection{Réduction forte à grands pas}
 
 \todo{expliquer plus en détail l'utilisation du type name}
 %le type name prend tous son sens dans cette section car il nous permet....
@@ -1453,72 +1504,6 @@ Nous allons pouvoir exploiter ceci avec l'aide de la fonction \fun{boundfree} do
 voici le code:
 \codefrom{typed}{lambda}{boundfree}
 
-\subsubsection{Produit cartésien}
-
-Nous allons maintenant implémenté le produit cartésien afin d'enrichire notre 
-language. Tout d'abord comme nous l'avons vu dans la Section~\ref{produit_cartesien}
-il nous faut introduire trois nouveaux termes ainsi qu'un nouveau constructeurs de type.
-\emph{Type}
-\codefrom{typed}{lambda}{type_pair}
-\emph{inTermes}
-\codefrom{typed}{lambda}{inTm_pair}
-\emph{exTermes}
-\codefrom{typed}{lambda}{exTm_pair}
-\emph{value}
-\codefrom{typed}{lambda}{value_pair}
-
-Il nous faut maintenant implémenter les règles de typage au sein de notre algotithme:
-
-\emph{check}
-\codefrom{typed}{lambda}{check_pair}
-\emph{synth}
-\codefrom{typed}{lambda}{synth_pair}
-
-Rien à commenter,
-
-\subsubsection{Extensions}
-\label{extensions_implem}
-
-\todo{je ne pense pas que je devrais faire cette section je n'ai rien à dire dessus}
-Voici l'ensemble des intégration dans le vérificateurs de type pour les termes
-n'ayant pas encore été présentée
-
-\emph{check} 
-\codefrom{typed}{lambda}{inTm_extensions}
-\emph{synth} 
-\codefrom{typed}{lambda}{exTm_extensions}
-
-SI JE PEUX PEUT ETRE PARLER DE VITTER POUR LES ENTIERS MAIS CEST TOUT
-
-
-
-
-%% Voici donc les règles d'évaluations:
-%% \begin{align*}
-%%   &\cfrac{t \Downarrow t'}
-%%   {t:T \Downarrow t'}&\mbox{(Ann)}&\: \\
-%%   &\cfrac{}
-%%   {x \Downarrow x}&\mbox{Var} \\
-%%   &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
-%%   {t\:t'\Downarrow \: v'}&\mbox{Appl redex} \\
-%%   &\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
-%%   {t\:t'\Downarrow \: n \: v'}&\mbox{Appl} \\
-%%   &\cfrac{e \Downarrow \: v}
-%%   {\lambda x.t \Downarrow \: \lambda x.v}&\mbox{Abs}
-%% \end{align*}
-
-
-
-
-
-
-
-
-
-
-
-
-%on veut maintenant montrer celle ou on transforme en mode normale et après mettre la big_step
 
 
 \section{Les types dépendants}
