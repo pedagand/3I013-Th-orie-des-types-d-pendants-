@@ -585,11 +585,12 @@ d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Représentation des $\lambda$-termes}
  
-Pour pallier au problème que nous énoncions précédement ~\ref{problemelibreliee}, nous
-utilisons une représentation particulière pour les variables liées:
-les indices de de Bruijn.  Nous allons ainsi représenter les variables
-liées non pas par un nom mais par un entier naturel. Cette valeur est determiné 
-à partir du nombre de $\lambda$ entre la variable et le $\lambda$ qui la lie.
+Pour pallier au problème que nous énoncions précédement
+~\ref{problemelibreliee}, nous utilisons une représentation
+particulière pour les variables liées: les indices de de Bruijn.  Nous
+allons ainsi représenter les variables liées non pas par un nom mais
+par un entier naturel. Cette valeur est determiné à partir du nombre
+d'abstractions entre la variable et l'abstraction qui l'introduit.
 
 \begin{example}
   Le $\lambda$-terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
