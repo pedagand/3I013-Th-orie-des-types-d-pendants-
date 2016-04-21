@@ -1032,14 +1032,14 @@ rapport à la Section~\ref{calculer_dans_le_lambda_calcul}.
 Le typage permet d'obtenir, à la compilation, des garanties quant à la
 bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés complementaires d'un système de type :
 \begin{description}
-\item[``Progress'':] soit \(t\) un terme correctement typé alors \(t\) est une valeur ou il
+\item[Progrès :] si un terme \(t\) est correctement typé alors soit \(t\) est une valeur, soit il
  existe une réduction telle que \(t \leadsto t'\)
-\item[``Preservation'':] si un terme \emph{t} a le type \emph{T}
+\item[Préservation :] si un terme \emph{t} a le type \emph{T}
 et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type \emph{T}
 \end{description}
 
 La conjonction de ces deux propriétés donne le slogan 
-``un programme bien typé ne plante jamais'' (citation Milner)  
+``un programme bien typé ne plante jamais'' \todo{(citation Milner)}
 tout programme bien typé réduit vers une valeur nécessairement bien typé. 
 
 Nous avons désormais des garanties quant à la terminaison de nos programme.
