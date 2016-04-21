@@ -851,16 +851,16 @@ liste ordonnée de paires variable/type :
 \todo{\textsc{Ne pas mettre de variables mathématiques en dehors du maths mode}}
 
 Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
-La règle (Var) spécifie le typage des variables. Cette expression se
+La règle (\textsc{Var}) spécifie le typage des variables. Cette expression se
 lit en partant du numérateur pour déduire le dénumérateur : supposons
 que la variable \Var{x} de type \Var{T} soit présente dans le
 contexte, alors on conclut que le type de la variable \Var{x} est
 \Var{T}.
-La règle (Abs) spécifie le typage des lambda
+La règle (\textsc{Abs}) spécifie le typage des lambda
 abstractions. L'abstraction construit un type de la forme \(A
 \Rightarrow B\) : il faut donc que la variable associée au lambda
 terme soit de type \(A\) et le résultat de type \(B\).
-La règle (App) spécifie le typage de l'application. 
+La règle (\textsc{App}) spécifie le typage de l'application. 
 Dans la Section~\ref{reduction:call_by_name}, nous avions vu que seul les 
 redex étaient réductible. Dans un language de programmation appliquer un terme n'étant 
 pas une fonction n'a pas de sens. C'est pour cette raison qu'il nous faut vérifier 
@@ -873,6 +873,8 @@ type $A\rightarrow B$ . De plus on vérifie que \emph{s} est bien du type
   \label{probleme:type_simple}
   Voici donc quelques exemples de dérivations de type.
   Ces dérivations se lisent du bas vers le haut.
+  \todo{Retirer les cfrac, utiliser inferrules.}
+
   \begin{align*}
     \cfrac{
       \cfrac{
