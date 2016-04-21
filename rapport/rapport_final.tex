@@ -1390,15 +1390,24 @@ Rien à commenter, \todo{ha bon ? Très bien alors}
 %le type name prend tous son sens dans cette section car il nous permet....
 
 
-Nous allons maintenant implémenté une nouvelle réduction. 
-Comme nous l'avons vu dans la Section~\ref{reduction_forte} %peut etre dans la partie safety je ne me souviens plus a voir 
-la réduction forte aboutie forcément à une forme normale, les termes que nous obtenons
-sont donc les memes qu'avec la réduction précédente \ref{reduction_petits_pas}. Nous allons donc implémenter 
-d'une nouvelle façon cette réduction. Le but de cette implémentation est d'exploiter 
-les ressources mises à dispositions par les languages de programmation fonctionnelle.
-Elle a aussi pour effet d'évaluer complètement les termes, on peut le constater du fait %a changer
-que les fonctions prenenent des \emph{inTermes} ou des \emph{exTermes} en entrée et retourne des valeurs.
-Les valeurs ne sont plus réinterprétées par la suite.
+Dans cette section, nous décrivons une implémentation alternative de
+la réduction forte qui exploite le language de programmation
+fonctionnelle que l'on utilise pour \emph{implémenter} la réduction
+forte.  \attention{Ceci n'est pas clair : tu es en train de donner une
+  semi-définition de ``normaliser''. Je préférerai que tu développes
+  l'aspect ``hack'' où l'on exploite les fonctions de OCaml pour
+  modéliser les fonctions de notre langage.} Elle a aussi pour effet
+d'évaluer complètement les termes, on peut le constater du fait \if 0
+a changer \fi que les fonctions prenenent des \emph{inTermes} ou des
+\emph{exTermes} en entrée et retourne des valeurs.  Les valeurs ne
+sont plus réinterprétées par la suite.
+
+Comme nous l'avons vu dans la Section~\ref{reduction_forte} \if 0 peut
+etre dans la partie safety je ne me souviens plus a voir \fi la
+réduction forte aboutie forcément à une forme normale, les termes que
+nous obtenons par la réduction à grand pas seront donc les memes que
+ceux obtenus avec la réduction à petits pas
+(Section~\ref{reduction_petits_pas}).
 
 \begin{align*}
   v &::= &\mbox{Valeurs} \\
