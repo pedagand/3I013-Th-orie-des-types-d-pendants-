@@ -1486,21 +1486,27 @@ simplement d'alléger le code de la fonction. \todo{C'est du morse
 
 
 
-Une fois nos termes normalisés, il nous faut maintenant un moyen de repasser nos termes
-dans la représentation classique. Il nous faut donc implémenter cette fonction permettant de 
-faire cette association, voici son code:
+Une fois nos termes évaluées dans OCaml, il nous faut maintenant les
+\emph{réifier} sous forme de termes de notre
+$\lambda$-calcul. \todo{La phrase suivante ne dit rien de très
+  utile. Il serait plus utile de décrire le type de la fonction (et
+  donc ses arguments) et donner une intuition de son comportement.} Il
+s'agit donc implémenter cette fonction permettant de faire cette
+association, voici son code:
 
 \codefrom{typed}{lambda}{value_to_inTm}
 \codefrom{typed}{lambda}{neutral_to_exTm}
 
-Revenons sur le type \emph{name} que nous avions introduit. Jusqu'a présent 
-celui ci n'était pas utile. Maintenant il va nous permettre de faire la distinction 
-entre les variables réellement libre et celles que nous souhaitons liée.
-Afin de transformer une value \emph{VLam} en \emph{Abs} il nous faut 
-appliquer la fonction \emph{f} à une variable libre, et celle ci se distinguera des
-autres variables libres car celle ci possède un indice. 
-Nous allons pouvoir exploiter ceci avec l'aide de la fonction \fun{boundfree} dont 
-voici le code:
+Le type \emph{name} nous permet de faire la distinction entre les
+variables réellement libre et celles que nous souhaitons liée \todo{ce
+  n'est pas le plus important : il faut expliquer que l'on est forcé
+  d'introduire des variables artificielles pendant la réification, que
+  l'on veut lier à leur abstraction (contrairemnt aux
+  \lstinline!FreeVar!)}.  Afin de transformer une value \emph{VLam} en
+\emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
+libre, et celle ci se distinguera des autres variables libres car elle
+possède un indice.  Nous allons pouvoir exploiter ceci avec l'aide de
+la fonction \fun{boundfree} dont voici le code:
 \codefrom{typed}{lambda}{boundfree}
 
 
