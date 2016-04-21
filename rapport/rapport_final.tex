@@ -224,6 +224,10 @@ Un terme ne contenant aucune occurrence de variable libre est dit \emph{clos}.
 \end{example}
 
 \label{problemelibreliee}
+\attention{Non, ce n'est pas ça le problème. Le problème, c'est que, a
+  priori, \Lam{\Var{x}}{\Var{x}} et \Lam{\Var{y}}{\Var{y}} sont des
+  termes distincts à cause du nom de variable différent alors que ce
+  sont moralement les deux mêmes termes}
 Un des problèmes introduit par cette représentation des variables est qu'il devient assez compliqué de déterminer si une variable est libre ou non, comme on peut le constater dans l'exemple ci-dessus (Exemple~\ref{example:ouvert-clos}). Il faut donc introduire la notion 
 d'$\alpha$-équivalence.
 
