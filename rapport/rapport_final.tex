@@ -267,7 +267,7 @@ Formellement, la substitution est définie par récursion sur le $\lambda$-terme
     \subst{x}{y}{u} &\triangleq x & (x \neq y)\\
     \subst{\lambda x.t}{x}{u} &\triangleq \lambda x.\subst{t}{x}{u} \\
     \subst{\lambda y.t}{x}{u} &\triangleq \lambda x.t \\
-    \subst{(t\: v)}{x}{u} &\triangleq (\subst{t}{x}{u}\: \subst{v}{x}{u}) 
+    \subst{(t\: v)}{x}{u} &\triangleq \subst{t}{x}{u}\: \subst{v}{x}{u}
 \end{align*}
 
 \begin{example}
