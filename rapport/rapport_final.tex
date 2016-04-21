@@ -981,25 +981,30 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 
 \begin{figure}
 \label{regles typage bidirectionnel}
-\center\boxed{\Gamma\vdash T \ni t}
 
-\begin{align*}
-  &\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-  {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}&\: \\
-  &\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-  {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} \\
-\end{align*}
+\todo{Arrêter les cfracs. Utiliser les macros de construction de termes.}
 
-\center\boxed{\Gamma\vdash t \in T}
+\[\begin{array}{c}
+\boxed{\Gamma\vdash T \ni t}
+\bigskip\\
+\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
+      {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}
+\medskip\\
+\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+      {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} 
+\bigskip\\
+\boxed{\Gamma\vdash t \in T}
+\bigskip\\
+\cfrac{x:T \in \Gamma}
+      {\Gamma \vdash x \in T }\mbox{(Var)}
+\medskip\\
+\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
+      {\Gamma\vdash f\:s\in B}\mbox{(App)} 
+\medskip\\
+\cfrac{\Gamma\vdash T \ni t}
+      {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} 
+\end{array}\]
 
-\begin{align*}
-  &\cfrac{x:T \in \Gamma}
-  {\Gamma \vdash x \in T }\mbox{(Var)}&\: \\
-  &\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-  {\Gamma\vdash f\:s\in B}\mbox{(App)} \\
-  &\cfrac{\Gamma\vdash T \ni t}
-    {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} \\
-\end{align*}
 
 \caption{Lambda calcul  bidirectionnel simplement typé}
 \label{fig:typage-simple-bi-direct} 
