@@ -76,7 +76,7 @@
 \newcommand{\ifte}{\mathsf{IfThenElse}}
 
 \newenvironment{bnf}
-               {\[\begin{array}{lclr}}
+               {\[\begin{array}{lcl@{\qquad}r}}
                {\end{array}\]}
 
 \newcommand{\fun}[1]{\lstinline!#1!}
@@ -157,7 +157,7 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 \newcommand{\App}[2]{\ensuremath{#1\:#2}}
 \newcommand{\Var}[1]{\ensuremath{#1}}
 
-
+\todo{Utiliser l'environement \texttt{bnf}}
 \begin{align*}
   t &::= & \mbox{(lambda terme)} \\
   &|\quad \Var{x} & \mbox{(variable)} \\
@@ -776,11 +776,11 @@ Et soit \emph{T} l'ensemble des types, on peut alors définir de façon inductiv
 ce qu'est un type.
 
 \begin{bnf}
-  T &::=& &\mbox{(Type)}\\
-  &|&int &\mbox{(Int)}\\ 
-  &|&bool &\mbox{(Bool)}\\
-  &|&T \rightarrow T &\mbox{(Flèche)}\\
-  &|&T \times T &\mbox{(Croix)}\\
+  T &::=& &\mbox{(type)}\\
+  &|&int &\mbox{(entiers)}\\ 
+  &|&bool &\mbox{(booléens)}\\
+  &|&T \rightarrow T &\mbox{(fonction)}\\
+  &|&T \times T &\mbox{(produit)}\\
 \end{bnf}
 Le type \(\rightarrow\) correpond au type des fonctions et le type (a*b)
 correspond au type des couples que nous allons désormais introduire dans notre language.
