@@ -598,22 +598,33 @@ d'abstractions entre la variable et l'abstraction qui l'introduit.
   et le terme $\Lam{x}{\Lam{y}{x}}$ s'écrira maintenant $\lambda.\lambda.1$ 
 \end{example}
 
-Mais nous n'allons pas simplement utilisé une représentation avec les indices de de Bruijn 
-car pour la représentation des variables libres nous utiliserons comme précédement un nom
-de variable. On appelle cette représentation ``locally nameless'' ~\citep{chargueraud:locally-nameless}
+Tandis que les variables \emph{liées} seront representées par des
+indices de de Bruijn, les variables \emph{libres} quant à elle seront
+représentées par un (unique) nom de variable, comme dans la
+présentation formelle. Une telle représentation est traditionnellement
+appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
 
-Voici le code Ocaml traduisant la définition inductive des termes que nous avions 
-définis.
+\begin{example}
+  \todo{Donner l'exemple de réduction sous un binder}
+  Soit \Var{x} une variable libre.
 
+  En théorie :
+  \(\App{(\Lam{\Var{y}}{\Var{y}})}{\Var{x}} \leadsto \Var{x}\)
+
+  En pratique avec des de Bruijn : \todo{montrer le problème et parler des shifts}
+
+  En pratique avec du locally nameless : \todo{montrer l'absence de problème}
+
+\end{example}
+
+Voici le code Ocaml traduisant la définition inductive des termes que
+nous avions définis :
+%
 \codefrom{untyped}{lambda}{untyped_term}
 
-\todo{Il serait super cool de faire des références de l'implémentation
-  vers la définition formelle. Tu pourrais utiliser une ``footnote''.}
-
-Cette représentation se rapproche au plus de la spécification
-formelle, seule la distinction entre les variables liées \lstinline!BoundVar! et les
-variables libres \lstinline!FreeVar! diffère du fait que que nous utilisons désormais 
-la représentation ``locally nameless''.
+Cette représentation se rapproche au plus de la spécification formelle
+: seule la distinction entre les variables liées \lstinline!BoundVar!
+et les variables libres \lstinline!FreeVar! diffère.
 
 
 \subsubsection{Analyse syntaxique}
