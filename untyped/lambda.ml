@@ -29,6 +29,11 @@ type lambda_term =
   | Zero | Succ of lambda_term 
   | Iter of lambda_term * lambda_term * lambda_term
 (*=End *)
+(*=pair_term *)
+  | Pair of lambda_term * lambda_term
+  | Pi0 of lambda_term
+  | Pi1 of lambda_term
+(*=End *)
 
 (** * A simple parser *)
 
@@ -231,6 +236,10 @@ let iota t
 (*=nat_evaluation *)
     | Iter(Zero,f,a) -> Some a
     | Iter(Succ num, f, a) -> Some (Appl(f, a))
+(*=End *)
+(*=pair_evaluation *) 
+    |Pi0(Pair(x,y)) -> Some x
+    |Pi1(Pair(x,y)) -> Some y
 (*=End *)
   | _ -> None
 
