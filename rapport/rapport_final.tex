@@ -746,6 +746,10 @@ On étend la substitution sans difficulté :
 \todo{Expliquer l'implem en relation avec la spec ci-dessus.}
 \codefrom{untyped}{lambda}{nat_evaluation}
 
+\subsubsection{Les paires}
+
+\todo{Introduire les paires (non typées) ici.}
+
 \section{Le $\lambda$-calcul simplement typé}
 
 \attention{bof : pas très clair.} Il nous faut maintenant définir un système formelle permettant de determiner si l'éxecution du programme,
@@ -755,12 +759,10 @@ types, puis nous verrons comment les utiliser en définissant des règles de typ
 \subsection{Les types}
 \label{simple_type}
 
-Il est important avant tout de définir ce qu'est un type.
-Considérons \emph{P} l'ensemble des types de base comme par exemple 
-\emph{int} l'ensemble des entiers et \emph{bool} l'ensemble des booléens.
-Et soit \emph{T} l'ensemble des types, on peut alors définir de façon inductive
-ce qu'est un type.
-
+Il est important avant tout de définir ce qu'est un type. Les types
+que nous considérons dans cette partie sont décrits par la grammaire
+suivante :
+%
 \begin{bnf}
   T &::=& &\mbox{(type)}\\
   &|&int &\mbox{(entiers)}\\ 
@@ -768,8 +770,6 @@ ce qu'est un type.
   &|&T \rightarrow T &\mbox{(fonction)}\\
   &|&T \times T &\mbox{(produit)}\\
 \end{bnf}
-Le type \(\rightarrow\) correpond au type des fonctions et le type (a*b)
-correspond au type des couples que nous allons désormais introduire dans notre language.
 
 \begin{example}
   Voici des exemples de type:
