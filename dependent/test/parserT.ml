@@ -48,6 +48,8 @@ let inputs
        ("(id N zero (succ zero))", Id(Nat,Zero,Succ(Zero)));
        ("(refl zero)",Refl(Zero));
        ("(trans N N N N N N)",Inv(Trans(Nat,Nat,Nat,Nat,Nat,Nat)));
+       ("(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))", Nat);
+       ("(lambda (A a b q) (trans A (lambda (a b q) (id A b a)) a b q (lambda a (refl a))))", Nat); 
        ("(+ (succ (succ zero)) (succ (succ zero)))", Inv(Appl(Appl(Ann((read "(lambda n_plus (lambda a_plus (iter (lambda x_plus N) n_plus (lambda ni_plus (lambda x_plus (succ x_plus))) a_plus)))")
 	   ,(read "(-> N (-> N N))")),(Succ(Succ Zero))),(Succ(Succ Zero)))));
        
@@ -58,5 +60,5 @@ let inputs
 
 
 let tests
-    = List.map (fun (term, res) -> term >:: fun ctxt -> assert_equal (read term) res) inputs
+    = List.map (fun (term, res) -> term >:: fun ctxt -> assert_equal ~printer:(fun a -> pretty_print_inTm a []) (read term) res) inputs
 

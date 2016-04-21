@@ -19,16 +19,16 @@ type inTm =
   | Pair of inTm * inTm 
   | Cross of inTm * inTm
   | List of inTm 
-  | Nil of inTm 
-  | Cons of inTm * inTm * inTm 
+  | Nil (* TODO: remove A *) of inTm 
+  | Cons  (* TODO: remove A *) of inTm * inTm * inTm 
 (*=terme_vector *)
   | Vec of inTm * inTm
-  | DNil of inTm
-  | DCons of inTm * inTm 
+  | DNil (* TODO: remove A *)  of inTm
+  | DCons (* TODO: remove A *) of inTm * inTm 
 (*=End *)
   | What
   | Id of inTm * inTm * inTm
-  | Refl of inTm 
+  | Refl (* TODO: remove *) of inTm 
 (*=exTm *) 
 and exTm = 
   | Ann of inTm * inTm 
