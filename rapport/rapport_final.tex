@@ -632,14 +632,28 @@ d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Substitution}
 
-Implémentons donc la substitution dans notre programme:
-
+Implémentons donc la substitution dans notre programme: \todo{Il va
+  falloir être plus descriptif : pourquoi tu incrémentes
+  \lstinline!var! dans le cas \lstinline!Abs!? Pourquoi c'est la
+  \lstinline!BoundVar v! pour \lstinline!v = var! que tu substitues ?
+  Ne jette pas le code en pâture au lecteur. Suggestion : } La
+substitution de la variable liée \lstinline!var! par le terme
+\lstinline!tsub! dans \lstinline!term! est implémentée par :
+%
 \codefrom{untyped}{lambda}{substitution}
 
 L'argument \emph{term} correspond au terme dans lequel on va substituer le terme \emph{tsub} et 
 l'argument \emph{var} est un entier qui va nous permettre de compter le nombre de binder \(\lambda\)
 traversés. Si l'on recontre une BoundVar avec comme indice var on retourne donc \emph{tsub} à la 
 place de celle-ci.
+
+\begin{example}
+\todo{Dérouler l'exécution de cette fonction sur un exemple concret.}
+\end{example}
+
+\begin{proposition}
+  \todo{Énoncer le lien entre l'implémentation et la spécification formelle.}
+\end{proposition}
 
 
 \subsubsection{$\beta$-Reduction et évaluation}
