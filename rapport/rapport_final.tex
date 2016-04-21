@@ -1192,10 +1192,31 @@ est transparente : il suffit d'effacer les annotations de type.
     réduction forte donne ``ce que l'on veut''.}
 \end{example}
 
+\paragraph{Implémentation:}
+\label{reduction_petits_pas}
+
+\todo{Transférer le code dans \texttt{untyped} et mettre à jour le texte.}
+
+\codefrom{typed}{lambda}{reduction_forte}
+
+Pour l'application \emph{SAppl} si le terme est une \emph{SAbs} on 
+effectue la substitution puis l'on évalue le terme obtenu.
+Sinon on évalue d'abord celui ci, si l'on obtient une \emph{SAbs} 
+on appel la réduction sur l'application de celui ci au terme de droite
+sinon il ne nous reste plus qu'à évaluer le terme de droite.
+
+Lorsque l'on réduit sous une \emph{SAbs} il nous faut d'abord libérer l'ensemble des
+variables qui lui sont liées. Il nous faut les reliers une fois la réduction terminé 
+nous avons donc implémenter une fonction pour effectuer cette opération RELIE LIBRE. %a changer
+Elle prend en argument le nom de la variable libre, la valeur de son indice de de Bruijn 
+et le terme. Son code est assez triviale nous ne le présenterons donc pas ici.
+
+Les autres règles ne nécéssitent pas de commentaires particuliers.
+
 \subsection{Extensions} 
 
 Dans notre précédent language nous avions introduit les booléens ainsi que les entiers,
-nous verrons ici la façon de les représenters ainsi que leurs règles de typage.
+nous verrons ici la façon de les représenter ainsi que leurs règles de typage.
 Nous introduirons aussi un nouveau type, le produit cartésien.
 
 \subsubsection{Les entiers}
@@ -1305,34 +1326,6 @@ les différents extensions dans les sections suivantes.
 
 
 
-\subsubsection{Réduction forte à petits pas}
-\label{reduction_petits_pas}
-
-
-Nous allons donc implémenté une fonction de réduction 
-On appelle cette implémentation de réduction ``à petits pas'' car 
-on effectue les réductions étapes par étape. Cela se raproche fortement 
-de l'implémentation que nous avons donné de la réduction dans le $\lambda$-calcul
-non typé du point de vue de l'implémentation.
-
-Les termes préfixés d'un \emph{S} sont équivalents aux $\lambda$-termes 
-du $\lambda$-calcul non typé, l'annotation n'est donc plus présente.
-
-\codefrom{typed}{lambda}{reduction_forte}
-
-Pour l'application \emph{SAppl} si le terme est une \emph{SAbs} on 
-effectue la substitution puis l'on évalue le terme obtenu.
-Sinon on évalue d'abord celui ci, si l'on obtient une \emph{SAbs} 
-on appel la réduction sur l'application de celui ci au terme de droite
-sinon il ne nous reste plus qu'à évaluer le terme de droite.
-
-Lorsque l'on réduit sous une \emph{SAbs} il nous faut d'abord libérer l'ensemble des
-variables qui lui sont liées. Il nous faut les reliers une fois la réduction terminé 
-nous avons donc implémenter une fonction pour effectuer cette opération RELIE LIBRE. %a changer
-Elle prend en argument le nom de la variable libre, la valeur de son indice de de Bruijn 
-et le terme. Son code est assez triviale nous ne le présenterons donc pas ici.
-
-Les autres règles ne nécéssitent pas de commentaires particuliers.
 
 \subsubsection{Réduction forte à grands pas}
 
