@@ -918,9 +918,12 @@ représentation de nos termes afin de résoudre ce problème.
 
 \subsubsection{Système de type bi-directionnel}
 
-Les applications dont le membre de gauche est une abstractions posent problème comme vu dans l'Exemple~\ref{probleme:type_simple}.
-Nous allons donc catégoriser nos \(\lambda\)-termes dans deux sous catégorie, 
-d'un coté les termes pouvant se trouver à gauche sans perturber la vérification de type d'une application et les autres.
+Les applications dont le membre de gauche est une abstractions posent
+problème, comme vu dans l'Exemple~\ref{probleme:type_simple}.  Nous
+allons donc partitionner les \(\lambda\)-termes en deux catégories :
+d'une part, les termes dont on peut automatiquement synthétiser le
+type (et que l'on peut donc placer à gauche d'une application) et ceux
+pour lesquels il faudra fournir une annotation de type.
 
 
 Nous nomerons les termes pouvant se trouver à gauche d'une application les \emph{termes synthétisables} et les 
