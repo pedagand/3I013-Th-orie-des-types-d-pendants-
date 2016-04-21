@@ -1311,23 +1311,31 @@ Règle de typages des paires: \todo{en dire plus.}
 
 %on peut parler du fait que de faire des paires de paires c'est long a checker c'est mieux de faire des vecteurs pour ça?
 
-\subsection{Implémentation}
+\paragraph{Implémentation :}
+Nous allons maintenant implémenté le produit cartésien afin d'enrichir
+notre language. Tout d'abord, il nous faut introduire trois nouveaux
+termes ainsi qu'un nouveau constructeurs de type. \todo{c'est (trop !) brut de
+  décoffrage !}
+\emph{Type}
+\codefrom{typed}{lambda}{type_pair}
+\emph{inTermes}
+\codefrom{typed}{lambda}{inTm_pair}
+\emph{exTermes}
+\codefrom{typed}{lambda}{exTm_pair}
+\emph{value}
+\codefrom{typed}{lambda}{value_pair}
 
-Certaines implémentations sont redondantes avec la précédente, nottament les 
-entiers, les booléens ect.. seul leur intération au sein du vérificateur de type
-est nouvelle. Nous regrouperons donc tout cela dans la Section~\ref{extensions_implem}.
-Voici une implémentation du $\lambda$-calcule simplement typé.
+Il nous faut maintenant implémenter les règles de typage au sein de notre algotithme:
 
-\subsubsection{Représentation des termes et des types}
+\emph{check}
+\codefrom{typed}{lambda}{check_pair}
+\emph{synth}
+\codefrom{typed}{lambda}{synth_pair}
 
-Comme nous précédement nous allons  
-présenter l'implémentation du noyau de notre language, nous introduirons 
-les différents extensions dans les sections suivantes.
+Rien à commenter, \todo{ha bon ? Très bien alors}
 
 
-
-
-\subsubsection{Réduction forte à grands pas}
+\subsection{Réduction forte à grands pas}
 
 \todo{expliquer plus en détail l'utilisation du type name}
 %le type name prend tous son sens dans cette section car il nous permet....
@@ -1442,72 +1450,6 @@ Nous allons pouvoir exploiter ceci avec l'aide de la fonction \fun{boundfree} do
 voici le code:
 \codefrom{typed}{lambda}{boundfree}
 
-\subsubsection{Produit cartésien}
-
-Nous allons maintenant implémenté le produit cartésien afin d'enrichire notre 
-language. Tout d'abord comme nous l'avons vu dans la Section~\ref{produit_cartesien}
-il nous faut introduire trois nouveaux termes ainsi qu'un nouveau constructeurs de type.
-\emph{Type}
-\codefrom{typed}{lambda}{type_pair}
-\emph{inTermes}
-\codefrom{typed}{lambda}{inTm_pair}
-\emph{exTermes}
-\codefrom{typed}{lambda}{exTm_pair}
-\emph{value}
-\codefrom{typed}{lambda}{value_pair}
-
-Il nous faut maintenant implémenter les règles de typage au sein de notre algotithme:
-
-\emph{check}
-\codefrom{typed}{lambda}{check_pair}
-\emph{synth}
-\codefrom{typed}{lambda}{synth_pair}
-
-Rien à commenter,
-
-\subsubsection{Extensions}
-\label{extensions_implem}
-
-\todo{je ne pense pas que je devrais faire cette section je n'ai rien à dire dessus}
-Voici l'ensemble des intégration dans le vérificateurs de type pour les termes
-n'ayant pas encore été présentée
-
-\emph{check} 
-\codefrom{typed}{lambda}{inTm_extensions}
-\emph{synth} 
-\codefrom{typed}{lambda}{exTm_extensions}
-
-SI JE PEUX PEUT ETRE PARLER DE VITTER POUR LES ENTIERS MAIS CEST TOUT
-
-
-
-
-%% Voici donc les règles d'évaluations:
-%% \begin{align*}
-%%   &\cfrac{t \Downarrow t'}
-%%   {t:T \Downarrow t'}&\mbox{(Ann)}&\: \\
-%%   &\cfrac{}
-%%   {x \Downarrow x}&\mbox{Var} \\
-%%   &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
-%%   {t\:t'\Downarrow \: v'}&\mbox{Appl redex} \\
-%%   &\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
-%%   {t\:t'\Downarrow \: n \: v'}&\mbox{Appl} \\
-%%   &\cfrac{e \Downarrow \: v}
-%%   {\lambda x.t \Downarrow \: \lambda x.v}&\mbox{Abs}
-%% \end{align*}
-
-
-
-
-
-
-
-
-
-
-
-
-%on veut maintenant montrer celle ou on transforme en mode normale et après mettre la big_step
 
 
 \section{Les types dépendants}
