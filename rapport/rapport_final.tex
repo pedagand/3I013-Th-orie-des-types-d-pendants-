@@ -1409,25 +1409,15 @@ nous obtenons par la réduction à grand pas seront donc les memes que
 ceux obtenus avec la réduction à petits pas
 (Section~\ref{reduction_petits_pas}).
 
-\begin{align*}
-  v &::= &\mbox{Valeurs} \\
-  &| \lambda x \rightarrow v &\mbox{Abstraction} \\
-  &| n &\mbox{terme neutre} \\
-  n &::= &\mbox{Neutres} \\
-  &|x &\mbox{Variable} \\
-  &|n v &\mbox{Application} \\
-\end{align*}
-Ici la représentation de l'abstraction sous la forme \(\lambda x\rightarrow v\)
-est lié au fait qu'une abstraction avec ces termes est une fonction.
-Voici donc le code correspondant en Ocaml:
-
+Voici donc le code correspondant en Ocaml: \todo{Il va falloir m'en
+  dire \emph{beaucoup} plus.}
+%
 \codefrom{typed}{lambda}{value}
 \codefrom{typed}{lambda}{neutral}
 
-La value \emph{VLam} est bien représenté par une fonction Ocaml
-Pour ce qui est de l'évaluation les règles formelles sont les memes que pour 
-la réduction à petit pas. 
-Commençons par donner le code de celle ci, nous le commenterons après.
+La value \emph{VLam} est représentée par une fonction Ocaml \todo{je
+  vois mais \emph{pourquoi} ?}.  Commençons par donner le code de
+celle ci, nous le commenterons après.
 
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_ann}
