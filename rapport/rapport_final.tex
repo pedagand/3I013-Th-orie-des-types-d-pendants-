@@ -821,26 +821,26 @@ liste ordonnée de paires variable/type :
 \medskip\\
 \inferrule[(Abs)]%
           {\Gamma, x:A \vdash t:B}%
-          {\Gamma \vdash \lambda x. t \,:\, A\rightarrow B}
+          {\Gamma \vdash \Lam{\Var{x}}{t} \,:\, A\rightarrow B}
 \qquad
 \inferrule[(App)]%
           {\Gamma \vdash f : A\rightarrow B \\
            \Gamma \vdash s : A}%
-          {\Gamma\vdash f\: s : B}
+          {\Gamma\vdash \App{f}{s} : B}
 \medskip\\
 \inferrule[(true)]
           {{}}
-          {\Gamma\vdash \mathsf{true} : \mathsf{bool}}
+          {\Gamma\vdash \true{} : \bool{}}
 \qquad
 \inferrule[(false)]
           {{}}
-          {\Gamma\vdash \mathsf{false} : \mathsf{bool}}
+          {\Gamma\vdash \false{} : \bool{}}
 \medskip\\
 \inferrule[(If-else)]
-          {t1:\mathsf{bool} \\
+          {t1:\bool{} \\
            t2:T \\
            t3:T}
-         {\Gamma\vdash \ifte \:t1 \:t2 \:t3}
+         {\Gamma\vdash \ifte{t1}{t2}{t3} : T}
 \end{array}
 \]
 
@@ -850,23 +850,27 @@ liste ordonnée de paires variable/type :
 
 \todo{\textsc{Ne pas mettre de variables mathématiques en dehors du maths mode}}
 
-Les règles de typage sont définies en Figure~\ref{fig:typage-simple}.
-La règle (\textsc{Var}) spécifie le typage des variables. Cette expression se
-lit en partant du numérateur pour déduire le dénumérateur : supposons
-que la variable \Var{x} de type \Var{T} soit présente dans le
-contexte, alors on conclut que le type de la variable \Var{x} est
-\Var{T}.
-La règle (\textsc{Abs}) spécifie le typage des lambda
-abstractions. L'abstraction construit un type de la forme \(A
-\Rightarrow B\) : il faut donc que la variable associée au lambda
-terme soit de type \(A\) et le résultat de type \(B\).
-La règle (\textsc{App}) spécifie le typage de l'application. 
-Dans la Section~\ref{reduction:call_by_name}, nous avions vu que seul les 
-redex étaient réductible. Dans un language de programmation appliquer un terme n'étant 
-pas une fonction n'a pas de sens. C'est pour cette raison qu'il nous faut vérifier 
-que notre application est \attention{confus : c'est quoi cette histoire de redex ?} bien une \emph{redex} en vérifiant que \emph{f} est bien du 
-type $A\rightarrow B$ . De plus on vérifie que \emph{s} est bien du type 
-\emph{A} pour \attention{qu'est-ce que l'on garanti ?} garantir l'application de \emph{s} à notre fonction \emph{f}.
+Les règles de typage sont définies en
+Figure~\ref{fig:typage-simple}. \attention{La figure en question
+  introduit les booléens : les définir plus tard ou alors les
+  expliquer maintenant.} La règle (\textsc{Var}) spécifie le typage
+des variables. Cette expression se lit en partant du numérateur pour
+déduire le dénumérateur : supposons que la variable \Var{x} de type
+\Var{T} soit présente dans le contexte, alors on conclut que le type
+de la variable \Var{x} est \Var{T}.  La règle (\textsc{Abs}) spécifie
+le typage des lambda abstractions. L'abstraction construit un type de
+la forme \(A \Rightarrow B\) : il faut donc que la variable associée
+au lambda terme soit de type \(A\) et le résultat de type \(B\).  La
+règle (\textsc{App}) spécifie le typage de l'application.  Dans la
+Section~\ref{reduction:call_by_name}, nous avions vu que seul les
+redex étaient réductible. Dans un language de programmation appliquer
+un terme n'étant pas une fonction n'a pas de sens. C'est pour cette
+raison qu'il nous faut vérifier que notre application est
+\attention{confus : c'est quoi cette histoire de redex ?} bien une
+\emph{redex} en vérifiant que \emph{f} est bien du type $A\rightarrow
+B$ . De plus on vérifie que \emph{s} est bien du type \emph{A} pour
+\attention{qu'est-ce que l'on garanti ?}  garantir l'application de
+\emph{s} à notre fonction \emph{f}.
 
 
 \begin{example}
