@@ -36,5 +36,5 @@ let inputs =
 
 (* il va me falloir une technique pour les noms je pense le faire avec gensym *)
 
-let tests = List.map (fun (term,sub,res) -> "lol" >:: fun ctxt -> assert_equal (substitution_inTm (read term) sub (-1)) (read res)) inputs
+let tests = List.map (fun (term,sub,res) -> "testsub" >:: fun ctxt -> assert_equal (substitution_inTm (read term) sub (-1)) (read res)) inputs
 
