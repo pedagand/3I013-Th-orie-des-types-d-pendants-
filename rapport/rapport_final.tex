@@ -449,7 +449,7 @@ de forme normale.
   \end{align*}
 \end{example}
 
-\attention{Définition trop floue : voir la définition ci-dessus (et supprimer dès que possible)} Elle consiste à
+\attention{Définition trop floue : voir la définition ci-dessus (et supprimer dès que tu es convaincu que l'on a rien perdu)} Elle consiste à
 réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}. \attention{fin.}
 
 \newcommand{\CBN}{\mathop{\leadsto_N}}
@@ -465,12 +465,8 @@ réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}. \attent
 \end{array}\]
 
 
-Pour certains termes, on ne peut pas atteindre une forme normale forte, cela
-permet de se rapprocher des définitions de fonctions dans les languages de 
-programmations où l'on ne précalcule pas les valeurs au seins d'une fonction.
-
 \begin{example}
-  Voici une réduction avec la stratégie \emph{appel par valeur}:
+  Voici une réduction en appel par nom:
   \begin{align*}
     & \App{\Lam{x}{\Var{x}}}({\App{\Lam{y}{\Var{y}}}({\Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}}})) \\
     \rightarrow & \App{\Lam{y}{\Var{y}}}({\Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}})\\
