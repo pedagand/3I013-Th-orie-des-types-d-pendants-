@@ -1047,9 +1047,11 @@ présenté en Figure~\ref{fig:typage-simple}.
 
 \paragraph{Implémentation :}
 
+\todo{Dans cette section, importer le code du type-checker ``rapide'', ie. sans traitement des erreurs.}
+
 \begin{itemize}
 
-\item[$\bullet$] \boxed{\Gamma\vdash T \ni t}\\
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni t}}\\
 
 Nous disposons d'une fonction de vérification \lstinline!check!
 \todo{ne pas lister mécaniquement les arguments : donner une
@@ -1068,7 +1070,7 @@ si le terme est correctement typé ou non. \label{check}
 \item[$\bullet$] \boxed{\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
        {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}} \\
 
-\attention{Ce n'est pas la raison : c'est juste que l'on va sous des binders. Quand on va sous un lieur, la variable autrefois liée devient libre et notre représentation nous impose donc de lui donner un nom explicite.} Afin de pouvoir associé une variable à son type dans le contexte il nous faut un nom pour celle ci.
+\attention{Ce n'est pas la raison : c'est juste que l'on va sous des abstractions. Quand on va sous une abstraction, la variable autrefois liée devient libre et notre représentation nous impose donc de lui donner un nom explicite.} Afin de pouvoir associé une variable à son type dans le contexte il nous faut un nom pour celle ci.
 En effet avec notre représentation avec les indices de de Bruijn il est difficile de faire l'association entre 
 une variable et son type étant donné que nous ne nommons plus les variables.
 C'est pour cette raison que l'on génère une nouvelle variable libre et que l'on substitue les variables liées 
@@ -1077,36 +1079,50 @@ La fonction de synthèse \lstinline!synth! prend un contexte et un
 \emph{exTerme} et renvoie le type de celui-ci.
 La fonction gensym utilisée ici permet de crée un nom de variable frais, garantissant que celui n'a encore jamais
 été utilisé. 
-
+%
  \codefrom{typed}{lambda}{check_abs}
-\end{itemize}
-  
+
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+                              {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}} \\
+
+
+Afin de tester l'égalité de type, l'égalité structurelle de OCaml est
+suffisante puisque les types sont purement statiques (contrairement
+aux types dépendants qui, eux, calculent).
+%
 \codefrom{typed}{lambda}{check_inv}
-$\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-         {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}$
-Ici pour l'égalité nous utilisons l'égalité d'ocaml car il s'agit d'un égalité syntaxique entre les temrmes.
+  
 
-La fonction de synthèse \lstinline!synth! prend un contexte et un
-\emph{exTerme} et renvoie le type de celui-ci.
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash t \in T}}\\
 
+La fonction de synthèse \lstinline!synth! prend un contexte, un
+terme synthétisable et renvoie le type de celui-ci.
 
+ \codefrom{typed}{lambda}{synth_def}
+
+\item[$\bullet$] \boxed{\cfrac{\Gamma\vdash T \ni t}
+                              {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}} \\
+\todo{Commenter}
 \codefrom{typed}{lambda}{synth_ann}
-$\cfrac{\Gamma\vdash T \ni t}
-         {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}$
 
-\codefrom{typed}{lambda}{synth_var}
-$\cfrac{x:T \in \Gamma}
-         {\Gamma \vdash x \in T }\mbox{(Var)}$
+\item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
+                               {\Gamma \vdash x \in T }\mbox{(Var)}}\\
+
 Dans la spécification formelle on ne fait pas de distinction entre une variable libre ou liée.
-Cependant il n'est pas possible de synthétiser une variable liée étant donné qu'elles sont libérés lors
+Cependant il \attention{texte pas clair : tu veux dire que ce cas est impossible.} n'est pas possible de synthétiser une variable liée étant donné qu'elles sont libérés lors
 de la vérification de l'abstraction.
 
+\codefrom{typed}{lambda}{synth_var}
+
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
+         {\Gamma\vdash f\:s\in B}\mbox{(App)}}\\
+
+\todo{Commenter}
 \codefrom{typed}{lambda}{synth_appl}
-$\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-         {\Gamma\vdash f\:s\in B}\mbox{(App)}$
 
+\end{itemize}
 
-Pour cette implémentation nous avons choisis générer des exeptions lorsque le terme
+Pour cette implémentation nous avons choisi de générer des exceptions lorsque le terme
 n'était pas correctement typé. Cela permet de terminer le programme directement car de toute
 façon le terme serait refusé. Nous reviendrons cependant sur certains points négatifs de cette
 méthode dans l'implémentation des types dépendants.
