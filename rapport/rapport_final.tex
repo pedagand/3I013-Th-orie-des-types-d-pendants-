@@ -329,7 +329,7 @@ t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
   Voici un autre exemple de réduction
   \todo{Écrire avec les macros App, Lam, Var}
   \begin{align*}
-    & ((\lambda x .\lambda y. y) w) \leadsto \lambda y.y \\
+    & (\lambda x .\lambda y. y) w \leadsto \lambda y.y \\
   \end{align*}
   \Var{x} n'étant pas utilisé dans la fonction, l'argument \Var{w} disparaît complètement.
 \end{example}
@@ -339,7 +339,7 @@ t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
 
 \label{reduction:call_by_name}
 Un terme est dit en \emph{forme
-  normale}~\citep{krivine:lambda-calculus} si on ne peut plus lui
+  normale} si on ne peut plus lui
 appliquer de réduction: il ne contient aucun redex. La normalisation
 consiste donc à reduire autant que possible notre terme. En
 particulier, on caractérise inductivement les formes normales de la
