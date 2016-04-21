@@ -449,18 +449,21 @@ de forme normale.
   \end{align*}
 \end{example}
 
-Il existe de nombreuses stratégies de normalisation des termes dans le
-lambda calcul non typé, les plus connues étant l'\emph{appel par nom}
-et l'\emph{appel par valeur}.  Pour le lambda calcul non typé 
-nous avons choisis d'utilisé l\emph{appel par valeur}. Elle consiste à
-réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}.
+\attention{Définition trop floue : voir la définition ci-dessus (et supprimer dès que possible)} Elle consiste à
+réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}. \attention{fin.}
 
-\begin{align*}
-  AppelParValeur(x) &\triangleq x \\
-  AppelParValeur(\Lam{x}{t}) &\triangleq \Lam{x}{t} \\
-  AppelParValeur(\App{\Lam{x}{t}}{u}) &\triangleq AppelParValeur(\subst{t}{x}{u}) \\
-  AppelParValeur(\App{t}{u}) &\triangleq AppelParValeur(\App{AppelParValeur(t)}{u})
-\end{align*}
+\newcommand{\CBN}{\mathop{\leadsto_N}}
+
+\todo{Faire remonter (et introduire) la définition de l'appel par nom plus haut.}
+\[\begin{array}{c}
+  \inferrule{{}}
+            {\App{(\Lam{\Var{x}}{t})}{u} \CBN \subst{t}{x}{u}}
+  \medskip\\
+  \inferrule{t \CBN t'}
+            {\App{t}{u} \CBN \App{t'}{u}}
+
+\end{array}\]
+
 
 Pour certains termes, on ne peut pas atteindre une forme normale forte, cela
 permet de se rapprocher des définitions de fonctions dans les languages de 
