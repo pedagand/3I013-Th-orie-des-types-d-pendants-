@@ -773,16 +773,14 @@ suivante :
 
 \begin{example}
   Voici des exemples de type:
-  \begin{equation}
-    int \rightarrow bool  \label{eq_1} 
-  \end{equation}
-  \begin{equation}
-    (bool * int) \label{eq_2} 
-  \end{equation}
-  Le type (\ref{eq_1}) est celui d'une fonction prenant un argument de type \emph{int} et 
-  retournant un résultat de type \emph{bool}.
-  Le second type (\ref{eq_2}) correspond a une pair donc le membre de gauche est un \emph{bool}
-  et le membre de droit un \emph{int}
+  \begin{eqnarray}
+    int \rightarrow bool  \label{eq_1}  \\
+    bool \times int \label{eq_2} 
+  \end{eqnarray}
+  Le type (\ref{eq_1}) est celui d'une fonction prenant un argument de type entier et 
+  retournant un résultat de type booléen.
+  Le second type (\ref{eq_2}) correspond a une paire donc le membre de gauche est un booléen
+  et le membre de droite un entier.
 \end{example}
 
 Comme nous l'avons vu précédement avec la curryfication qui consistait à exprimer une 
