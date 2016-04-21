@@ -1463,20 +1463,23 @@ variable.
   $u$, retournant ainsi $v_u$ comme souhaité.
 \end{example}
 
-Pour évaluer l'application d'un coup il est nécéssaire de crée une fonction externe \emph{vapp}.
+\todo{donner cette explication plus tôt}
+Pour évaluer l'application d'un coup, il est nécessaire de créer une fonction externe \emph{vapp}.
 Nous appelons donc cette fonction avec le couple formé de l'évaluation des deux membres de l'application.
-Si le membre de gauche est une \emph{VLam}, il nous suffit d'appliquer celle ci avec l'application d'Ocaml
-étant donné que c'est une fonction anonyme.
+Si le membre de gauche est une \emph{VLam}, il nous suffit d'appliquer celle-ci \emph{dans Ocaml},
+étant donné qu'elle est encodée par une fonction anonyme OCaml.
 
-La fonction \emph{VFree} permet simplement à partir d'un nom de crée une \emph{NFree}
-à l'intérieure d'un \emph{VNeutral}.
-Elle permet simplement d'alléger le code de la fonction.
+La fonction \emph{VFree} permet simplement à partir d'un nom de créer
+une \emph{NFree} à l'intérieure d'un \emph{VNeutral}.  Elle permet
+simplement d'alléger le code de la fonction. \todo{C'est du morse
+  ça. Explique le ``pourquoi'', pas ``comment'' cette fonction opère
+  (je peux lire le code, merci)}
 
 \codefrom{typed}{lambda}{vfree}
 
 
 
-Une fois nos termes normalisés il nous faut maintenant un moyen de repasser nos termes
+Une fois nos termes normalisés, il nous faut maintenant un moyen de repasser nos termes
 dans la représentation classique. Il nous faut donc implémenter cette fonction permettant de 
 faire cette association, voici son code:
 
