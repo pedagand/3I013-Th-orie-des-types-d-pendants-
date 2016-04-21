@@ -380,12 +380,12 @@ Un terme normalisable (mais pas \emph{fortement} normalisable) pourra
 donc diverger ou retourner une forme normale selon les réductions
 effectuées lors de la conversion : l'ordre dans lequel sont effectuées
 ces réductions est donc important. Nous considérons ici une
-\emph{stratégie} de réduction qui est assurée d'obtenir la forme
-normale, pour tout terme normalisable : il s'agit de la réduction en
-appel par nom.
+\emph{stratégie} de réduction qui, pour tout terme normalisable, est assurée d'obtenir une forme
+normale : il s'agit de la réduction en
+\emph{appel par nom}.
 
 On remarque tout d'abord que tout terme \(t\) du \(\lambda\)-calcul
-est de la forme
+s'écrit sous la forme
 %
 \[
 \Lam{\Var{x_0}}\Lam{\Var{x_m}}\App{\App{\App{k}{t_0}}{\ldots}}{t_n}
