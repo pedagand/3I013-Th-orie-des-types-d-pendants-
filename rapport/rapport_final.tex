@@ -464,14 +464,14 @@ réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}. \attent
 
 \end{array}\]
 
+\attention{Les lambdas scope le plus à droite possible. Donc il faut parenthéser les applications.}
 
 \begin{example}
   Voici une réduction en appel par nom:
   \begin{align*}
-    & \App{\Lam{x}{\Var{x}}}({\App{\Lam{y}{\Var{y}}}({\Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}}})) \\
-    \rightarrow & \App{\Lam{y}{\Var{y}}}({\Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}})\\
-    \rightarrow & \Lam{z}{\App{\Lam{x}{\Var{x}}}{\Var{z}}}\\
-    \nrightarrow & \:
+    & \App{(\Lam{x}{\Var{x}})}({\App{(\Lam{y}{\Var{y}})}({\Lam{z}{\App{(\Lam{x}{\Var{x}})}{\Var{z}}}}})) \\
+    \rightarrow & \App{(\Lam{y}{\Var{y}})}({\Lam{z}{\App{(\Lam{x}{\Var{x}})}{\Var{z}}}})\\
+    \rightarrow & \Lam{z}{\App{(\Lam{x}{\Var{x}})}{\Var{z}}}
   \end{align*}
   Ici il n'y a plus rien à réduire avec notre stratégie. On obtient une forme normale faible.
 \end{example}
