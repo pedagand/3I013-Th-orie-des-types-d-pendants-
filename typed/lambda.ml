@@ -448,9 +448,11 @@ let gensym =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
-(*=check_abs *)
+(*=check_def *)
 let rec check contexte inT ty
     = match inT with
+(*=End *)
+(*=check_abs *)
     | Abs(x, b) -> 
        begin
          match ty with
