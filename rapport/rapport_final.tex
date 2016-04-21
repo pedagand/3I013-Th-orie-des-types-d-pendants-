@@ -132,6 +132,7 @@ L'intéret du typage est donc de vérifier que le programme s'executera correcte
 Il permet aussi d'obtenir des informations très précises sur la sources des erreurs.
 
 \section{$\lambda$-calcul non typé}
+\label{sec:untyped}
 
 \todo{Remplacer tous les ``lambda''s par ``$\lambda$''}
 
@@ -1056,22 +1057,15 @@ forme normale forte pour nos termes contrairement au \(\lambda\)-calcul non typ�
 \subsubsection{Reduction forte}
 
 \label{reduction_forte}
-Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation \emph{Appel par nom}
-car nous souhaitions évaluer les termes vers une forme normale faible. Nous ne pouvions pas implémenter 
+Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation en appel par nom
+car nous \attention{ce n'était pas un souhait mais une obligation : les termes ne terminaient pas nécessairement.} souhaitions évaluer les termes vers une forme normale faible. Nous ne pouvions pas implémenter 
 une stratégie de réduction forte car dans certains cas cela aurait pu provoquer la non terminaison du 
 programme.
-D'après les propriétés de la section précédente nous disposons de la certitude que une fois 
-acceptés par le type-checker nos termes réduisent tous vers une forme normale forte.
-Nous allons donc implémenter une stratégie de réduction forte.
+D'après les propriétés de la section précédente nous disposons de la certitude que les termes acceptés  par le type-checker sont fortement normalisants. De plus, les types ne sont plus utiles lors de l'évaluation. 
+Nous allons donc implémenter une stratégie de réduction forte sur les \(\lambda\)-termes non typés de la Section~\ref{sec:untyped}.
 
-Les types ne sont pas utiles lors de l'évaluation. Nous allons donc tout d'abord implémenter
-une fonction de réduction forte sur les \(\lambda\)-termes non typés.
-
-Voici la spécification de notre réduction forte :
-Voici donc les règles d'évaluations:
+\attention{faire converger avec l'implémentation}\todo{Cela manque d'explication. En particulier, il faudrait expliquer la différence entre les neutres et les valeurs.} Voici la spécification de notre réduction forte : \todo{arrêter les cfracs}
 \begin{align*}
-  &\cfrac{t \Downarrow t'}
-  {t:T \Downarrow t'}&\mbox{(Ann)}&\: \\
   &\cfrac{}
   {x \Downarrow x}&\mbox{Var} \\
   &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
@@ -1083,10 +1077,10 @@ Voici donc les règles d'évaluations:
 \end{align*}
 
 La traduction de nos termes bidirectionnels vers les termes non typés
-est transparente, il suffit d'effacer les annotations de type.
+est transparente : il suffit d'effacer les annotations de type.
 
 \begin{example}
-  Faire un exemple où avec l'ancien cela ne marchait pas et maintenant ça marche
+  \todo{Faire un exemple où avec l'ancien cela ne marchait pas et maintenant ça marche}
 \end{example}
 
 \subsection{Extensions} 
