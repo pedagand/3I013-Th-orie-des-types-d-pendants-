@@ -497,27 +497,27 @@ les entiers et les booléens.
 
 \subsubsection{Les booléens de Church}
 
-\newcommand{\True}{\ensuremath{\mathrm{true}}}
-\newcommand{\False}{\ensuremath{\mathrm{false}}}
-\newcommand{\Ifte}{\ensuremath{\mathrm{ifte}}}
+\newcommand{\True}{\ensuremath{\mathit{true}}}
+\newcommand{\False}{\ensuremath{\mathit{false}}}
+\newcommand{\Ifte}{\ensuremath{\mathit{ifte}}}
 
 Nous allons ici voir une représentation des booléens accompagnée de la 
 structure de contrôle \texttt{if ... then ... else ...}.
 Voici les termes correspondants aux constructeurs \True{}, \False{} et 
 \Ifte{} :
 \begin{align*}
-  \True &\triangleq \lambda x.\lambda y. y  \Lam{x}{\Lam{y}{\Var{y}}} \\
-  \False &\triangleq \lambda x.\lambda y. x \Lam{x}{\Lam{y}{\Var{x}}} \\
+  \True &\triangleq  \Lam{x}{\Lam{y}{\Var{y}}} \\
+  \False &\triangleq \Lam{x}{\Lam{y}{\Var{x}}} \\
   \Ifte &\triangleq \Lam{l}{\Lam{m}{\Lam{n}{\App{\Var{l}}{\App{\Var{m}}{\Var{n}}}}}}  \\
 \end{align*}
 
-On assimile ces deux termes aux booléens $True$ et $False$ car leur calcul au sein
-de l'application d'un $Ifte$ reproduit le comportement attendu.
+On assimile ces deux termes aux booléens \True{} et \False{} car leur calcul au sein
+de l'application d'un \Ifte{} reproduit le comportement attendu.
 
 \begin{example}
-  Voici un exemple de réduction du terme Ifte avec comme condition \emph{False}:
+  Voici un exemple de réduction du terme \Ifte{} appliqué à la condition \False{} :
   \begin{align*}
-    &\App{\App{\App{(\Lam{l}{\Lam{m}{\Lam{n}{\App{\App{l}{m}}{n}}}}})({\Lam{x}{\Lam{y}{y}}}}){v}}{w} \\
+    \App{\App{\App{\Ifte}{\False}}{\Var{v}}}{\Var{w}}  \triangleq& \App{\App{\App{(\Lam{l}{\Lam{m}{\Lam{n}{\App{\App{l}{m}}{n}}}}})({\Lam{x}{\Lam{y}{y}}}}){v}}{w} \\
     \rightarrow & \App{\App{({\Lam{m}{\Lam{n}{\App{\App({\Lam{x}{\Lam{y}{y}}}){m}}{n}}}}}){v}}{w} \\
     \rightarrow & \App{(\Lam{n}{\App{\App({\Lam{x}{\Lam{y}{y}}}){v}}{n}})}{w} \\
     \rightarrow & \App{\App({\Lam{x}{\Lam{y}{y}}}){v}}{w}) \\
