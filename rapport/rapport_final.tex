@@ -70,10 +70,6 @@
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 \newcommand{\attention}[1]{\textcolor{orange}{#1}}
 \newcommand{\etc}{\textit{etc.}}
-\newcommand{\true}{\mathsf{true}}
-\newcommand{\false}{\mathsf{false}}
-\newcommand{\bool}{\mathsf{bool}}
-\newcommand{\ifte}{\mathsf{IfThenElse}}
 
 \newenvironment{bnf}
                {\[\begin{array}{lcl@{\qquad}r}}
@@ -579,6 +575,7 @@ les entiers et les booléens.
 
 
 \subsubsection{Les booléens de Church}
+\label{church-bool}
 
 \newcommand{\True}{\ensuremath{\mathit{true}}}
 \newcommand{\False}{\ensuremath{\mathit{false}}}
@@ -668,37 +665,59 @@ sera question d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Les booléens}
 
-Afin d'implémenter les boléens dans notre language un choix d'implémentation 
-possible est de simplement définir de nouveaux termes True,False et Ifte
-comme nous l'avons vu dans la section précédente. Cependant nous avons choisi 
-d'enrichir le noyau de notre language en créant trois nouveaux constructeurs.
-Cela permet de ne pas alourdir l'écriture de certains termes ainsi que 
-d'améliorer la représentation et d'automatiser des opérations d'évaluation.
+\newcommand{\NTrue}{\lstinline!True!}
+\newcommand{\NFalse}{\lstinline!False!}
+\newcommand{\NIfte}{\lstinline!IfThenElse!}
 
+Afin d'implémenter les boléens dans notre language, une possibilité
+consiste à exporter l'encodage à la Church des termes \True{},
+\False{} et \Ifte{} définis en Section~\ref{church-bool}. Cependant
+nous avons choisi d'enrichir le noyau de notre language afin de
+supporter, de façon primitive, les entiers. Cela permet d'alléger
+l'écriture des termes mais surtout de faciliter la représentation et,
+par la suite, la compilation des programmes manipulant des expressions
+booléennes.
+
+\newcommand{\ifte}[3]{\ensuremath{\mathit{if}\: #1\: \mathit{then}\: #2\: \mathit{else}\: #3}}
+\newcommand{\true}{\ensuremath{\mathit{true}}}
+\newcommand{\false}{\ensuremath{\mathit{false}}}
+
+\todo{Étendre la grammaire formelle avec \ifte{}{}{}, \true{} et \false{}}
+
+\todo{Explique ce que tu fais là.}
+%
 \codefrom{untyped}{lambda}{bool_term}
 
-Pour la substitution des termes \emph{True} et \emph{False} les règles 
-sont triviales. Pour le terme \emph{IfThenElse} il faut rappeler la 
-fonction de substitution sur l'ensemble des arguments du constructeur.
-Il n'est pas nécéssaire d'incrémenter la valeur de \emph{var} étant donné
-que ce constructeur ne lie aucune variables.
-
+Pour la substitution des constructeurs \NTrue{} et \NFalse{}, les règles
+sont triviales. Pour le terme \NIfte{}, il faut rappeler la fonction de
+substitution sur l'ensemble des arguments du constructeur.  En
+particulier, il n'est pas nécéssaire d'incrémenter la valeur de
+\lstinline!var! étant donné que ce constructeur ne lie aucune
+variables.
+\todo{Expliquer d'où vient / où va ce bout de code :}
 \codefrom{untyped}{lambda}{bool_substitution}
 
-Pour la réduction il n'y à pas de réduction possible pour nos termes
-ce qui reviens donc a retourner le terme sans aucunes modifications.
 
 
-Voici enfin la section correspondant à l'évaluation des booléens.
-Encore une fois True et False s'évaluant simplement en True et False ils
-ne représentent aucune difficulté d'implémentation. En ce qui concerne
-le terme \emph{IfThenElse} si le premier argument est \emph{True}
-on retourne alors le second argument et on retourne le troisième argument 
-dans le cas où la condition serait un \emph{False}. Dans le cas 
-où le premier argument ne sera pas un booléens on evalue celui ci pour 
-essayer d'obtenir un booléens qui nous permettrait d'évaluer notre 
-terme.
+La réduction est étendue au-delà de la \(\beta\)-réduction par une
+relation de \(\iota\)-réduction, correspondant à la réduction du test
+conditionnel \ifte{\ldots}{\ldots}{\ldots} face aux booléens \true{}
+ou \false{} :
+%
+\[\begin{array}{c}
+  \inferrule{{}}
+            {\ifte{\true}{u}{v} \Red u}
+  \medskip\\
+  \inferrule{{}}
+            {\ifte{\false}{u}{v} \Red v}
+  \medskip\\
+  \inferrule{t \Red t'}
+            {\ifte{t}{u}{v} \Red \ifte{t'}{u}{v} }
+\end{array}\]
 
+
+L'implémentation de cette réduction ne présente pas de difficulté
+particulière :
 \codefrom{untyped}{lambda}{bool_evaluation}
 
 
