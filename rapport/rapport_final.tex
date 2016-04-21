@@ -515,6 +515,8 @@ On assimile ces deux termes aux booléens \True{} et \False{} car leur calcul au
 de l'application d'un \Ifte{} reproduit le comportement attendu.
 
 \begin{example}
+  \todo{Problème d'espaces dans le code maths}
+
   Voici un exemple de réduction du terme \Ifte{} appliqué à la condition \False{} :
   \begin{align*}
     \App{\App{\App{\Ifte}{\False}}{\Var{v}}}{\Var{w}}  \triangleq& \App{\App{\App{(\Lam{l}{\Lam{m}{\Lam{n}{\App{\App{l}{m}}{n}}}}})({\Lam{x}{\Lam{y}{y}}}}){v}}{w} \\
@@ -526,28 +528,34 @@ de l'application d'un \Ifte{} reproduit le comportement attendu.
   \end{align*}
 \end{example}
 
-Ici nous n'avons aucun moyen de vérifier avant normalisation que le premier
-argument de Ifte est un booléen, nous ne pouvons pas garantire la bonne évaluation
-de notre terme.
+Ici nous n'avons aucun moyen de vérifier avant normalisation que le
+premier argument de \Ifte{} est effectivement un booléen : nous ne
+pouvons donc pas garantire la bonne évaluation de notre terme.
 
 \todo{Tu pourrais faire une petite remarque sur l'encodage objet des
   booléens, qui est effectivement utilisé dans des langages purement
-  objets comme Self, Smalltalk ou Pharo.}
+  objets comme Self, Smalltalk ou Pharo. Donner le code correspondant en Java.} 
 
 \subsubsection{Les entiers de Church}
 
-Ici, nous allons voir comment créer
-les entiers naturels \textit{ex nihilo} en utilisant un \emph{encodage à
-  la Church}.
+\newcommand{\Zero}{\mathit{zero}}
+\newcommand{\Un}{\mathit{un}}
+\newcommand{\Deux}{\mathit{deux}}
+\newcommand{\Succ}{\mathit{successeur}}
+\newcommand{\Plus}{\mathit{plus}}
 
-L'idée consiste à représenter le nombre \(n\) par une fonction d'ordre
-supérieur prenant en argument une fonction \Var{f} et l'appliquant \(n\)
-fois à un argument \Var{x}. On définira donc 
+\todo{Écrire le code avec les macros Lam, App et Var.}
+
+Ici, nous allons voir comment créer les entiers naturels \textit{ex
+  nihilo} en utilisant un encodage à la Church. L'idée consiste à
+représenter le nombre \(n\) par une fonction d'ordre supérieur prenant
+en argument une fonction \Var{f} et l'appliquant \(n\) fois à un
+argument \Var{x}. On définira donc
 %
 \begin{align*}
-\mathsf{zero} &= \lambda f. \lambda x. x \\
-\mathsf{un}   &= \lambda f. \lambda x. f\: x \\
-\mathsf{deux} &= \lambda f. \lambda x. f\: (f\: x)
+\Zero &\triangleq \lambda f. \lambda x. x \\
+\Un   &\triangleq \lambda f. \lambda x. f\: x \\
+\Deux &\triangleq \lambda f. \lambda x. f\: (f\: x)
 \end{align*}
 
 Afin de construire tous les entiers naturels, on s'inspire alors de la
@@ -555,18 +563,18 @@ définition des entiers de Peano et définit le successeur d'un nombre \(n\)
 comme
 %
 \[
-\mathsf{successeur} = \lambda n. \lambda f. \lambda x. n\: f\: (f\: x)
+\Succ \triangleq \lambda n. \lambda f. \lambda x. n\: f\: (f\: x)
 \]
 %
-c'est-à-dire \(n\) applications de \(f\) précédées d'une première
+c'est-à-dire \(n\) applications de \(f\) précédée d'une première
 application de \(f\), soit \(n+1\) applications.
 
 De la même manière, on construit l'addition de deux nombres \(m\) et
-\(n\) en faisant \(m\) applications répétées de \(f\) précédées par
+\(n\) en faisant \(m\) applications répétées de \(f\) précédée par
 \(n\) applications :
 %
 \[
-\mathsf{plus} = \lambda m. \lambda n. \lambda f. \lambda x. m f (n f x)
+\Plus \triangleq \lambda m. \lambda n. \lambda f. \lambda x. m f (n f x)
 \]
 
 
