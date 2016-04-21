@@ -178,6 +178,7 @@ arguments peut etre représenté, par curryfication, à l'aide une
 succession de fonctions à un seul argument.
 
 \begin{example}
+  \label{example:id}
   Le \(\lambda\)-terme $\Lam{x\: y}{t}$ correspond au terme $\Lam{x}{\Lam{y}{t}}$  
 \end{example} 
 
@@ -188,13 +189,15 @@ argument.
 
 \newcommand{\IsFree}{\mathrm{isFree}}
 
-Une variable est liée lorsque celle ci est déclarée dans le corps d'un lambda, 
-dans l'exemple précédent x était une variable liée. 
-Si la variable n'a pas été déclarée, elle est dite libre. 
-
+Une variable est liée lorsque celle ci est déclarée dans le corps d'un
+lambda, dans l'exemple~\ref{example:id}, $x$ était une variable liée.
+Si la variable n'a pas été déclarée, elle est dite
+libre. Formellement, l'ensemble des variables libres d'un terme est
+défini récursivement de la façon suivante
+%
 \begin{align*}
   \IsFree(x) &\triangleq \{x\} \\
-  \IsFree(\lambda x. t) &\triangleq \IsFree(t)/\{x\} \\
+  \IsFree(\lambda x. t) &\triangleq \IsFree(t) \backslash \{x\} \\
   \IsFree(f s) &\triangleq \IsFree(f) \cup \IsFree(s) \\
 \end{align*}
 
