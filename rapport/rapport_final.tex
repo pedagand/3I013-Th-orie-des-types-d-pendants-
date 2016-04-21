@@ -195,7 +195,7 @@ argument.
   ``clos''.}
 
 Une variable est liée lorsque celle ci est déclarée dans le corps d'un
-lambda, dans l'exemple~\ref{example:id}, $x$ était une variable liée.
+lambda, dans l'Exemple~\ref{example:id}, $x$ était une variable liée.
 Si la variable n'a pas été déclarée, elle est dite
 libre. Formellement, l'ensemble des variables libres d'un terme est
 défini récursivement de la façon suivante
@@ -587,7 +587,7 @@ d'analyser certaines parties du code et non sa totalité.
 
 \subsubsection{Représentation des $\lambda$-termes}
  
-Pour pallier à la remarque~\ref{problemelibreliee}, nous utilisons une représentation
+Pour pallier à la Remarque~\ref{problemelibreliee}, nous utilisons une représentation
 particulière pour les variables liées: les indices de de Bruijn.  Nous
 allons ainsi représenter les variables liées non pas par un nom mais
 par un entier naturel. Cette valeur est determiné à partir du nombre
@@ -883,7 +883,7 @@ abstractions. L'abstraction construit un type de la forme \(A
 terme soit de type \(A\) et le résultat de type \(B\).
 
 La règle (App) spécifie le typage de l'application. 
-Dans la section ~\ref{reduction:call_by_name} nous avions vu que seul les 
+Dans la Section~\ref{reduction:call_by_name} nous avions vu que seul les 
 redex étaient réductible. Dans un language de programmation appliquer un terme n'étant 
 pas une fonction n'a pas de sens. C'est pour cette raison qu'il nous faut vérifier 
 que notre application est bien une \emph{redex} en vérifiant que \emph{f} est bien du 
@@ -928,7 +928,7 @@ afin de résoudre ce problème.
 
 \subsubsection{Système de type bi-directionnel}
 
-Les applications dont le membre de gauche est une abstractions posent problème comme vu dans l'exemple ~\ref{probleme:type_simple}.
+Les applications dont le membre de gauche est une abstractions posent problème comme vu dans l'Exemple~\ref{probleme:type_simple}.
 Nous allons donc catégoriser nos \(\lambda\)-termes dans deux sous catégorie, 
 d'un coté les termes pouvant se trouver à gauche sans perturber la vérification de type d'une application et les autres.
 
@@ -1019,7 +1019,7 @@ Pour la vérification on connait le type \emph{T} et l'on souhaite déterminer s
 est bien de ce type. Pour la synthèse, on ne connait pas le type de \emph{t} et l'on souhaite le
 determiner.
 
-Le système de type bi-directionnel que nous avons introduit est équivalent à celui de la section \ref{simple_type}.
+Le système de type bi-directionnel que nous avons introduit est équivalent à celui de la Section~\ref{simple_type}.
 En effet si nous avions résolu le problème de l'application \ref{probleme:type_simple} nous aurions du annoter 
 l'ensemble des termes de gauche dans une application.
 
@@ -1027,7 +1027,7 @@ l'ensemble des termes de gauche dans une application.
 
 Dans cette section nous verrons certaines propriétés offertent par les systèmes de type, et nous parlerons 
 de l'évaluation. Nous ne reviendrons pas sur la substitution ni la $\beta$-réduction car cela reste identique par 
-rapport à la section \ref{calculer_dans_le_lambda_calcul}.
+rapport à la Section~\ref{calculer_dans_le_lambda_calcul}.
 
 \subsubsection{Méta-théorie}
 
@@ -1185,7 +1185,7 @@ Règle de typages des paires:
 
 Certaines implémentations sont redondantes avec la précédente, nottament les 
 entiers, les booléens ect.. seul leur intération au sein du vérificateur de type
-est nouvelle. Nous regrouperons donc tout cela dans la section \ref{extensions_implem}.
+est nouvelle. Nous regrouperons donc tout cela dans la Section~\ref{extensions_implem}.
 Voici une implémentation du $\lambda$-calcule simplement typé.
 
 \subsubsection{Représentation des termes et des types}
@@ -1301,7 +1301,7 @@ Les autres règles ne nécéssitent pas de commentaires particuliers.
 
 
 Nous allons maintenant implémenté une nouvelle réduction. 
-Comme nous l'avons vu dans la section \ref{reduction_forte} %peut etre dans la partie safety je ne me souviens plus a voir 
+Comme nous l'avons vu dans la Section~\ref{reduction_forte} %peut etre dans la partie safety je ne me souviens plus a voir 
 la réduction forte aboutie forcément à une forme normale, les termes que nous obtenons
 sont donc les memes qu'avec la réduction précédente \ref{reduction_petits_pas}. Nous allons donc implémenter 
 d'une nouvelle façon cette réduction. Le but de cette implémentation est d'exploiter 
@@ -1412,7 +1412,7 @@ voici le code:
 \subsubsection{Produit cartésien}
 
 Nous allons maintenant implémenté le produit cartésien afin d'enrichire notre 
-language. Tout d'abord comme nous l'avons vu dans la section \ref{produit_cartesien}
+language. Tout d'abord comme nous l'avons vu dans la Section~\ref{produit_cartesien}
 il nous faut introduire trois nouveaux termes ainsi qu'un nouveau constructeurs de type.
 \emph{Type}
 \codefrom{typed}{lambda}{type_pair}
@@ -1643,7 +1643,7 @@ Nous allons donc dorénavant noté \emph{*} le type des types.
 \subsubsection{Formalisation}
 
 Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons maintenant enrichire notre language,
-voici les nouvelles règles de typage en figure~\ref{fig:typage dependant}.
+voici les nouvelles règles de typage en Figure~\ref{fig:typage dependant}.
 
 \begin{figure}
   \center\boxed{\Gamma\vdash T \ni t}
@@ -1706,7 +1706,7 @@ de typage simple est inclus dans l'ensemble des termes des types dépendants.
 
 \subsection{Extensions}
 
-Comme nous l'avons vu dans l'exemple précédent \ref{example vecteur} nous pouvons typé de nouveaux termes inexistants au paravant.
+Comme nous l'avons vu dans l'Exemple~\ref{example vecteur} nous pouvons typé de nouveaux termes inexistants au paravant.
 Nous commencerons par mettre a niveau les encodages précédents. Nous présenterons ensuite les vecteurs ainsi que l'égalité.
 
 \subsubsection{Les entiers}
@@ -1739,7 +1739,7 @@ Pour continuer l'analogie avec la logique propositionnelle, on constate que la r
 Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
 
 Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide de notre syntaxe
-lispienne présentée en section \ref{parsing}:
+lispienne présentée en Section~\ref{parsing}:
 \begin{align*}
   plus\:=\: (lambda\:n\:(lambda\:a\:(iter\:(lambda\:x\:N)\:n\:(lambda\:ni\:(lambda\:x\:(succ\:x)))\:a)))
 \end{align*}
@@ -1755,7 +1755,7 @@ Afin d'aléger la syntaxe nous utiliserons dorénavant ``(+ n m'' correspondant 
 
 Les vecteurs sont un très bon exemple d'encodage où l'on peut introduire de la dépendance. Nous avions vu une présentation assez informelle
 des vecteurs afin de présenter les types dépendants, il sera donc question ici formaliser l'intuition de la
-la section \ref{presentation_type_dependants}. 
+la Section~\ref{presentation_type_dependants}. 
 
 Tout d'abord commençons par introduire le type des vecteurs:
 \begin{align*}
@@ -1899,7 +1899,7 @@ En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut
 tester l'égalité avec la simple fonction d'ocaml. Il nous faut donc d'abord transformer 
 nos \emph{value} en \emph{termes inférables}. Le second problème est que le nom associé 
 aux différents binder tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
-meme nom. Comme nous l'avons vu dans la section \ref{alpha_equiv}sur l'$\alpha$-équivalence 
+meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv}sur l'$\alpha$-équivalence 
 deux termes sont égaux meme si le nom de leur variables est différents. 
 La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
 du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les memes.
