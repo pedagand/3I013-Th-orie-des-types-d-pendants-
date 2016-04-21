@@ -300,7 +300,7 @@ Formellement, on définit la \(\beta\)-réduction par induction sur les
 termes :
 \[\begin{array}{c}
   \inferrule{{}}
-            {\App{\Lam{\Var{x}}{t}}{u} \Red \subst{t}{x}{u}}
+            {\App{(\Lam{\Var{x}}{t})}{u} \Red \subst{t}{x}{u}}
   \medskip\\
   \inferrule{t \Red t'}%
             {\Lam{\Var{x}}{t} \Red \Lam{\Var{x}}{t'}}
@@ -320,8 +320,8 @@ t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
 \begin{example}
   Soit le terme \attention{problème de parenthèse} \(\App{\Lam{x}{\Lam{y}{\App{y}{x}}}}{z}\).  Ce terme est
   sous la forme d'une application ayant une abstraction comme membre
-  de gauche. La réduction consiste à substituer la variable liée par
-  l'abstraction par le membre droit de l'application. On obtient donc 
+  de gauche. La réduction consiste à substituer la variable liée dans
+  la première abstraction par le membre droit de l'application. On obtient donc 
    \(\Lam{x}{\Lam{y}{\App{z}{x}}}\)
 \end{example}
 
