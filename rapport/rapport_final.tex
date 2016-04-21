@@ -844,7 +844,7 @@ liste ordonnée de paires variable/type :
 \end{array}
 \]
 
-\caption{Typage (lambda calcul simplement typé)}
+\caption{Lambda calcul simplement typé}
 \label{fig:typage-simple}
 \end{figure} 
 
@@ -1012,11 +1012,9 @@ vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
 de synthèse.  Lors de la vérification, on connait le type \emph{T} et
 l'on souhaite déterminer si le terme \emph{t} est bien de ce
 type. Lors de la synthèse, on est en mesure, à partir d'un terme
-\Var{t} quelconque, de déterminer son type sans ambiguïté.
-
-Le système de type bi-directionnel que nous avons introduit est équivalent à celui de la Section~\ref{simple_type}.
-En effet si nous avions résolu le problème de l'application \ref{probleme:type_simple} nous aurions du annoter 
-l'ensemble des termes de gauche dans une application.
+\Var{t} quelconque, de déterminer son type sans ambiguïté.  On vérifie
+aisément que ce système de type bi-directionnel est équivalent à celui
+présenté en Figure~\ref{fig:typage-simple}.
 
 \subsection{Normalisation} %en gros calculer dans le lambda calcul non typé
 
