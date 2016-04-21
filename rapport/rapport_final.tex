@@ -1127,22 +1127,20 @@ Les règles d'évaluations restent inchangés.
 \subsubsection{Les booléens}
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
-
-
 En suivant la meme demarche que  pour les entiers les 
 constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes inférables}
 et le constructeur \emph{Ifte} un \emph{terme synthétisable}
 
 
 
-Nous pouvons désormais typer nos booléens de la manière suivante:
+Nous pouvons désormais typer nos booléens de la manière suivante: \todo{Stop les cfracs}
 \begin{align*}
   &\cfrac{}
   {\Gamma\vdash Bool \ni true}&\mbox{(True)} \\
   &\cfrac{}
   {\Gamma\vdash Bool \ni false}&\mbox{(False)} \\
   &\cfrac{\Gamma\vdash Bool \ni c \:\: \Gamma\vdash t \in C \:\: \Gamma\vdash e \in C}
-  {\Gamma\vdash \mathrm{ifte}\: c\: t\: e\in C}&\mbox{(Ifte)}
+  {\Gamma\vdash \mathrm{ifte}\: C\: c\: t\: e\in C}&\mbox{(Ifte)}
 \end{align*}
 
 On constate ici un exemple d'utilisation concrète des types. En effet 
