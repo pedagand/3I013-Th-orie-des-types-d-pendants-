@@ -514,7 +514,7 @@ d'écrire des termes/programmes qui ne terminent pas : ceux-ci n'ont pas
 de forme normale. 
 
 \begin{example}
- 
+ \label{paradoxe}
   Le terme suivant n'admet pas de forme normale :
   %
   \begin{align*}
@@ -805,9 +805,11 @@ La réduction des membres de la paire se fera dans la fonction d'évaluation
 
 \section{Le $\lambda$-calcul simplement typé}
 
-\attention{bof : pas très clair.} Il nous faut maintenant définir un système formelle permettant de determiner si l'éxecution du programme,
-c'est à dire la réduction de nos termes va bien se dérouler. Dans un premier temps nous introduirons les 
+Nous allons maintenant enrichire notre $\lambda$-calcul non typé avec des types. Cela va nous donner des propriétés quand
+à l'évaluation de nos termes et leur utilisation. Nous verrons que dans le $\lambda$-calcul simplement typé il
+n'existe plus de paradoxes comme dans l'exemple \ref{paradoxe}. Dans un premier temps nous introduirons les 
 types, puis nous verrons comment les utiliser en définissant des règles de typage pour nos termes.
+
 
 \subsection{Les types}
 \label{simple_type}
@@ -832,8 +834,8 @@ suivante :
 \begin{example}
   Voici des exemples de type:
   \begin{eqnarray}
-    int \rightarrow bool  \label{eq_1}  \\
-    bool \times int \label{eq_2} 
+    \intg \rightarrow \bool  \label{eq_1}  \\
+    \bool \times \intg \label{eq_2} 
   \end{eqnarray}
   Le type (\ref{eq_1}) est celui d'une fonction prenant un argument de type entier et 
   retournant un résultat de type booléen.
@@ -886,20 +888,6 @@ liste ordonnée de paires variable/type :
           {\Gamma \vdash f : A\rightarrow B \\
            \Gamma \vdash s : A}%
           {\Gamma\vdash \App{f}{s} : B}
-\medskip\\
-\inferrule[(true)]
-          {{}}
-          {\Gamma\vdash \true{} : \bool{}}
-\qquad
-\inferrule[(false)]
-          {{}}
-          {\Gamma\vdash \false{} : \bool{}}
-\medskip\\
-\inferrule[(If-else)]
-          {t1:\bool{} \\
-           t2:T \\
-           t3:T}
-         {\Gamma\vdash \ifte{t1}{t2}{t3} : T}
 \end{array}
 \]
 
@@ -910,9 +898,7 @@ liste ordonnée de paires variable/type :
 \todo{\textsc{Ne pas mettre de variables mathématiques en dehors du maths mode}}
 
 Les règles de typage sont définies en
-Figure~\ref{fig:typage-simple}. \attention{La figure en question
-  introduit les booléens : les définir plus tard ou alors les
-  expliquer maintenant.} La règle (\textsc{Var}) spécifie le typage
+Figure~\ref{fig:typage-simple}. La règle (\textsc{Var}) spécifie le typage
 des variables. Cette expression se lit en partant du numérateur pour
 déduire le dénumérateur : supposons que la variable \Var{x} de type
 \Var{T} soit présente dans le contexte, alors on conclut que le type
@@ -924,21 +910,18 @@ règle (\textsc{App}) spécifie le typage de l'application.  Dans la
 Section~\ref{reduction:call_by_name}, nous avions vu que seul les
 redex étaient réductible. Dans un language de programmation appliquer
 un terme n'étant pas une fonction n'a pas de sens. C'est pour cette
-raison qu'il nous faut vérifier que notre application est
-\attention{confus : c'est quoi cette histoire de redex ?} bien une
-\emph{redex} en vérifiant que \emph{f} est bien du type $A\rightarrow
-B$ . De plus on vérifie que \emph{s} est bien du type \emph{A} pour
-\attention{qu'est-ce que l'on garanti ?}  garantir l'application de
-\emph{s} à notre fonction \emph{f}.
+raison qu'il nous faut vérifier que le membre gauche de notre application
+est bien est bien une abstraction de type $A\rightarrow B$.
+De plus on vérifie que le membre droit est bien du type $A$ afin de
+vérifier si celui ci est applicable à notre fonction.
 
 
 \begin{example}
   \label{probleme:type_simple}
   Voici donc quelques exemples de dérivations de type.  Ces
-  dérivations se lisent du bas vers le haut.  \todo{Retirer les cfrac,
-    utiliser inferrules. Utiliser les macros définies précédemment
-    pour l'écriture des termes.}
-
+  dérivations se lisent du bas vers le haut.
+  
+  \todo{avec cfrac}
   \begin{align*}
     \cfrac{
       \cfrac{
@@ -947,30 +930,43 @@ B$ . De plus on vérifie que \emph{s} est bien du type \emph{A} pour
           \cfrac{y:Int\in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash y:Int}%level3droitApp
         }{\Gamma,x:Int\rightarrow Bool,y:Int\vdash \App{x}{y} : bool}%level2
       }{\Gamma,x:Int\rightarrow Bool\vdash \Lam{y}{\App{x}{y}}:Int \rightarrow Bool}%level1
-    }{\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(Int\rightarrow Bool) \rightarrow Int \rightarrow Bool} %level0
+    }{\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(\intg\rightarrow \bool) \rightarrow \intg \rightarrow \bool} %level0
   \end{align*}
+
+  \todo{avec inferrule}
+  \[
+  \begin{array}{c}    
+\inferrule[]%
+          {\inferrule[]%
+            {\inferrule[]              
+              {\inferrule[]{x:\intg\rightarrow \bool \in \Gamma}{\Gamma,x:\intg\rightarrow \bool,y:\intg\vdash x:\intg\rightarrow \bool} %level3gaucheApp
+               \inferrule[]{y:\intg\in \Gamma}{\Gamma,x:\intg\rightarrow \bool,y:\intg\vdash y:\intg} %level3droitApp
+              }
+              {\Gamma,x:\intg\rightarrow \bool,y:\intg\vdash \App{x}{y} : \bool}%level2
+            }            
+            {\Gamma,x:\intg\rightarrow \bool\vdash \Lam{y}{\App{x}{y}}:\intg \rightarrow \bool}%level1
+            }
+             {\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(\intg\rightarrow \bool) \rightarrow \intg \rightarrow \bool}%level0 
+\end{array}
+\]
+
 
   Ce terme est donc correctement typé.
 
 
-  Tentons maintenant de type checker le terme suivant:   \attention{Qu'est-ce que c'est que ce truc ?!}
-  \begin{align*}
-    \cfrac{
-      \cfrac{}{\Gamma,y:Int\vdash x:A\rightarrow B}%level1DroitApp
-      \cfrac{}{\Gamma,y:Int\vdash y:A}%level1GaucheApp
-    }{\Gamma,y:Int\vdash\App{x}{y}:Bool}%level0
-  \end{align*}
-  Nous ne parvenons pas à type checker ce terme pourtant celui ci est un terme de notre language.
+  Tentons maintenant de type checker le terme suivant:
+  \todo{il faut que je retrouve le terme que j'avais présenté à frederic}
+
 \end{example}
 
-%ici je pourrais dire que l'on doit annoter tous les termes mais que c'est trop lourd
-%syntaxiquement donc que on préfère introduire le bi-directionnel
 Comme nous avons pu le constater dans le dernier exemple, il nous
-manque des informations \attention{non, pas ici : c'est la
-  \emph{spécification}, on peut tout se permettre. Le problème qu'il
-  faut faire passer : ``si on veut implémenter un algo qui fait ça,
-  cette règle va être compliquée''} quand au type de \emph{f}. En
-effet lorsque l'on vérifie une application il faut vérifier que le
+manque des informations sur le type de $f$. Avec la specification ce n'est pas génant
+car celle ci est manipulée par des êtres humains qui peuvent chercher cette information
+sans savoir précisément où elle se trouve.
+Pour un algorithme c'est déja beaucoup plus compliqué de trouver le type
+de la fonction, celui ci ne peut chercher que dans le contexte pour
+trouver de l'information.
+En effet lorsque l'on vérifie une application il faut vérifier que le
 membre de gauche est de type $A \rightarrow B$ alors que l'on ne
 connait que \emph{B}. Nous allons donc introduire une nouvelle
 représentation de nos termes afin de résoudre ce problème.
@@ -995,48 +991,33 @@ information.
 \newcommand{\Inv}[1]{\ensuremath{\mathit{inv}(#1)}}
 \newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
 
-\todo{Utiliser l'environnement \texttt{bnf}. Utiliser les macros App, etc}
 Voici donc notre représentation des termes:
-\begin{align*}
-  ex &::= & \mbox{(termes synthétisables)} \\
-  &| ex\: in &\mbox{(application)} \\
-  &| x &\mbox{(variable)} \\
-  &| \Ann{in}{T}&\mbox{(annotation)} \\
-  in &::= & \mbox{(termes inférables)} \\
-  &|\lambda x.in &\mbox{(abstraction)} \\ 
-  &|\Inv{ex} &\mbox{(inversion de phase)} \\
-\end{align*}
+ 
+\begin{bnf}
+  ex &::= &&\mbox{(termes synthétisables)} \\
+  &|& \App{ex}{in} & \mbox{(Application)} \\
+  &|& \Var{x} & \mbox{(variable)} \\
+  &|& \Ann{in}{T} & \mbox{(Annotation)} \\
+  in &::= &&\mbox{(termes vérifiables} \\
+  &|& \Lam{x}{in} & \mbox{(Abstraction)} \\
+  &|& \Inv{ex} & \mbox{(Inversion)}
+\end{bnf}
 
-\todo{Utiliser ``vérifiable'' plutôt que ``inférable''}
 Les deux nouveaux termes sont donc l'inversion \Inv{-} qui permet d'inclure les 
 \emph{termes synhtétisables} dans le monde des \emph{termes inférables}, l'annotation 
 effectue la meme opération en fournissant l'information de typage manquante.
 
-\todo{Définir des macros pour les jugements de typage, synthèse de
-  type et vérification de type}.
-\todo{On ne doit pas voir apparaître le terme ``inférence de type'' dans ce rapport : attention !}
+\newcommand{\verif}{vérification de type}
+\newcommand{\synth}{synthèse de type}
+\newcommand{\verifterme}{termes vérifiables}
+\newcommand{\synthterme}{termes synthétisables}
 
-\begin{example}
-  \todo{Re-phraser : il n'y avait pas vraiment de problème, la
-    différence est juste que cette dérivation peut être
-    automatiquement trouvée, sans devinettes.} \todo{Ne pas utiliser
-    de cfrac} \attention{Cet example est aussi cassé que le précédant
-    : réparer.} Voici maintenant la dérivation qui nous possait
-  problème précédement.
-  \begin{align*}
-    \cfrac{
-      \cfrac{
-      }{\Gamma,y:Int\vdash (x:Int\rightarrow Bool) \in Int\rightarrow Bool}\:\:\:\:%level1GaucheApp
-      \cfrac{
-        \cfrac{y:Int \in \Gamma}{\Gamma,y:Int\vdash y \in Bool}%level2Droit
-      }{\Gamma,y:Int\vdash Bool \ni y}%level1DroitApp
-    }{\Gamma,y:Int\vdash \App{(x:Int\rightarrow Bool)}{y} \in Bool}%level0
-  \end{align*}
-\end{example}
 
 \paragraph{Implémentation :}
 
-\todo{Introduire ces définitions :} 
+\todo{Introduire ces définitions :}
+
+Commençons par implémenter nos termes dans notre programme:
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
 
@@ -1063,7 +1044,7 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 \boxed{\Gamma\vdash T \ni t}
 \bigskip\\
 \cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-      {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}
+      {\Gamma \vdash T \ni \Lam{x}{t}}\mbox{(Abs)}
 \medskip\\
 \cfrac{\Gamma \vdash t \in T' \:\: T=T'}
       {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} 
@@ -1074,10 +1055,10 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
       {\Gamma \vdash x \in T }\mbox{(Var)}
 \medskip\\
 \cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-      {\Gamma\vdash f\:s\in B}\mbox{(App)} 
+      {\Gamma\vdash \App{f}{s}\in B}\mbox{(App)} 
 \medskip\\
 \cfrac{\Gamma\vdash T \ni t}
-      {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} 
+      {\Gamma\vdash \Ann{t}{T} \in T}\mbox{(Ann)} 
 \end{array}\]
 
 
@@ -1089,46 +1070,54 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 
 Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de
 vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
-de synthèse.  Lors de la vérification, on connait le type \emph{T} et
-l'on souhaite déterminer si le terme \emph{t} est bien de ce
+de synthèse.  Lors de la vérification, on connait le type $T$ et
+l'on souhaite déterminer si le terme $t$ est bien de ce
 type. Lors de la synthèse, on est en mesure, à partir d'un terme
-\Var{t} quelconque, de déterminer son type sans ambiguïté.  On vérifie
+$t$ quelconque, de déterminer son type sans ambiguïté.  On vérifie
 aisément que ce système de type bi-directionnel est équivalent à celui
 présenté en Figure~\ref{fig:typage-simple}.
+
+\begin{example}
+  Voici maintenant la même dérivation mais avec notre système de type bi-directionnel:
+  problème précédement.
+  \todo{roman: faire l'exemple de fred avec le new système}
+  On constate maintenant qu'il ne manque plus d'informations, il sera donc beaucoup plus simple
+  de faire un algorithme implémentant notre système bi-directionnel.
+\end{example}
 
 \paragraph{Implémentation :}
 
 \todo{Dans cette section, importer le code du type-checker ``rapide'', ie. sans traitement des erreurs.}
 
 \begin{itemize}
-
+  
 \item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni t}}\\
-
-Nous disposons d'une fonction de vérification \lstinline!check!
-\todo{ne pas lister mécaniquement les arguments : donner une
-  spécification informelle de la fonction en nommant les arguments (et
-  leur type) en passant} ayant pour paramètres: un contexte qui est
-une liste de paires de la forme \emph{(var,type)}, un \emph{inTerme}
-ainsi qu'un type. Elle retourne un booléen indiquant
-si le terme est correctement typé ou non. \label{check}
-%
-\todo{Permuter \lstinline!inT! et \lstinline!ty! dans la définition de
-  \lstinline!check! de telle sorte que cela corresponde à l'ordre du
-  jugement de typage.}
-%
-\codefrom{typed}{lambda}{check_def} 
-
+  
+  Nous disposons d'une fonction de vérification \lstinline!check!
+  permettant d'éffectuer la vérification de type du terme \fun{inT}.
+  où \fun{contexte} nous permet de stocker
+  des paires associants une variable à son type. Il nous faut aussi
+  donner le type d'entrée \fun{ty}.
+    
+  %
+  \todo{Permuter \lstinline!inT! et \lstinline!ty! dans la définition de
+    \lstinline!check! de telle sorte que cela corresponde à l'ordre du
+    jugement de typage.}
+  %
+  \codefrom{typed}{lambda}{check_def} 
+  
 \item[$\bullet$] \boxed{\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-       {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}} \\
-
-\attention{Ce n'est pas la raison : c'est juste que l'on va sous des abstractions. Quand on va sous une abstraction, la variable autrefois liée devient libre et notre représentation nous impose donc de lui donner un nom explicite.} Afin de pouvoir associé une variable à son type dans le contexte il nous faut un nom pour celle ci.
-En effet avec notre représentation avec les indices de de Bruijn il est difficile de faire l'association entre 
-une variable et son type étant donné que nous ne nommons plus les variables.
-C'est pour cette raison que l'on génère une nouvelle variable libre et que l'on substitue les variables liées 
-au $\lambda$ par celle ci. On peut donc insérer dans le contexte l'association variable type.
-La fonction de synthèse \lstinline!synth! prend un contexte et un
-\emph{exTerme} et renvoie le type de celui-ci.
-La fonction gensym utilisée ici permet de crée un nom de variable frais, garantissant que celui n'a encore jamais
+  {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}} \\
+  
+  Une fois que l'on veut vérifier le terme cotnenus dans une abstraction il nous libérer l'ensemble des variables
+  qui lui sont associées. Avec notre représentation ``locally nameless'' nous somme obliger d'effectuer une substitution
+  contrairement à une représentation composé uniquement des indices de de Bruijn.
+  
+  C'est pour cette raison que l'on génère une nouvelle variable libre et que l'on substitue les variables liées 
+  au $\lambda$ par celle ci. On insère donc dans le contexte l'association variable type.
+  La fonction de synthèse \lstinline!synth! prend un contexte et un
+  \emph{terme synthéthisable} et renvoie le type de celui-ci.
+  La fonction gensym utilisée ici permet de crée un nom de variable frais, garantissant que celui n'a encore jamais
 été utilisé. 
 %
  \codefrom{typed}{lambda}{check_abs}
@@ -1153,22 +1142,35 @@ terme synthétisable et renvoie le type de celui-ci.
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash T \ni t}
                               {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}} \\
-\todo{Commenter}
+
+  Nous somme ici en synthèse c'est à dire que nous devons retourner un type.
+  Essayons de traduire la spécification de façon algorithmique. Si la vérification
+  de $t$ de type $T$ est vraie alors il nous faut retourner $T$
+  
 \codefrom{typed}{lambda}{synth_ann}
+
+
 
 \item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
                                {\Gamma \vdash x \in T }\mbox{(Var)}}\\
 
-Dans la spécification formelle on ne fait pas de distinction entre une variable libre ou liée.
-Cependant il \attention{texte pas clair : tu veux dire que ce cas est impossible.} n'est pas possible de synthétiser une variable liée étant donné qu'elles sont libérés lors
-de la vérification de l'abstraction.
+Dans la spécification formelle on ne fait pas de distinction entre les variables libres et liées.
+Comme nous l'avons vu dans la règle de typage de l'abstraction, l'ensemble des variables
+liées à chaqu'un des lieurs sont libérées. La spécification parle donc bien des variables libres,
+et il n'est pas donc possible synhtéthiser le type d'une variable liée. Si l'on rencontre une variable
+le terme n'est pas bien formé, il faut donc le rejeter.
 
 \codefrom{typed}{lambda}{synth_var}
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
          {\Gamma\vdash f\:s\in B}\mbox{(App)}}\\
 
-\todo{Commenter}
+  
+  Comme la spécification nous l'indique il est d'abord nécéssaire de synthétiser le type de $f$.
+  Il faut ensuite s'assurer que le type retourné par la synthèse est bien de la forme $A\rightarrow B$
+  puis en extraire le type $A$ pour pouvoir cette fois ci vérifier $s$. Si cette vérification réussi
+  on retourne le type $B$.
+ 
 \codefrom{typed}{lambda}{synth_appl}
 
 \end{itemize}
@@ -1216,9 +1218,7 @@ forme normale forte pour nos termes contrairement au \(\lambda\)-calcul non typ�
 
 \label{reduction_forte}
 Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation en appel par nom
-car nous \attention{ce n'était pas un souhait mais une obligation : les termes ne terminaient pas nécessairement.} souhaitions évaluer les termes vers une forme normale faible. Nous ne pouvions pas implémenter 
-une stratégie de réduction forte car dans certains cas cela aurait pu provoquer la non terminaison du 
-programme.
+car nous n'avions pas la garantie qu'une forme normale forte existait.
 D'après les propriétés de la section précédente nous disposons de la certitude que les termes acceptés  par le type-checker sont fortement normalisants. De plus, les types ne sont plus utiles lors de l'évaluation. 
 Nous allons donc implémenter une stratégie de réduction forte sur les \(\lambda\)-termes non typés de la Section~\ref{sec:untyped}.
 
@@ -1301,6 +1301,21 @@ Les règles de typage bidirectionnelles sont donc:
 Les règles d'évaluations restent inchangés.
 
 \subsubsection{Les booléens}
+
+%% \inferrule[(true)]
+%%           {{}}
+%%           {\Gamma\vdash \true{} : \bool{}}
+%% \qquad
+%% \inferrule[(false)]
+%%           {{}}
+%%           {\Gamma\vdash \false{} : \bool{}}
+%% \medskip\\
+%% \inferrule[(If-else)]
+%%           {t1:\bool{} \\
+%%            t2:T \\
+%%            t3:T}
+%%          {\Gamma\vdash \ifte{t1}{t2}{t3} : T}
+
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
 En suivant la meme demarche que  pour les entiers les 
