@@ -104,8 +104,6 @@
 
 \section{Introduction}
 
-\todo{Utilise ``ispell'' pour la correction orthographique.}
-\todo{Remplace ``analyseur de type'' à la place de ``type checker''}
 Les languages de programmations sont entièrements définis par leur compilateur.....
 
 \attention{Parti pris pas inintéressant : présenter la chaîne de
@@ -255,7 +253,7 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
 \begin{example}
   \todo{Donner l'exemple de réduction sous un binder}
   Soit \Var{x} une variable libre.
-
+  \todo{roman: je ne me suis jamais penché sur ce problème il faut que je lise pierce}
   En théorie :
   \(\App{(\Lam{\Var{y}}{\Var{y}})}{\Var{x}} \leadsto \Var{x}\)
 
@@ -335,8 +333,8 @@ raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} o
 \begin{proposition}
   
 \end{proposition}
-\todo{Roman: je ne vois vraiment pas quoi dire la dessus}
-
+Grace à notre représentation locally nameless il n'y à pas besoin de faire d'$\alpha$-convertions lors de la
+substitution. Dans le cas ou une des variables à substituer à été trouvé, on retourne directement le terme substituant.
 \subsubsection{$\beta$-réduction}
 \label{reduction}
 
@@ -462,7 +460,24 @@ nécessairement une variable : le redex le plus à gauche du terme est
 La stratégie d'\emph{appel par nom} consiste à contracter
 successivement le redex de tête (et uniquement ce redex). 
 
-\todo{Donner la réduction en appel par nom ici.}
+\newcommand{\CBN}{\mathop{\leadsto_N}}
+
+\[\begin{array}{c}
+\inferrule{{}}
+          {\App{(\Lam{\Var{x}}{t})}{u} \CBN \subst{t}{x}{u}}
+          \medskip\\
+          \inferrule{t \CBN t'}
+                    {\App{t}{u} \CBN \App{t'}{u}}
+                    \medskip\\
+                    \inferrule{{}}
+                              {\Lam{x}{t}\Red \Lam{x}{t}}
+                              \medskip\\
+                              \inferrule{{}}
+                                        {x\Red x}
+                                        
+\end{array}\]
+
+
 
 Crucialement, nous avons la propriété suivante~\citep[th.3,
   p.62]{krivine:lambda-calculus} :
@@ -477,12 +492,14 @@ Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
 pas tous fortement normalisable, on privilégiera la réduction en appel
 par nom.
 
-\attention{Ceci n'est pas correct :} Cependant il
-existe tout de meme deux formes normales, la faible qui considère
-qu'un lambda est une valeur finale, et la forte où meme les redex à
-l'intérieure d'une \emph{abstraction} doivent etre évaluées.  Il
-existe donc plusieurs stratégies de réduction qui permettent
-d'atteindre différents type de forme normale. \attention{fin.}
+Il existe d'autres stratégies de réduction comme par exemple 
+\emph{normal order strategy}, \emph{l'appel par valeur}.
+Chacune des stratégie d'évaluation possède des avantages et
+des inconvénients. Dans le $\lambda$-calcul non typé nous avons
+choisis d'utiliser \emph{l'appel par nom} car c'est un très bon 
+compromis, celle ci obtient toujours la forme normale si elle 
+existe. 
+
 
 \begin{example}
   \begin{align*}
@@ -507,22 +524,6 @@ de forme normale.
   \end{align*}
 \end{example}
 
-\attention{Définition trop floue : voir la définition ci-dessus (et supprimer dès que tu es convaincu que l'on a rien perdu)} Elle consiste à
-réduire les \emph{redex} sauf celle étant sous une \emph{abstraction}. \attention{fin.}
-
-\newcommand{\CBN}{\mathop{\leadsto_N}}
-
-\todo{Faire remonter (et introduire) la définition de l'appel par nom plus haut.}
-\[\begin{array}{c}
-  \inferrule{{}}
-            {\App{(\Lam{\Var{x}}{t})}{u} \CBN \subst{t}{x}{u}}
-  \medskip\\
-  \inferrule{t \CBN t'}
-            {\App{t}{u} \CBN \App{t'}{u}}
-
-\end{array}\]
-
-\attention{Les lambdas scope le plus à droite possible. Donc il faut parenthéser les applications.}
 
 \begin{example}
   Voici une réduction en appel par nom:
@@ -800,6 +801,7 @@ Implémentons donc ces règles:
 \codefrom{untyped}{lambda}{pair_evaluation}
 La réduction des membres de la paire se fera dans la fonction d'évaluation
 
+\todo{roman: rajouter les paires dans le prog}
 
 \section{Le $\lambda$-calcul simplement typé}
 
