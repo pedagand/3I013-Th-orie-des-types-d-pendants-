@@ -13,9 +13,11 @@ type inTm =
   | Pi of name * inTm * inTm 
   | Star
 (*=End *)
+(*=terme_nat *)
   | Zero
   | Succ of inTm
   | Nat
+(*=End *)
   | Pair of inTm * inTm 
   | Cross of inTm * inTm
   | List of inTm 
@@ -36,7 +38,9 @@ and exTm =
   | FVar of name 
   | Appl of exTm * inTm
 (*=End *)
+(*=terme_iter *)
   | Iter of inTm * inTm * inTm * inTm  
+(*=End *)
   | Trans of inTm * inTm * inTm * inTm * inTm * inTm 
   | P0 of exTm
   | P1 of exTm 
@@ -44,10 +48,11 @@ and exTm =
   | DFold of inTm * inTm * inTm * inTm * inTm * inTm 
 (*=End *)
  
-(*=Value *)
+
 type value = 
   | VLam of (value -> value)
   | VNeutral of neutral 
+(*=value_pi_star *)
   | VStar 
   | VPi of value * (value -> value)
 (*=End *)
@@ -67,7 +72,9 @@ and neutral =
   | NFree of name 
   | NApp of neutral * value 
   | NIter of value * value * value * value
+(*=neutral_fold *)
   | NDFold of value * value * value * value * value * value 
+(*=End *)
   | NTrans of value * value * value * value * value * value  
 
 (*=debug *) 
@@ -298,8 +305,10 @@ let rec big_step_eval_inTm t envi =
   | Inv(i) -> big_step_eval_exTm i envi
 (*=End *)
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
+(*=big_step_new *)
   | Star -> VStar
   | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
+(*=End *)
   | Nat -> VNat
   | Zero -> VZero
   | Succ(n) -> VSucc(big_step_eval_inTm n envi)
@@ -356,10 +365,12 @@ let rec value_to_inTm i v =
   match v with 
   | VLam f -> value_to_inTm (i+1) (f (vfree(Quote i)))
   | VNeutral n -> Inv(neutral_to_exTm i n)
+(*=value_to_inTm_new *)		     
   | VPi(x,f) -> let var = gensym () in 
 		begin
 		  Pi(Global(var),(value_to_inTm i x),(value_to_inTm (i+1) (f(vfree(Quote i)))))
 		end
+(*=End *)
   | VStar -> Star
   | VNat -> Nat
   | VZero -> Zero

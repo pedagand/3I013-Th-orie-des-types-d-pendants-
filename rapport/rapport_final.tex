@@ -721,10 +721,10 @@ particulière :
 
 \subsubsection{Les entiers}
 
-\newcommand{\zero}{\ensuremath{\mathit{zero}}}
+\newcommand{\zero}{\ensuremath{\mathit{zero}}} 
 \newcommand{\succs}{\ensuremath{\mathit{succ}}}
 \newcommand{\iter}{\ensuremath{\mathit{iter}}}
-
+\newcommand{\nat}{\ensuremath{\mathit{nat}}}
 \newcommand{\NZero}{\lstinline!Zero!}
 \newcommand{\NSucc}{\lstinline!Succ!}
 \newcommand{\NIter}{\lstinline!Iter!}
@@ -1659,8 +1659,6 @@ comme par exemple les vecteurs de taille \emph{n}.
     &... \\
     &[.....] &: \forall n:Int\: \forall \alpha : A . Vec\: \alpha \: n \\
   \end{align*}
-  Si nous souhaitons maintenant additionner deux vecteurs, il nous faut donc effectuer des calculs sur les types.
-  PRESENTER UN PETIT TRUC EN VITESSE
 \end{example}
 On ressent de plus en plus l'intuition que en introduisant une dépendance dans nos types, ceux ci se comportent de la meme façon que 
 les termes.
@@ -1740,161 +1738,10 @@ de typage simple est inclus dans l'ensemble des termes des types dépendants.
   \end{align*}
 \end{example}
 
-\subsection{Extensions}
-
-Comme nous l'avons vu dans l'Exemple~\ref{example vecteur} nous pouvons typé de nouveaux termes inexistants au paravant.
-Nous commencerons par mettre a niveau les encodages précédents. Nous présenterons ensuite les vecteurs ainsi que l'égalité.
-
-\subsubsection{Les entiers}
-
-Il nous faut maintenant introduire de la dépendance au sein des entiers. 
-Voici leurs nouvelles règles de typage:
-
-\todo{roman:mieux présenter iter dans la spec} 
-\begin{align*}
-  &\cfrac{}
-  {\Gamma\vdash * \ni Nat}&\mbox{(Nat)} \\
-  &\cfrac{}
-  {\Gamma\vdash Nat \ni Zero}&\mbox{(Zero)} \\
-  &\cfrac{\Gamma\vdash Nat \ni n}
-  {\Gamma\vdash Nat \ni Succ\:n}&\mbox{(Succ)} \\
-  &\cfrac{\Gamma\vdash Nat\rightarrow *\ni P\: \Gamma\vdash Nat\ni n\: \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\:
-  \Gamma\vdash P\:Zero\ni a}
-  {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}&\mbox{(Iter)}\\
-\end{align*}
-Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
-
-Dans le $\lambda$-calcul simplement typé \ref{entier_type} nous avions besoin que l'argument \emph{a} soit un \emph{terme synthétisable}
-afin de déterminer le type de retour de cette construction.
-Maintenant l'ensemble des arguments de iter sont des termes inférables car l'introduction d'un prédicat
-\emph{P} nous permet de connaitre le type de retour de iter et donc de vérifier les autres termes. 
-Ce prédicat nous permet d'une part de crée de la dépendance et d'autre part de rajouter de l'information.
-
-Pour continuer l'analogie avec la logique propositionnelle, on constate que la règle de typage de iter correspond à un raisonnement par
-\emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de zero. 
-Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
-
-Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide de notre syntaxe
-lispienne présentée en Section~\ref{parsing}:
-\begin{align*}
-  plus\:=\: (lambda\:n\:(lambda\:a\:(iter\:(lambda\:x\:N)\:n\:(lambda\:ni\:(lambda\:x\:(succ\:x)))\:a)))
-\end{align*}
-Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à iterer \emph{n} fois la fonction successeur sur \emph{m}.
-Afin d'aléger la syntaxe nous utiliserons dorénavant ``(+ n m'' correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
-\emph{m}.
-
-\subsubsection{Les booléens}
-
-\todo{Nous n'avons pas vu les booléens dans les types dépendants donc à voir si il y à un réel ajout}
-
-\subsubsection{Les vecteurs}
-
-Les vecteurs sont un très bon exemple d'encodage où l'on peut introduire de la dépendance. Nous avions vu une présentation assez informelle
-des vecteurs afin de présenter les types dépendants, il sera donc question ici formaliser l'intuition de la
-la Section~\ref{presentation_type_dependants}. 
-
-Tout d'abord commençons par introduire le type des vecteurs:
-\begin{align*}
-  &\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
-  {\Gamma\vdash * \ni Vec\: \alpha\:n }&\mbox{(Vec)} \\
-\end{align*}
-
-Ici $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
-Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
-de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants dans 
-l'utilisation des types dépendants. Si l'on possédait ce genre de constructions dans un language comme Java par exemple, nous
-pourrions crée une surchage sur des fonctions qui permettrait de traiter différement les vecteurs de grande taille pour le tri par exemple.
-Certains tris étant beaucoup plus efficaces sur de grands vecteurs et inversements. 
-Voici maintenant deux constructeurs pour les vecteurs:
-\begin{align*}
-  &\cfrac{}
-  {\Gamma\vdash Vec\:\alpha\:n\ni dnil\:\alpha}&\mbox{(dnil)} \\
-  &\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
-  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
-\end{align*}
-
-Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
-\begin{example}
-  Voici un vecteur de taille trois et dont les éléments sont des entiers:
-  \begin{align*}
-    dcons\:zero\:(dcons\:(succ\:zero)\:(dcons\:zero\:(dnil\:Nat)))
-  \end{align*}  
-\end{example}
-
-Nous pouvons maintenant crée des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utilisers. Nous allons 
-implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold} dont voici une définition intuitive:
-\fun{fold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
-Définissons maintenant l'éliminateur \emph{dfold} comme un \emph{terme synthétisable}:
-\todo{modifier la présentation aussi}
-\begin{align*}
-  &\cfrac{\Gamma\vdash *\ni\alpha\:
-    \Gamma\vdash Nat \ni n \: 
-    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P\:
-    \Gamma\vdash Vec\:\alpha\:n\ni v\:
-    \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
-  {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}&\mbox{(dfold)}
-\end{align*}
-
-De la meme manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
-de rendre le type de retour dépendant des différents arguments.
-
-Il existe de nombreuses façon d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
-Voici le terme correspondant à cette utilisation:
-\begin{align*}
-  somme_liste\:=\:(lambda\:v (lambda n(dfold\:N\:(lambda\:n\:(lambda\:xs\:N))\:n\:v\:(lambda\:n(lambda\:xs\:(lambda\:a\:(lambda\:x\:(+\:a\:x)))))\:zero)))
-\end{align*}
-
-\subsubsection{L'égalite} 
-
-Pour implémenter l'égalité au sein de notre language il faut nous tourner vers la logique. 
-Leibniz philosophe du XVII siècle énonça que deux éléments sont identiques si elles ont les memes propriétés.
-\todo{expliquer plus en détail en faisant un parallèle avec la logique}
-
-On peut maintenant introduire le type identité:
-\begin{align*}
-  &\cfrac{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
-  {\Gamma\vdash * \ni Id\:A\:a\:b}&\mbox{(Id)}
-\end{align*}
-
-refl
-\begin{align*}
-  &\cfrac{\Gamma\vdash A \ni a}
-  {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}&\mbox{(refl)}
-\end{align*}
-
-et trans
-\begin{align*}
-  &\cfrac{
-    \Gamma\vdash * \ni A
-    \Gamma\vdash A\ni a
-    \Gamma\vdash A \ni b
-    \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *)
-    \Gamma\vdash Id\:A\:a\:b \ni q
-    \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
-    {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}&\mbox{(trans)}
-\end{align*}
-
-\todo{roman: a finir quand j'aurais mieux compris}
-
-\subsection{Implémentation}
-
-Etant donné que nous allons présenté l'implémentation finale de ce projet, nous verrons l'ensemble du code.
-Nous ne rentrerons pas dans les détails pour l'explication des parties redondantes, mais il sera plus facile 
-pour la lecture de disposer de l'intégralité des fonctions. 
-
-\todo{je ne sais pas si c'est une bonne idée}
-
-
-
-\subsubsection{Noyau du language}
-
-Les termes synthétisables et inférables enrichies pour les types dépendants:
+\paragraph{Implémentation :} 
+La représentation de nos termes vérifiables et synthétisables dans le programme:
 \codefrom{dependent}{lambda}{inTm}
 \codefrom{dependent}{lambda}{exTm}
-
-Les value et tout
-
-\subsubsection{Type Checker}
 
 Nous n'avons rajouter que deux nouveaux termes dans le noyeau de notre language mais 
 le fait de ne plus faire la distinction entre les termes et les types change beaucoup de
@@ -1973,54 +1820,273 @@ $\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
     {\Gamma\vdash (t:T) \in T}$
 
 Etant donné que nos termes et nos types sont équivalents il faut maintenant vérifier que 
-\emph{T} est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
+$T$ est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
+
+\subsubsection{Mise à jour de l'évaluation}
+
+Nous savons maitenant comment vérifier les termes \emph{pi} et \emph{Star}, passons donc 
+à leur évaluation:
+
+\[\begin{array}{c}
+  \inferrule{{}}
+            {*\Downarrow *}
+  \medskip\\
+  \inferrule{{p\Downarrow t\:\:\:p'\Downarrow t'}}
+            {\forall x:p.p'\Downarrow \forall x:t.t'}
+\end{array}\]
+
+Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont:
+\codefrom{dependent}{lambda}{value_pi_star}
+
+En suivant le meme raisonnement que pour l'évaluation d'une abstraction avec la
+fonction \fun{big_step_eval}, nous allons transformer le second membre de $\forall$
+en fonction anonyme. 
+
+\codefrom{dependent}{lambda}{big_step_new}
+Le premier membre est évalué simplement tandisque le second est bien évalué en fonction anonyme,
+car comme pour l'abstraction cela nous permet de pouvoir substituer dans notre type 
+directement.
+
+Pour terminer voici la fonction permettant de remettre nos \emph{values} dans le monde
+des termes vérifiables:
+
+\codefrom{dependent}{lambda}{value_to_inTm_new}
 
 
 
-\subsubsection{Substitution et Normalisation}
-\todo{roman: ...}
-Voici le code de la substitution:
-\codefrom{dependent}{lambda}{substitution_inTm}
-\codefrom{dependent}{lambda}{substitution_exTm}
+\subsection{Extensions}
 
-Désormais nous utiliserons seulement la réduction à grand pas
-
-
-%parler du fait que dans la règle inv on à maintenant une égalité qui n'est plus celle de Ocaml
-
+Comme nous l'avons vu dans l'Exemple~\ref{example vecteur} nous pouvons typé de nouveaux termes inexistants au paravant.
+Nous commencerons par mettre a niveau les encodages précédents. Nous présenterons ensuite les vecteurs ainsi que l'égalité.
 
 \subsubsection{Les entiers}
 
+Nous avons désormais besoin de modifier notre grammaire des entiers dans notre language:
+\begin{bnf}
+  t &::= &....... &\mbox{(termes vérifiables)} \\
+  &|& \nat & \mbox{(nat)} \\
+  &|& \zero & \mbox{(zero)} \\
+  &|& \succs\:t & \mbox{(succ)} \\
+  s &::= &....... &\mbox{(termes synthétisables)} \\
+  &|& \iter\:t\:t\:t\:t & \mbox{(iter)}
+\end{bnf}
+Maintenant iter possède un argument de plus que précédement nous verrons sont role dans le typage des entiers.
+\codefrom{dependent}{lambda}{terme_nat}
+\codefrom{dependent}{lambda}{terme_iter}
+
+
+
+Passons maintenant aux règles de typages:
+
+\todo{roman:mieux présenter iter dans la spec} 
+\begin{align*}
+  &\cfrac{}
+  {\Gamma\vdash * \ni Nat}&\mbox{(Nat)} \\
+  &\cfrac{}
+  {\Gamma\vdash Nat \ni Zero}&\mbox{(Zero)} \\
+  &\cfrac{\Gamma\vdash Nat \ni n}
+  {\Gamma\vdash Nat \ni Succ\:n}&\mbox{(Succ)} \\
+  &\cfrac{\Gamma\vdash Nat\rightarrow *\ni P\: \Gamma\vdash Nat\ni n\: \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\:
+  \Gamma\vdash P\:Zero\ni a}
+  {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}&\mbox{(Iter)}\\
+\end{align*}
+Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
+
+Dans le $\lambda$-calcul simplement typé \ref{entier_type} nous avions besoin que l'argument \emph{a} soit un \emph{terme synthétisable}
+afin de déterminer le type de retour de cette construction.
+Maintenant l'ensemble des arguments de iter sont des termes inférables car l'introduction d'un prédicat
+\emph{P} nous permet de connaitre le type de retour de iter et donc de vérifier les autres termes. 
+Ce prédicat nous permet d'une part de crée de la dépendance et d'autre part de rajouter de l'information.
+
+Pour continuer l'analogie avec la logique propositionnelle, on constate que la règle de typage de iter correspond à un raisonnement par
+\emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de zero. 
+Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
+
+Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide de notre syntaxe
+lispienne présentée en Section~\ref{parsing}:
+\begin{align*}
+  plus\:=\: (lambda\:n\:(lambda\:a\:(iter\:(lambda\:x\:N)\:n\:(lambda\:ni\:(lambda\:x\:(succ\:x)))\:a)))
+\end{align*}
+Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à iterer \emph{n} fois la fonction successeur sur \emph{m}.
+Afin d'aléger la syntaxe nous utiliserons dorénavant ``(+ n m'' correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
+\emph{m}.
+
+Les règles de typages correspondantes dans notre algorithme:
+
+\todo{mettre le code quand celui ci sera mis au propre car pas présentable pour le moment}
+
+
+Pour l'évaluation nous n'avons pas besoin d'évaluer le prédicat, celle ci s'effectue de la meme façon que 
+dans le $\lambda$-calcul simplement typé.
+
+
 \subsubsection{Les vecteurs}
 
-Pour cette implémentation nous avons besoin d'intégrer les termes ainsi que les \emph{value} suivant:
+Les vecteurs sont un très bon exemple d'implémentation où l'on peut introduire de la dépendance. Nous avons vu une 
+présentation assez informelle
+des vecteurs afin de présenter les types dépendants, il sera donc question ici formaliser l'intuition de la
+la Section~\ref{presentation_type_dependants}. 
+Commençons par enrichire notre grammaire:
+
+\newcommand{\vect}{\mathit{vec}} 
+\newcommand{\dnil}{\mathit{dnil}}
+\newcommand{\dcons}{\mathit{dcons}}
+\newcommand{\dfold}{\mathit{dfold}}
+
+\begin{bnf}
+  t &::= &....... &\mbox{(termes vérifiables)} \\
+  &|& \vect\:t\:t & \mbox{(vec)} \\
+  &|& \dnil\:t & \mbox{(dnil)} \\
+  &|& \dcons\:t\:t & \mbox{(dcons)} \\
+  s &::= &....... &\mbox{(termes synthétisables)} \\
+  &|& \dfold\:t\:t\:t\:t\:t\:t & \mbox{(dfold)}
+\end{bnf}
 
 \codefrom{dependent}{lambda}{terme_vector}
 \codefrom{dependent}{lambda}{terme_dfold}
-\codefrom{dependent}{lambda}{Value_Vector}
 
 
-Passons à l'implémentation au sein du type checker:
+
+Les arguments des différents constructeurs seront expliqué une fois que nous aurrons vu les 
+règles de typage:
+\begin{align*}
+  &\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
+  {\Gamma\vdash * \ni Vec\: \alpha\:n }&\mbox{(Vec)} \\
+\end{align*}
+
+
+
+
+Ici $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
+Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
+de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants dans 
+l'utilisation des types dépendants. Si l'on possédait ce genre de constructions dans un language comme Java par exemple, nous
+pourrions crée une surchage sur des fonctions qui permettrait de traiter différement les vecteurs de grande taille pour le tri par exemple.
+Certains tris étant beaucoup plus efficaces sur de grands vecteurs et inversements. 
+Voici maintenant deux constructeurs pour les vecteurs:
+\begin{align*}
+  &\cfrac{}
+  {\Gamma\vdash Vec\:\alpha\:n\ni dnil\:\alpha}&\mbox{(dnil)} \\
+  &\cfrac{\Gamma\vdash Vec\:\alpha\:\zero\ni v \:\:\Gamma\vdash \alpha\ni a}
+  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
+\end{align*}
+
+Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
+\begin{example}
+  Voici un vecteur de taille trois et dont les éléments sont des entiers:
+  \begin{align*}
+    dcons\:zero\:(dcons\:(succ\:zero)\:(dcons\:zero\:(dnil\:Nat)))
+  \end{align*}  
+\end{example}
+
+Nous pouvons maintenant crée des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utilisers. Nous allons 
+implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold} dont voici une définition intuitive:
+\fun{fold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
+Définissons maintenant l'éliminateur \emph{dfold} comme un \emph{terme synthétisable}:
+\todo{modifier la présentation aussi}
+\begin{align*}
+  &\cfrac{\Gamma\vdash *\ni\alpha\:
+    \Gamma\vdash Nat \ni n \: 
+    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P\:
+    \Gamma\vdash Vec\:\alpha\:n\ni v\:
+    \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
+  {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}&\mbox{(dfold)}
+\end{align*}
+
+De la meme manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
+de rendre le type de retour dépendant des différents arguments.
+
+Il existe de nombreuses façon d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
+Voici le terme correspondant à cette utilisation:
+\begin{align*}
+  somme_liste\:=\:(lambda\:v (lambda n(dfold\:N\:(lambda\:n\:(lambda\:xs\:N))\:n\:v\:(lambda\:n(lambda\:xs\:(lambda\:a\:(lambda\:x\:(+\:a\:x)))))\:zero)))
+\end{align*}
+
+Voici donc le code du type-checker correpondant:
 
 \codefrom{dependent}{lambda}{check_vec}
+$\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
+  {\Gamma\vdash * \ni Vec\: \alpha\:n }$
 \codefrom{dependent}{lambda}{check_dnil}
+$\cfrac{}
+  {\Gamma\vdash Vec\:\alpha\:\zero\ni dnil\:\alpha}$
+
 \codefrom{dependent}{lambda}{check_dcons}
+  $\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
+  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}$
 
-\todo{Gros problème mes implémentations sont claires mais pas adaptables au format papier ....}
+\todo{rajouter dfold mais plus tard, la c'est vraiment pas présentable}
 
+\paragraph{Evaluation :} 
+Avant d'implémenter l'évaluation dans notre programme il nous faut tout d'abord
+rajouter les \emph{valeurs} suivantes à notre language.
+\codefrom{dependent}{lambda}{Value_Vector}
+Passons maintenant à l'évaluation des vecteurs, nos trois constructeurs 
+n'ont pas d'évaluation particulière:
+\[\begin{array}{c}
+  \inferrule{{\alpha\Downarrow \alpha'\:\:\:n\Downarrow n'}}
+            { \vect\:\alpha\:n\Downarrow \vect\:\alpha'\:n'}
+  \medskip\\
+  \inferrule{{\alpha\Downarrow \alpha'}}
+            {\dnil\:\alpha\Downarrow \dnil\:\alpha'}
+  \medskip\\
+  \inferrule{{a \Downarrow a'\:\:\:xs \Downarrow xs'}}
+            {\dcons\:a\:xs\Downarrow \dcons\:a'\:xs'}
+\end{array}\]
 
-Commençons par implémenter l'évaluation des vecteurs.
+Ce qui se traduit dans notre algorithme de la façon suivante:
 \codefrom{dependent}{lambda}{big_step_vec}
-Rien de plus classique en ce qui concerne nos trois constructeurs. 
-En revanche l'évaluation de vfold nécéssite 
 
+L'évaluation de \emph{dfold} s'effectue de la manière suivante:
+\[\begin{array}{c}
+  \inferrule{{xs\Downarrow \dnil\:\alpha\:\:\:n\Downarrow \zero}}
+            {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow a}
+  \medskip\\
+  \inferrule{{xs\Downarrow \dcons\:e\:xs'\:\:\:n\Downarrow\succs\:n'}}
+            {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow \App{\App{f}{(n\:xs\:e)}}{(\dfold\:\alpha\:P\:n'\:xs'\:f\:a)}}           
+\end{array}\]
 
+Si $dfold$ contient des variables libres il nous faut un élément neutre à retourner:
+
+\codefrom{dependent}{lambda}{neutral_fold}
+Pour l'implémentation, de la meme façon que avec iter nous avons crée une fonction \fun{vfold}
+qui nous permet d'éffectuer l'évaluation:
 
 \codefrom{dependent}{lambda}{vfold}
 
-Commençons tout d'abord par voir
 
-\subsubsection{L'égalité}
+\subsubsection{L'égalite} 
+
+Pour implémenter l'égalité au sein de notre language il faut nous tourner vers la logique. 
+Leibniz philosophe du XVII siècle énonça que deux éléments sont identiques si elles ont les memes propriétés.
+\todo{expliquer plus en détail en faisant un parallèle avec la logique}
+
+On peut maintenant introduire le type identité:
+\begin{align*}
+  &\cfrac{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
+  {\Gamma\vdash * \ni Id\:A\:a\:b}&\mbox{(Id)}
+\end{align*}
+
+refl
+\begin{align*}
+  &\cfrac{\Gamma\vdash A \ni a}
+  {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}&\mbox{(refl)}
+\end{align*}
+
+et trans
+\begin{align*}
+  &\cfrac{
+    \Gamma\vdash * \ni A
+    \Gamma\vdash A\ni a
+    \Gamma\vdash A \ni b
+    \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *)
+    \Gamma\vdash Id\:A\:a\:b \ni q
+    \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
+    {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}&\mbox{(trans)}
+\end{align*}
+
+\todo{roman: a finir quand j'aurais mieux compris}
+
 
 
 
