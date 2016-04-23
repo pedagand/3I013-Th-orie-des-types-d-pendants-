@@ -424,6 +424,172 @@ and equal_exTm t1 t2 =
 
 
 
+let rec lcheck contexte ty inT =
+  match inT with
+  | Abs(x,y) ->
+     begin
+       match ty with
+       | VPi(s,t) -> let freshVar = gensym() in
+		     lcheck (((Global freshVar),s)::contexte)
+		       (t (vfree (Global freshVar)))
+		       (substitution_inTm y (FVar(Global(freshVar))) 0)
+       | _ -> false
+     end
+  | Inv(x) -> 
+     let ret = lsynth contexte x in
+	 if equal_inTm (value_to_inTm 0 (ty)) (value_to_inTm 0 ret)
+	 then true
+	 else false
+	   
+(*=End *)
+(*=check_star *)
+  | Star -> 
+     begin 
+      match ty with 
+	| VStar -> true 
+	| _ -> false 
+     end
+(*=End *)
+(*=check_pi *)
+  | Pi (v,s,t) -> 
+     begin 
+       match ty with 
+       | VStar -> let freshVar = gensym () in 
+		  lcheck contexte VStar s 
+		  && lcheck (((Global freshVar),(big_step_eval_inTm s []))::contexte)
+		    VStar
+		    (substitution_inTm t (FVar(Global(freshVar))) 0)
+       | _ -> false
+     end 
+(*=End *)
+  | Nat -> 
+     begin 
+       match ty with
+       | VStar -> true
+       | _ -> false
+     end 
+  | Zero -> 
+     begin 
+       match ty with 
+       | VNat -> true 
+       | _ -> false 
+     end
+  | Succ(x) -> 
+     begin 
+       match ty with 
+	 | VNat -> lcheck contexte VNat x 
+	 | _ -> false
+     end 
+(*=check_vec *)
+  | Vec(alpha,n) -> 
+     begin        
+       match ty with 
+       | VStar -> lcheck contexte VStar alpha  &&
+	  	  lcheck contexte VNat n   
+       | _ -> false 
+     end
+(*=End *)
+(*=check_dnil *)
+  | DNil(alpha) -> 
+     begin
+       match ty with
+       | VVec(alpha_vec,VZero) -> equal_inTm (value_to_inTm 0 (big_step_eval_inTm alpha [])) 
+					       (value_to_inTm 0 alpha_vec)								
+       | _ -> false
+     end 
+(*=End *)
+(*=check_dcons *)
+  | DCons(a,xs) -> 
+     begin 
+       match ty with 
+       | VVec(alpha,VSucc(n)) -> lcheck contexte (VVec(alpha,n)) xs  && 				 
+				 lcheck contexte alpha a  				 
+       | _ -> false
+     end 
+(*=End *)
+  | What -> false 
+  | Id(gA,a,b) ->
+     let eval_gA = big_step_eval_inTm gA [] in
+     lcheck contexte VStar gA  &&
+       lcheck contexte eval_gA a  &&
+       lcheck contexte eval_gA b 
+  | Refl(a) ->
+     begin
+       match ty with 
+       | VId(gA,ta,ba) -> 
+	  if equal_inTm a (value_to_inTm 0 ta) &&
+	    equal_inTm a (value_to_inTm 0 ba)
+	  then lcheck contexte gA a
+	  else false
+       | _ -> false
+     end
+| _ -> failwith "HEHEHEHEHE"
+and lsynth contexte exT =
+  match exT with
+  | BVar x -> failwith "Impossible to check a BoundVar"
+  | FVar x -> List.assoc x contexte
+(*=End *)
+(*=synth_ann *) 
+  | Ann(x,t) -> let eval_t = big_step_eval_inTm t [] in
+		if lcheck contexte VStar t 
+		  && lcheck contexte (big_step_eval_inTm t []) x 
+		then eval_t 		    		   
+		else failwith "fail synth Ann"  
+(*=End *)
+(*=synth_app *) 
+  | Appl(f,s) -> 
+     let synth_f = lsynth contexte f in
+     begin
+       match synth_f with
+       | VPi(s_pi,fu) -> if lcheck contexte s_pi s 
+		     then (fu (big_step_eval_inTm s [])) 
+		     else failwith "fail synth Appl"
+       | _ -> failwith "fail synth Appl"
+     end
+(*=End *) 
+  | Iter(p,n,f,a) -> let big_p = big_step_eval_inTm p [] in
+		     let big_n = big_step_eval_inTm n [] in 
+ 		     if lcheck contexte (big_step_eval_inTm (read "(-> N *)") []) p &&
+		     lcheck contexte (big_step_eval_inTm (read "N") []) n &&
+		     lcheck contexte (big_step_eval_inTm
+					(Pi(Global("n"),Nat,
+					    Pi(Global("NO"),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),n))),
+					       (Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])  f &&
+		     lcheck contexte (vapp(big_p,VZero)) a 
+		     then (vapp(big_p,big_n))
+		     else failwith "Iter synth fail"
+  | DFold(alpha,p,n,xs,f,a) ->
+     let type_p = (Pi(Global"n",Nat,(Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
+     if lcheck contexte VStar alpha &&
+       lcheck contexte (big_step_eval_inTm type_p []) p &&
+       lcheck contexte VNat n &&
+       lcheck contexte (big_step_eval_inTm (Vec(alpha,n)) []) xs &&
+       lcheck contexte (big_step_eval_inTm 
+			  (Pi(Global"n",Nat,
+			      Pi(Global"xs",Vec(alpha,Inv(BVar 0)),
+				 Pi(Global"a",alpha,
+				    Pi(Global"NO",Inv(Appl(Appl(Ann(p,type_p),n),xs)),
+				       Inv(Appl(Appl(Ann(p,type_p),Succ(n)),DCons(a,xs)))))))) []) f &&
+       lcheck contexte (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) []) a				 
+     then (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
+     else failwith "DFOld synth something goes wrong" 
+  | Trans(gA,p,a,b,q,x) ->
+     let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
+     if lcheck contexte VStar gA &&
+       lcheck contexte (big_step_eval_inTm gA []) a &&
+       lcheck contexte (big_step_eval_inTm gA []) b &&
+       lcheck contexte  (big_step_eval_inTm (Id(gA,a,b)) []) q &&  
+       lcheck contexte (big_step_eval_inTm type_p []) p && 
+       lcheck contexte (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) x
+     then (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
+     else failwith "Trans synth fail"           			       
+  | _ -> failwith "HAHAHAHAHAHAHA"
+    
+
+
+
+
+     
 let rec contexte_to_string contexte = 
   match contexte with 
   | [] -> "|" 	    
@@ -431,6 +597,9 @@ let rec contexte_to_string contexte =
   | _ -> failwith "Must not append"
 
 
+
+
+     
 (*=check_abs *)
 let rec check contexte inT ty steps = 
   match inT with 
@@ -695,3 +864,6 @@ and synth contexte exT steps =
 
 
 (* let () = Printf.printf "%s" (print_report (check [] (read "(lamba x x)") (big_step_eval_inTm (read "(-> * *)") []) "")) *)
+
+
+

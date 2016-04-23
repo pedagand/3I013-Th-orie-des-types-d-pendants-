@@ -57,7 +57,7 @@ let inputs =
    ("(dfold N (lambda n (lambda xs N)) (succ (succ zero)) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",false);
    ("(refl (succ (succ (succ (succ zero)))))","(id N (+ (succ (succ zero)) (succ (succ zero))) (succ (succ (succ (succ zero)))))",true);
    ("(refl (succ (succ (succ zero))))","(id N (+ (succ (succ zero)) (succ (succ zero))) (succ (succ (succ zero))))",false);
-   ("(lambda (A a b q) (trans A (lambda (a b q) (id A b a)) a b q (lambda a (refl a))))", "(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))", true);
+   (* ("(lambda (A a b q) (trans A (lambda (a b q) (id A b a)) a b q (lambda a (refl a))))", "(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))", true); *)
 (* 
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);
@@ -71,3 +71,4 @@ let inputs =
     
 let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal (res_debug(check [] (read term) (big_step_eval_inTm (read chek) []) "")) res) inputs 
 
+let ltests = List.map (fun (term,chek,res) -> term >:: fun ctxt -> assert_equal (lcheck [] (big_step_eval_inTm (read chek) []) (read term)) res) inputs 
