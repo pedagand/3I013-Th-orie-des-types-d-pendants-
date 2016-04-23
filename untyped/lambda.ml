@@ -329,6 +329,7 @@ let rec bind i bv t =
   | Succ(n) -> Succ(bind i bv n)
   | Iter(n,f,a) -> Iter((bind i bv n),(bind i bv f),(bind i bv a))
 
+(*=reduction_forte *)
 let reduction_forte env t 
   = 
   let rec eval t =
@@ -345,6 +346,7 @@ let reduction_forte env t
     | None -> t
   in
   eval t
+(*=End *)
 
 (*
 let rec reduction_forte env t  = 

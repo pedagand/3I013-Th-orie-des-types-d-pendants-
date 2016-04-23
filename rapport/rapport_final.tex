@@ -104,16 +104,14 @@
 
 \section{Introduction}
 
-Les languages de programmations sont entièrements définis par leur compilateur.....
 
-\attention{Parti pris pas inintéressant : présenter la chaîne de
-  compilation d'un langage et se concentrer sur le typage. Pourquoi
-  pas.}
+Un language de compilation est entièrement définis par son compilateur. En effet ce logiciel permet de traduire
+des programmes écris dans un language en instructions pour le compilateur....
 
 Il sera donc question dans ce rapport de comprendre le typage, une des étapes de la chaine de compilation.
 Pour résumé brievement le compilateur 
-traduit d'abord le texte écris par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite analysable 
-par un programme. %bof
+traduit d'abord le texte écris par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite utilisable
+dans un algorithme.
 Si le compilateur ne génère pas d'erreur durant cette étape on dit que le programme est syntaxiquement correcte. Cependant 
 le programmeur à pu écrire des instructions tels que ``x = 2 + true''. Meme si cette instruction est syntaxiquement correcte, celle ci 
 n'a aucun sens. Il lui faut maintenant à partir de l'arbre de syntaxe abstraite générer du code assembleur, un code compréhensible 
@@ -607,9 +605,13 @@ Ici nous n'avons aucun moyen de vérifier avant normalisation que le
 premier argument de \Ifte{} est effectivement un booléen : nous ne
 pouvons donc pas garantire la bonne évaluation de notre terme.
 
-\todo{Tu pourrais faire une petite remarque sur l'encodage objet des
-  booléens, qui est effectivement utilisé dans des langages purement
-  objets comme Self, Smalltalk ou Pharo. Donner le code correspondant en Java.} 
+\begin{remark}
+  Les languages orientés objets permettent de représenter ce type d'encodage d'une manière particulière.
+  Voici la représentation avec le language JAVA:
+
+  \todo{Roman: je ne sais pas encore avec quel moyen je vais le rediger}
+\end{remark}
+
 
 \subsubsection{Les entiers de Church}
 
@@ -799,9 +801,9 @@ L'évaluation d'une paire ainsi que celle des projections est la suivante:
 
 Implémentons donc ces règles:
 \codefrom{untyped}{lambda}{pair_evaluation}
-La réduction des membres de la paire se fera dans la fonction d'évaluation
+La réduction des membres de la paire se fera dans la fonction d'évaluation.
 
-\todo{roman: rajouter les paires dans le prog}
+\todo{Roman: implémenter les paires dans le prog}
 
 \section{Le $\lambda$-calcul simplement typé}
 
@@ -814,7 +816,6 @@ types, puis nous verrons comment les utiliser en définissant des règles de typ
 \subsection{Les types}
 \label{simple_type}
 
-\todo{Utiliser les macros bool et intg pour les types int et bool}
 
 \newcommand{\intg}{\ensuremath{\mathit{int}}}
 \newcommand{\bool}{\ensuremath{\mathit{bool}}}
@@ -895,7 +896,6 @@ liste ordonnée de paires variable/type :
 \label{fig:typage-simple}
 \end{figure} 
 
-\todo{\textsc{Ne pas mettre de variables mathématiques en dehors du maths mode}}
 
 Les règles de typage sont définies en
 Figure~\ref{fig:typage-simple}. La règle (\textsc{Var}) spécifie le typage
@@ -921,19 +921,18 @@ vérifier si celui ci est applicable à notre fonction.
   Voici donc quelques exemples de dérivations de type.  Ces
   dérivations se lisent du bas vers le haut.
   
-  \todo{avec cfrac}
-  \begin{align*}
-    \cfrac{
-      \cfrac{
-        \cfrac{
-          \cfrac{x:Int\rightarrow Bool \in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash x:Int\rightarrow Bool}\:\:\:\:%level3gaucheApp
-          \cfrac{y:Int\in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash y:Int}%level3droitApp
-        }{\Gamma,x:Int\rightarrow Bool,y:Int\vdash \App{x}{y} : bool}%level2
-      }{\Gamma,x:Int\rightarrow Bool\vdash \Lam{y}{\App{x}{y}}:Int \rightarrow Bool}%level1
-    }{\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(\intg\rightarrow \bool) \rightarrow \intg \rightarrow \bool} %level0
-  \end{align*}
+  %% \todo{avec cfrac}
+  %% \begin{align*}
+  %%   \cfrac{
+  %%     \cfrac{
+  %%       \cfrac{
+  %%         \cfrac{x:Int\rightarrow Bool \in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash x:Int\rightarrow Bool}\:\:\:\:%level3gaucheApp
+  %%         \cfrac{y:Int\in \Gamma}{\Gamma,x:Int\rightarrow Bool,y:Int\vdash y:Int}%level3droitApp
+  %%       }{\Gamma,x:Int\rightarrow Bool,y:Int\vdash \App{x}{y} : bool}%level2
+  %%     }{\Gamma,x:Int\rightarrow Bool\vdash \Lam{y}{\App{x}{y}}:Int \rightarrow Bool}%level1
+  %%   }{\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(\intg\rightarrow \bool) \rightarrow \intg \rightarrow \bool} %level0
+  %% \end{align*}
 
-  \todo{avec inferrule}
   \[
   \begin{array}{c}    
 \inferrule[]%
@@ -953,9 +952,17 @@ vérifier si celui ci est applicable à notre fonction.
 
   Ce terme est donc correctement typé.
 
-
-  Tentons maintenant de type checker le terme suivant:
-  \todo{il faut que je retrouve le terme que j'avais présenté à frederic}
+  Voici un second exemple de typage
+  \[
+  \begin{array}{c}
+    \inferrule[]
+              {\inferrule[]{}{\Gamma\vdash (\Lam{x}{x}):A\rightarrow \bool }%level1gauche
+               \:\:\:\inferrule[]{}{\Gamma\vdash true:A}%level1droit 
+              }
+              {\Gamma\vdash \App{(\Lam{x}{x})}{\true}:\bool}%level0
+              
+  \end{array}  
+  \]  
 
 \end{example}
 
@@ -1015,9 +1022,8 @@ effectue la meme opération en fournissant l'information de typage manquante.
 
 \paragraph{Implémentation :}
 
-\todo{Introduire ces définitions :}
 
-Commençons par implémenter nos termes dans notre programme:
+Commençons par implémenter nos termes bidirectionnels dans notre programme:
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
 
@@ -1033,32 +1039,34 @@ aisément les règles de typage
 (Figure~\ref{fig:typage-simple-bi-direct}), qui sont désormais
 entièrement dirigées par la syntaxe et donc purement algorithmique.
 
-\todo{Écrire ``bidirectionnel'', pas ``bi-directionnel''}
 
 \begin{figure}
 \label{regles typage bidirectionnel}
 
-\todo{Arrêter les cfracs. Utiliser les macros de construction de termes.}
-
 \[\begin{array}{c}
 \boxed{\Gamma\vdash T \ni t}
 \bigskip\\
-\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-      {\Gamma \vdash T \ni \Lam{x}{t}}\mbox{(Abs)}
+\inferrule[(Abs)]
+          {T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
+          {\Gamma \vdash T \ni \Lam{x}{t}}
 \medskip\\
-\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-      {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} 
+\inferrule[(Inv)]
+          {\Gamma \vdash t \in T' \:\: T=T'}
+          {\Gamma\vdash T \ni inv(t)}
 \bigskip\\
 \boxed{\Gamma\vdash t \in T}
 \bigskip\\
-\cfrac{x:T \in \Gamma}
-      {\Gamma \vdash x \in T }\mbox{(Var)}
+\inferrule[(Var)]
+          {x:T \in \Gamma}
+          {\Gamma \vdash x \in T }
 \medskip\\
-\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-      {\Gamma\vdash \App{f}{s}\in B}\mbox{(App)} 
+\inferrule[(App)]
+          {\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s}
+          {\Gamma\vdash \App{f}{s}\in B}
 \medskip\\
-\cfrac{\Gamma\vdash T \ni t}
-      {\Gamma\vdash \Ann{t}{T} \in T}\mbox{(Ann)} 
+\inferrule[(Ann)]
+          {\Gamma\vdash T \ni t}
+          {\Gamma\vdash \Ann{t}{T} \in T}
 \end{array}\]
 
 
@@ -1066,7 +1074,6 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 \label{fig:typage-simple-bi-direct} 
 \end{figure}   
 
-\todo{\textsc{Remplace les emph bizarres par du maths mode}}
 
 Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de
 vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
@@ -1222,7 +1229,6 @@ car nous n'avions pas la garantie qu'une forme normale forte existait.
 D'après les propriétés de la section précédente nous disposons de la certitude que les termes acceptés  par le type-checker sont fortement normalisants. De plus, les types ne sont plus utiles lors de l'évaluation. 
 Nous allons donc implémenter une stratégie de réduction forte sur les \(\lambda\)-termes non typés de la Section~\ref{sec:untyped}.
 
-\attention{faire converger avec l'implémentation}\todo{Cela manque d'explication. En particulier, il faudrait expliquer la différence entre les neutres et les valeurs.} Voici la spécification de notre réduction forte : \todo{arrêter les cfracs}
 \begin{align*}
   &\cfrac{}
   {x \Downarrow x}&\mbox{Var} \\
@@ -1238,31 +1244,19 @@ La traduction de nos termes bidirectionnels vers les termes non typés
 est transparente : il suffit d'effacer les annotations de type.
 
 \begin{example}
-  \todo{Prendre un des exemples d'opération sur les entiers de Church
-    où la réduction faible ``s'arrête trop tôt'' à notre goût et où la
-    réduction forte donne ``ce que l'on veut''.}
+  \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport}
 \end{example}
 
 \paragraph{Implémentation:}
 \label{reduction_petits_pas}
 
-\todo{Transférer le code dans \texttt{untyped} et mettre à jour le texte.}
+\codefrom{untyped}{lambda}{reduction_forte}
 
-\codefrom{typed}{lambda}{reduction_forte}
+La fonction de réduction forte est très similaire à la fonction d'évaluation précédente.
+Avec les garanties offertes par notre système de type nous pouvons à présent évaluer l'ensemble du
+terme. 
 
-Pour l'application \emph{SAppl} si le terme est une \emph{SAbs} on 
-effectue la substitution puis l'on évalue le terme obtenu.
-Sinon on évalue d'abord celui ci, si l'on obtient une \emph{SAbs} 
-on appel la réduction sur l'application de celui ci au terme de droite
-sinon il ne nous reste plus qu'à évaluer le terme de droite.
 
-Lorsque l'on réduit sous une \emph{SAbs} il nous faut d'abord libérer l'ensemble des
-variables qui lui sont liées. Il nous faut les reliers une fois la réduction terminé 
-nous avons donc implémenter une fonction pour effectuer cette opération RELIE LIBRE. %a changer
-Elle prend en argument le nom de la variable libre, la valeur de son indice de de Bruijn 
-et le terme. Son code est assez triviale nous ne le présenterons donc pas ici.
-
-Les autres règles ne nécéssitent pas de commentaires particuliers.
 
 \subsection{Extensions} 
 
@@ -1273,8 +1267,8 @@ Nous introduirons aussi un nouveau type, le produit cartésien.
 \subsubsection{Les entiers}
 \label{entier_type}
 
-Commençons cette fois-ci par les entiers étant donné que \attention{ce n'est pas vrai, si ?} le type \emph{Nat}
-est déja présent dans notre language. \attention{si ce n'est en effet pas justifié, commencer la présentation par les booléens, qui sont plus simples.}
+Commençons cette fois-ci par les entiers étant donné que le type \emph{int}
+est déja présent dans notre language.
 Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé 
 cependant, maintenant que nous disposons de termes bi-directionnels, il est important
 de préciser leur phase.
@@ -1283,11 +1277,8 @@ de préciser leur phase.
 %Pour les types dépendants je dirais que ceux dans les exTm c'est parceque on veut pouvoir avoir de la dépendance
 %sur eux mais je sais pas si ici je peux en parler
 \emph{Succ} et \emph{Zero} sont des termes inférables étant donné que
-l'on peut aisément vérifier qu'ils appartiennent au type des
-entiers. \todo{Dire quelque chose sur \iter{}. Remarque : j'ai décidé
-  de mettre le type de retour \Var{A} dans la définition de \iter{},
-  pour être raccord avec ce que l'on fait avec les types
-  dépendants. Et plus de question de ``pourquoi on synthétise ?''}.
+leur type sera toujours \emph{Nat} contrairement à \emph{iter}.
+Celui ci est un terme synthétisable étant donné que son type diffère en fonction de ses arguments.
 Les règles de typage bidirectionnelles sont donc:
 \begin{align*}
   &\cfrac{\:}
@@ -1297,24 +1288,10 @@ Les règles de typage bidirectionnelles sont donc:
   &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A\rightarrow A \ni f}
   {\Gamma\vdash \mathrm{iter}\: A\: n\: f\: a \in A}&\mbox{(Iter)} \\
 \end{align*}
-
-Les règles d'évaluations restent inchangés.
+Les arguments de \emph{Iter} sont composés d'un type $A$ qui correspond au type de retour et de termes vérifiables.
+Les règles d'évaluations restent inchangés. 
 
 \subsubsection{Les booléens}
-
-%% \inferrule[(true)]
-%%           {{}}
-%%           {\Gamma\vdash \true{} : \bool{}}
-%% \qquad
-%% \inferrule[(false)]
-%%           {{}}
-%%           {\Gamma\vdash \false{} : \bool{}}
-%% \medskip\\
-%% \inferrule[(If-else)]
-%%           {t1:\bool{} \\
-%%            t2:T \\
-%%            t3:T}
-%%          {\Gamma\vdash \ifte{t1}{t2}{t3} : T}
 
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
@@ -1322,50 +1299,45 @@ En suivant la meme demarche que  pour les entiers les
 constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes inférables}
 et le constructeur \emph{Ifte} un \emph{terme synthétisable}
 
-
-
-Nous pouvons désormais typer nos booléens de la manière suivante: \todo{Stop les cfracs}
-\begin{align*}
-  &\cfrac{}
-  {\Gamma\vdash Bool \ni true}&\mbox{(True)} \\
-  &\cfrac{}
-  {\Gamma\vdash Bool \ni false}&\mbox{(False)} \\
-  &\cfrac{\Gamma\vdash Bool \ni c \:\: \Gamma\vdash t \in C \:\: \Gamma\vdash e \in C}
-  {\Gamma\vdash \mathrm{ifte}\: C\: c\: t\: e\in C}&\mbox{(Ifte)}
-\end{align*}
+Nous pouvons désormais typer nos booléens de la manière suivante: 
+\[
+\begin{array}{c}
+\inferrule[(true)]
+          {{}}
+          {\Gamma\vdash \true{} : \bool{}}
+\qquad
+\inferrule[(false)]
+          {{}}
+          {\Gamma\vdash \false{} : \bool{}}
+\medskip\\
+\inferrule[(If-else)]
+          {\Gamma\vdash \bool\ni t1{} \\
+           \Gamma\vdash t2\in T \\
+           \Gamma\vdash t3\in T}
+         {\Gamma\vdash \ifte{t1}{t2}{t3} : T}
+\end{array}
+\]
 
 \subsubsection{Le produit cartésien}
 \label{produit_cartesien}
 
-\todo{Extraire la partie syntaxe \& réduction et l'amener en Section~\ref{paires}}
-\todo{Définir des commandes pour écrire les paires et les 2 projections}
-
-Le produit cartésien est un objet mathématique qui est définit comme
-un ensemble composé de deux éléments.
-Cela nous permettra de crée des collections d'éléments. 
-Pour ce faire nous allons implémenter un nouveau constructeur:
-les \emph{paires} sous la forme \emph{($a\,b$)}
-Nous allons aussi rajouter deux éliminateurs, les projections:
-\emph{$\pi 0$} qui appliqué à une paire 
-permet de retourner son premier élément ainsi que \emph{$\pi 1$} pour le second élément.
-
+\todo{Roman :changer ces commandes elles sont nuls mais ça bugue}
+\newcommand{\pair}[2]{\ensuremath{#1,#2}}
+\newcommand{\produit}[2]{\ensuremath{#1\times#2}}
+\newcommand{\projun}[1]{\ensuremath{\pi0.#1}}
+\newcommand{\projdeux}[1]{\ensuremath{\pi1.#1}}
 
 
 Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
-introduisons donc un type \emph{produit} $A \times B$. \todo{Étendre formellement la grammaire des types \Var{T}}
+introduisons donc un type \emph{produit cartésien} \produit{A}{B}.
+\begin{bnf}
+  T &::= &....... &\mbox{(Types)} \\
+  &|& T\times T & \mbox{(Produit cartésien)} \\
+\end{bnf}
 
-Nous allons maintenant évaluer nos termes, \todo{en dire plus}
-\begin{align*}
-  &\cfrac{a \Downarrow a' \:\: b\Downarrow b'}
-  {a,b \Downarrow a',b'}\\
-  &\cfrac{a\Downarrow a'}
-  {p.\pi0(a,b)\Downarrow a'}\\
-  &\cfrac{b\Downarrow b'}
-  {p.\pi1(a,b)\Downarrow b'}\\
-\end{align*}
+Pour l'évaluation les règles sont les mêmes que en section~\ref{paires}.
 
-
-Règle de typages des paires: \todo{en dire plus.}
+Règle de typages des paires: 
 \begin{align*}
   &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
   {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
@@ -1374,14 +1346,16 @@ Règle de typages des paires: \todo{en dire plus.}
   &\cfrac{\Gamma\vdash p \in A\times B} 
   {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
 \end{align*}
-
-%on peut parler du fait que de faire des paires de paires c'est long a checker c'est mieux de faire des vecteurs pour ça?
+Pour les \emph{projections} il nous faut vérifier le fait que l'argument est bien de type \emph{produit} afin de
+retourner le type du membre de gauche ou droit.
 
 \paragraph{Implémentation :}
 Nous allons maintenant implémenté le produit cartésien afin d'enrichir
-notre language. Tout d'abord, il nous faut introduire trois nouveaux
-termes ainsi qu'un nouveau constructeurs de type. \todo{c'est (trop !) brut de
-  décoffrage !}
+notre language. Il nous faut rajouter le type \emph{produit} ainsi que la \emph{paire}
+et les \emph{projection}.
+Les projections sont des \emph{termes synthétisables} étant donné que leur type dépend de la paire
+sur laquelle ils sont appliqués. La paire un \emph{terme vérifiable} car chaque paire à un type statique.
+
 \emph{Type}
 \codefrom{typed}{lambda}{type_pair}
 \emph{inTermes}
@@ -1398,28 +1372,21 @@ Il nous faut maintenant implémenter les règles de typage au sein de notre algo
 \emph{synth}
 \codefrom{typed}{lambda}{synth_pair}
 
-Rien à commenter, \todo{ha bon ? Très bien alors}
 
 
 \subsection{Réduction forte à grands pas}
 
-\todo{expliquer plus en détail l'utilisation du type name}
-%le type name prend tous son sens dans cette section car il nous permet....
-
 
 Dans cette section, nous décrivons une implémentation alternative de
-la réduction forte qui exploite le language de programmation
-fonctionnelle que l'on utilise pour \emph{implémenter} la réduction
-forte.  \attention{Ceci n'est pas clair : tu es en train de donner une
-  semi-définition de ``normaliser''. Je préférerai que tu développes
-  l'aspect ``hack'' où l'on exploite les fonctions de OCaml pour
-  modéliser les fonctions de notre langage. Idée clé : on implémente
-  un interpréteur pour nos termes en utilisant les termes OCaml pour
-  interpréter les fonctions de notre langage} Elle a aussi pour effet
-d'évaluer complètement les termes, on peut le constater du fait \if 0
-a changer \fi que les fonctions prenenent des \emph{inTermes} ou des
-\emph{exTermes} en entrée et retourne des valeurs.  Les valeurs ne
-sont plus réinterprétées par la suite.
+la réduction forte qui permet d'exploiter certaines fonctionnalités des languages de programmation fonctionnelle.
+Etant donné que nous utilisons un language de programmation utilisant déja
+des mechanismes de définition de fonction ou d'application .Il est
+intéressant de les exploiter afin de crée un interpréteur pour nos termes
+en utilisant les termes Ocaml ce qui nous permettra de ne pas à
+gérer certains méchanismes.
+
+Nous allons donc devoir définir de nouveaux termes et un moyen de
+faire une bijection entre notre ancien ensemble de terme et le nouveau.
 
 Comme nous l'avons vu dans la Section~\ref{reduction_forte} \if 0 peut
 etre dans la partie safety je ne me souviens plus a voir \fi la
@@ -1435,39 +1402,13 @@ ceux obtenus avec la réduction à petits pas
   valeurs, puis de la ``fonction de réification'' pour aller des
   valeurs aux formes normales.}
 
-Voici donc le code correspondant en Ocaml: \todo{Il va falloir m'en
-  dire \emph{beaucoup} plus.}
-%
+\newcommand{\VLam}{\lstinline!VLam!}
+Voici donc le code correspondant en Ocaml:
+
 \codefrom{typed}{lambda}{value}
 \codefrom{typed}{lambda}{neutral}
 
-\todo{Définir et utiliser des macros pour les termes OCaml, comme VLam.}
-
-\newcommand{\VLam}{\lstinline!VLam!}
-
-La value \emph{VLam} est représentée par une fonction Ocaml \todo{je
-  vois mais \emph{pourquoi} ?}.  Commençons par donner le code de
-celle ci, nous le commenterons après\todo{Non, commente au fil de
-  l'eau, c'est plus digeste}.
-
-\todo{Commenter l'annotation}
-\codefrom{typed}{lambda}{big_step_eval_exTm_ann}
-\todo{Commenter la variable}
-\codefrom{typed}{lambda}{big_step_eval_exTm_var}
-\todo{Commenter l'application}
-\codefrom{typed}{lambda}{big_step_eval_exTm_app}
-\todo{Commenter vapp}
-\codefrom{typed}{lambda}{vapp}
-\todo{Commenter inv}
-\codefrom{typed}{lambda}{big_step_eval_inTm_inv}
-
-L'abstraction est interprétée comme une fonction anonyme Ocaml puis évaluons 
-le terme sous le $\lambda$. \todo{étoffer}
-
-\codefrom{typed}{lambda}{big_step_eval_inTm_abs}
-
-%revoir ce paragraphe.
-\todo{Donner cette explication plus tôt}
+Le terme \fun{VLam} correspond à l'abstraction.
 Cette représentation nous permet de reconsidérer la façon de voir la 
 réduction d'une abstraction. En effet lorsque l'on applique une abstraction
 à un terme, nous avions introduit la substitution, qui consiste à remplacer les occurences 
@@ -1487,42 +1428,64 @@ variable.
   $u$, retournant ainsi $v_u$ comme souhaité.
 \end{example}
 
-\todo{donner cette explication plus tôt}
+
+\codefrom{typed}{lambda}{big_step_eval_exTm_ann}
+Comme nous l'avons vu précédement le type contenue dans une \emph{annotation} n'est pas utile lors de l'évaluation.
+Il nous faut simplement évalué le terme \fun{x} contenue dans celle ci.
+
+\codefrom{typed}{lambda}{big_step_eval_exTm_var}
+
+La fonction \emph{VFree} permet simplement à partir d'un nom de créer
+une \emph{NFree} à l'intérieure d'un \emph{VNeutral}. Nous avons besoins
+de crée des \fun{neutral} pour tous les termes dont l'évaluation est terminé.
+Cette opération pouvant être utile assez régulièrement on décide d'implémenter
+une fonction à part entière dont voici le code:
+\codefrom{typed}{lambda}{vfree}
+
+Pour les variables liées il faut retrouvé dans le contexte la variable à laquel elle est associé.
+Cela nous permettra de définire cette variable comme un argument de la fonction anonyme que nous avons
+crée avec l'évaluation de l'abstraction.
+
+\codefrom{typed}{lambda}{big_step_eval_exTm_app}
+
 Pour évaluer l'application d'un coup, il est nécessaire de créer une fonction externe \emph{vapp}.
 Nous appelons donc cette fonction avec le couple formé de l'évaluation des deux membres de l'application.
 Si le membre de gauche est une \emph{VLam}, il nous suffit d'appliquer celle-ci \emph{dans Ocaml},
-étant donné qu'elle est encodée par une fonction anonyme OCaml.
+étant donné qu'elle est encodée par une fonction anonyme OCaml. Sinon l'évaluation ne peut pas continuer
+il faut donc crée un terme neutre \fun{NApp} contenant nos deux arguments. Voici donc le code de
+la fonction \fun{vapp}:
 
-La fonction \emph{VFree} permet simplement à partir d'un nom de créer
-une \emph{NFree} à l'intérieure d'un \emph{VNeutral}.  Elle permet
-simplement d'alléger le code de la fonction. \todo{C'est du morse
-  ça. Explique le ``pourquoi'', pas ``comment'' cette fonction opère
-  (je peux lire le code, merci)}
+\codefrom{typed}{lambda}{vapp}
 
-\codefrom{typed}{lambda}{vfree}
+\codefrom{typed}{lambda}{big_step_eval_inTm_inv}
+Pour \emph{l'inversion} il nous faut évaluer le \emph{terme synthétisable} que ce constructeur contient.
 
-
+\codefrom{typed}{lambda}{big_step_eval_inTm_abs}
+Comme nous l'avons vu précédement, nous avons crée une \fun{value} correspondant
+à l'abstraction, \fun{VLam}. Nous avons déja vu son rôle, ici il sera simplement question
+de crée une fonction anonyme Ocaml dont le corp correpond à l'évaluation du terme
+contenu dans l'abstraction.
 
 Une fois nos termes évaluées dans OCaml, il nous faut maintenant les
 \emph{réifier} sous forme de termes de notre
-$\lambda$-calcul. \todo{La phrase suivante ne dit rien de très
-  utile. Il serait plus utile de décrire le type de la fonction (et
-  donc ses arguments) et donner une intuition de son comportement.} Il
-s'agit donc implémenter cette fonction permettant de faire cette
-association, voici son code:
+$\lambda$-calcul. Cette fonction doit nécéssairement prendre un argument de
+type{value} afin de nous retourner un \emph{terme synthétisable}.
 
 \codefrom{typed}{lambda}{value_to_inTm}
 \codefrom{typed}{lambda}{neutral_to_exTm}
 
-Le type \emph{name} nous permet de faire la distinction entre les
-variables réellement libre et celles que nous souhaitons liée \todo{ce
-  n'est pas le plus important : il faut expliquer que l'on est forcé
-  d'introduire des variables artificielles pendant la réification, que
-  l'on veut lier à leur abstraction (contrairemnt aux
-  \lstinline!FreeVar!)}.  Afin de transformer une value \emph{VLam} en
+
+
+Le type \fun{name} nous permet de faire la distinction entre les
+variables réellement libre et celles que nous souhaitons liée.
+Afin de transformer une value \emph{VLam} en
 \emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
 libre, et celle ci se distinguera des autres variables libres car elle
-possède un indice.  Nous allons pouvoir exploiter ceci avec l'aide de
+possède un indice grace au type \fun{name}.
+Nous avons un problème quand au nom de la variable de l'abstraction, lorsque nous
+avons transformé celle ci en fonction anonyme nous avons perdu cette information.
+Nous somme donc forcé d'introduire des variables artificielles grâce \fun{gensym}.
+Nous allons pouvoir exploiter ceci avec l'aide de
 la fonction \fun{boundfree} dont voici le code:
 \codefrom{typed}{lambda}{boundfree}
 
