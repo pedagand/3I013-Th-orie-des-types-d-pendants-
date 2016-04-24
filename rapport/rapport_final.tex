@@ -106,14 +106,14 @@
 
 
 Un language de compilation est entièrement définis par son compilateur. En effet ce logiciel permet de traduire
-des programmes écris dans un language en instructions pour le compilateur....
+des programmes écris dans un language en instructions pour le compilateur.... \todo{à terminer}
 
 Il sera donc question dans ce rapport de comprendre le typage, une des étapes de la chaine de compilation.
 Pour résumé brievement le compilateur 
 traduit d'abord le texte écris par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite utilisable
 dans un algorithme.
 Si le compilateur ne génère pas d'erreur durant cette étape on dit que le programme est syntaxiquement correcte. Cependant 
-le programmeur à pu écrire des instructions tels que ``x = 2 + true''. Meme si cette instruction est syntaxiquement correcte, celle ci 
+le programmeur à pu écrire des instructions tels que \lstinline!x = 2 + true!. Meme si cette instruction est syntaxiquement correcte, celle ci 
 n'a aucun sens. Il lui faut maintenant à partir de l'arbre de syntaxe abstraite générer du code assembleur, un code compréhensible 
 par les microprocesseurs. Le compilateur peut très bien générer une suite d'instructions assembleurs correspondant à l'expression 
 précédente, c'est durant l'execution du programme que le processeur va interompre le programme. Lorsque ces erreurs surviennent il est 
