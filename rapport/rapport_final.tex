@@ -300,8 +300,8 @@ Formellement, la substitution est définie par récursion sur le $\lambda$-terme
 \begin{align*}
     \subst{x}{x}{u} &\triangleq u \\
     \subst{x}{y}{u} &\triangleq x & (x \neq y)\\
-    \subst{\lambda y.t}{x}{u} &\triangleq \lambda x.\subst{t}{x}{u} \\
     \subst{\lambda x.t}{x}{u} &\triangleq \lambda x.t \\
+    \subst{\lambda y.t}{x}{u} &\triangleq \lambda y. (\subst{t}{x}{u}) & (x \neq y)\\
     \subst{(t\: v)}{x}{u} &\triangleq \subst{t}{x}{u}\: \subst{v}{x}{u}
 \end{align*}
 
