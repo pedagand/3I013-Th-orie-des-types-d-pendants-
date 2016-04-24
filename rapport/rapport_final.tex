@@ -1381,7 +1381,11 @@ Nous pouvons désormais typer nos booléens de la manière suivante:
 %% \newcommand{\projun}[1]{\ensuremath{\pi0.#1}}
 %% \newcommand{\projdeux}[1]{\ensuremath{\pi1.#1}}
 
-Règle de typages des paires\todo{ il va falloir en dire un peu plus}:  \todo{Non aux cfracs!} \todo{Utiliser les macros Pair, Fst et Snd}
+Les projections sont des \emph{termes synthétisables} étant donné que
+leur type dépend de la paire sur laquelle ils sont appliqués. La paire
+un \emph{terme vérifiable} car chaque paire à un type statique.
+
+Règle de typages des paires\todo{ il va falloir en dire un peu plus comme, par exemple, qui est synthétisable et pourquoi.}:  \todo{Non aux cfracs!} \todo{Utiliser les macros Pair, Fst et Snd}
 \begin{align*}
   &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
   {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
@@ -1398,26 +1402,22 @@ droit.
 Concernant l'évaluation, les règles sont les mêmes qu'en Section~\ref{paires}.
 
 \paragraph{Implémentation :}
-Nous allons maintenant implémenté le produit cartésien afin d'enrichir
-notre language. Il nous faut rajouter le type \emph{produit} ainsi que la \emph{paire}
-et les \emph{projection}.
-Les projections sont des \emph{termes synthétisables} étant donné que leur type dépend de la paire
-sur laquelle ils sont appliqués. La paire un \emph{terme vérifiable} car chaque paire à un type statique.
+Nous allons maintenant implémenter le produit cartésien afin d'enrichir
+notre language. 
 
-\emph{Type}
-\codefrom{typed}{lambda}{type_pair}
-\emph{inTermes}
-\codefrom{typed}{lambda}{inTm_pair}
-\emph{exTermes}
-\codefrom{typed}{lambda}{exTm_pair}
-\emph{value}
-\codefrom{typed}{lambda}{value_pair}
+%% En l'état, cette liste de code sans commentaire nous est inutile.
+%% \emph{Type}
+%% \codefrom{typed}{lambda}{type_pair}
+%% \emph{inTermes}
+%% \codefrom{typed}{lambda}{inTm_pair}
+%% \emph{exTermes}
+%% \codefrom{typed}{lambda}{exTm_pair}
 
-Il nous faut maintenant implémenter les règles de typage au sein de notre algotithme:
-
-\emph{check}
+L'algorithme de typage suit litéralement sa spécification bidirectionnelle :
+%
+\codefrom{typed}{lambda}{check_def}\lstinline!(...)!
 \codefrom{typed}{lambda}{check_pair}
-\emph{synth}
+\codefrom{typed}{lambda}{synth_def}\lstinline!(...)!
 \codefrom{typed}{lambda}{synth_pair}
 
 

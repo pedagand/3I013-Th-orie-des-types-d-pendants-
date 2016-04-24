@@ -476,8 +476,8 @@ let rec check contexte inT ty
     | Pair(x,y) -> 
        begin 
 	 match ty with 
-	 | Croix(a,b) -> if (check contexte x a) 
-			 then (check contexte y b) 
+	 | Croix(a,b) -> if check contexte x a
+                            && check contexte y b then true
 			 else failwith "In Pair(x,y) x is not of type a"				  
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
@@ -524,16 +524,16 @@ and synth contexte exT
 		       end 
 		     else failwith "Iter first arg must be a Nat"
 (*=End *)
-(*=synth *)
+(*=synth_pair *)
     | P0(x) -> 
        begin 
-	 match (synth contexte x) with 
+	 match synth contexte x with 
 	 | Croix(a,b) -> a
 	 | _ -> failwith "Po must be applied to a pair" 	   
        end 
     | P1(x) -> 
        begin 
-	 match (synth contexte x) with 
+	 match synth contexte x with 
 	 | Croix(a,b) -> b
 	 | _ -> failwith "P1 must be applied to a pair" 	   
        end 
