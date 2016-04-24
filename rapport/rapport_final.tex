@@ -143,6 +143,9 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 \newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
 \newcommand{\App}[2]{\ensuremath{#1\:#2}}
 \newcommand{\Var}[1]{\ensuremath{#1}}
+\newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
+\newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
+\newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
 
 \begin{bnf}
   t &::= & &\mbox{(lambda terme)} \\
@@ -768,6 +771,9 @@ Nous rappelons donc la fonction avec cette fois ci \fun{(f a)} et le prédécess
 
 \subsubsection{Les paires}
 \label{paires}
+
+\todo{Utiliser les macros Fst et Snd pour écrire les projections, et
+  Pair pour construire des paires.}
 
 La paire est une construction très répandue dans les languages fonctionnelles, 
 cela nous permet de crée un ensemble de deux éléments. Afin d'utiliser nos paires 
