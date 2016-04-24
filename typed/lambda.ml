@@ -537,7 +537,7 @@ and synth contexte exT
 	 | Croix(a,b) -> b
 	 | _ -> failwith "P1 must be applied to a pair" 	   
        end 
-(*=Pair *)
+(*=End *)
 	
 		     
 
