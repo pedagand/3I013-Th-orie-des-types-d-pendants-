@@ -1050,9 +1050,13 @@ Voici donc notre représentation des termes:
   &|& \Inv{ex} & \mbox{(inversion)}
 \end{bnf}
 
-Les deux nouveaux termes sont donc l'inversion \Inv{-} qui permet d'inclure les 
-\emph{termes synhtétisables} dans le monde des \emph{termes inférables}, l'annotation 
-effectue la meme opération en fournissant l'information de typage manquante.
+
+On a ainsi introduit l'inversion \Inv{ex}, qui permet d'inclure les
+termes synhtétisables dans le monde des termes inférables\todo{il
+  n'existe pas de termes ``inférables'', ce sont les termes
+  ``vérifiables''.}, et l'annotation \Ann{in}{T}, qui inclut les termes
+vérifiables dans le monde des termes synthétisables en fournissant
+l'information de typage manquante.
 
 \newcommand{\verif}{vérification de type}
 \newcommand{\synth}{synthèse de type}
