@@ -488,10 +488,8 @@ and synth contexte exT
 (*=End *)
 (*=synth_ann *)
     | Ann(tm, ty) ->
-       if check contexte tm ty then
-         ty 
-       else
-         failwith "Wrong annotation"
+       if check contexte tm ty then ty 
+       else failwith "Wrong annotation"
 (*=End *)
 (*=synth_var *)
     | FVar(x) -> List.assoc x contexte
