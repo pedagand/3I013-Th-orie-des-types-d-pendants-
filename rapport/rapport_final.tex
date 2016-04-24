@@ -1042,12 +1042,12 @@ Voici donc notre représentation des termes:
  
 \begin{bnf}
   ex &::= &&\mbox{(termes synthétisables)} \\
-  &|& \App{ex}{in} & \mbox{(Application)} \\
+  &|& \App{ex}{in} & \mbox{(application)} \\
   &|& \Var{x} & \mbox{(variable)} \\
-  &|& \Ann{in}{T} & \mbox{(Annotation)} \\
-  in &::= &&\mbox{(termes vérifiables} \\
-  &|& \Lam{x}{in} & \mbox{(Abstraction)} \\
-  &|& \Inv{ex} & \mbox{(Inversion)}
+  &|& \Ann{in}{T} & \mbox{(annotation)} \\
+  in &::= &&\mbox{(termes vérifiables)} \\
+  &|& \Lam{x}{in} & \mbox{(abstraction)} \\
+  &|& \Inv{ex} & \mbox{(inversion)}
 \end{bnf}
 
 Les deux nouveaux termes sont donc l'inversion \Inv{-} qui permet d'inclure les 
