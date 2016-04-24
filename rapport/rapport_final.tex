@@ -147,6 +147,10 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 \newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
 \newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
 \newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
+\newcommand{\ifte}[3]{\ensuremath{\mathsf{if}\: #1\: \mathsf{then}\: #2\: \mathsf{else}\: #3}}
+\newcommand{\true}{\ensuremath{\mathsf{true}}}
+\newcommand{\false}{\ensuremath{\mathsf{false}}}
+
 
 \begin{bnf}
   t &::= & &\mbox{(lambda terme)} \\
@@ -685,20 +689,16 @@ l'écriture des termes mais surtout de faciliter la représentation et,
 par la suite, la compilation des programmes manipulant des expressions
 booléennes.
 
-\newcommand{\ifte}[3]{\ensuremath{\mathit{if}\: #1\: \mathit{then}\: #2\: \mathit{else}\: #3}}
-\newcommand{\true}{\ensuremath{\mathit{true}}}
-\newcommand{\false}{\ensuremath{\mathit{false}}}
 
-Nous allons donc étendre la grammaire de nos $\lambda$-termes:
+Nous allons donc étendre la grammaire de nos $\lambda$-termes
 \begin{bnf}
   t &::= & (\ldots) &\mbox{(lambda terme)} \\
   &|& \true & \mbox{(true)} \\
   &|& \false & \mbox{(false)} \\
   &|& \ifte{t}{t}{t} & \mbox{(ifte)}
 \end{bnf}
-
-Et rajoutons la dans notre implémentation.
-
+%
+ainsi que notre implémentation
 %
 \codefrom{untyped}{lambda}{bool_term}
 
