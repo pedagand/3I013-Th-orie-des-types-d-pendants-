@@ -1525,7 +1525,7 @@ donc le code de la fonction \fun{vapp}:
 de crée une fonction anonyme Ocaml dont le corp correpond à l'évaluation du terme
 contenu dans l'abstraction.
 
-Une fois nos termes évalués dans OCaml, il s'agit de
+Une fois nos termes évalués dans OCaml, il s'agit de les
 \emph{réifier} sous forme de termes de notre
 $\lambda$-calcul. Cette fonction doit nécéssairement prendre un argument de
 type{value} afin de nous retourner un \emph{terme synthétisable}.
@@ -1536,15 +1536,12 @@ type{value} afin de nous retourner un \emph{terme synthétisable}.
 
 
 Le type \fun{name} nous permet de faire la distinction entre les
-variables réellement libre et celles que nous souhaitons liée.
-Afin de transformer une value \emph{VLam} en
+variables réellement libres et celles que nous souhaitons lier pendant la réification.
+Afin de transformer une valeur \lstinline!VLam f! en
 \emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
-libre, et celle ci se distinguera des autres variables libres car elle
-possède un indice grace au type \fun{name}.
-Nous avons un problème quand au nom de la variable de l'abstraction, lorsque nous
-avons transformé celle ci en fonction anonyme nous avons perdu cette information.
-Nous somme donc forcé d'introduire des variables artificielles grâce \fun{gensym}.
-Nous allons pouvoir exploiter ceci avec l'aide de
+de reification, que l'on distinguera des autres variables libres grace au type \fun{name}.
+On s'assure que les variables ainsi introduites sont fraîches en utilisant la fonction \fun{gensym}.
+Nous allons pouvoir \todo{c'est quoi ``ceci'' ?} exploiter ceci avec l'aide de
 la fonction \fun{boundfree} dont voici le code:
 \codefrom{typed}{lambda}{boundfree}
 
