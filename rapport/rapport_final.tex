@@ -1276,11 +1276,20 @@ bien typé réduit vers une valeur de ce type.
 \subsubsection{Reduction forte}
 
 \label{reduction_forte}
-Dans le \(\lambda\)-calcul non typé nous avions utilisé une stratégie d'évaluation en appel par nom
-car nous n'avions pas la garantie qu'une forme normale forte existait.
-D'après les propriétés de la section précédente nous disposons de la certitude que les termes acceptés  par le type-checker sont fortement normalisants. De plus, les types ne sont plus utiles lors de l'évaluation. 
-Nous allons donc implémenter une stratégie de réduction forte sur les \(\lambda\)-termes non typés de la Section~\ref{sec:untyped}.
+Dans le \(\lambda\)-calcul non typé, nous avions utilisé une stratégie
+d'évaluation en appel par nom car nous n'avions pas la garantie que
+les termes réduits soient fortement normalisants.  D'après les
+propriétés de la section précédente nous disposons de la certitude que
+les termes acceptés par le type-checker sont fortement
+normalisants. De plus, les types ne sont plus utiles lors de
+l'évaluation.  Nous allons donc implémenter une stratégie de réduction
+forte sur les \(\lambda\)-termes non typés de la
+Section~\ref{sec:untyped}. La réduction forte du \(\lambda\)-calcul
+simplement typé sera donc obtenue par plongement des termes
+bidirectionnels dans le fragment fortement normalisant du
+\(\lambda\)-calcul non typé.
 
+\todo{Mort au cfracs}
 \begin{align*}
   &\cfrac{}
   {x \Downarrow x}&\mbox{Var} \\
