@@ -420,7 +420,7 @@ façon suivante :
 \item Une variable \(\Var{x}\) est en forme normale ;
 \item Si \(t\) est en forme normale, alors \(\Lam{\Var{x}}{t}\) est en
   forme normale ;
-\item Si \(t\) et \(u\) sont en formes normales et que \(u\) n'est pas
+\item Si \(t\) et \(u\) sont en forme normale et que \(u\) n'est pas
   une abstraction, alors \(\App{t}{u}\) est en forme normale.
 \end{itemize}
 
@@ -502,17 +502,13 @@ Crucialement, nous avons la propriété suivante~\citep[th.3,
   forme normale de tête).
 \end{proposition}
 
+
+Il existe d'autres stratégies de réduction comme par exemple
+\emph{l'appel par valeur}, qu'implémente OCaml. Bien que plus
+efficace, l'appel par valeur diverge pour certains termes normalisant.
 Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
 pas tous fortement normalisable, on privilégiera la réduction en appel
 par nom.
-
-Il existe d'autres stratégies de réduction comme par exemple 
-\emph{normal order strategy}, \emph{l'appel par valeur}.
-Chacune des stratégie d'évaluation possède des avantages et
-des inconvénients. Dans le $\lambda$-calcul non typé nous avons
-choisis d'utiliser \emph{l'appel par nom} car c'est un très bon 
-compromis, celle ci obtient toujours la forme normale si elle 
-existe. 
 
 
 \begin{example}
