@@ -1035,7 +1035,7 @@ Nous nomerons les premiers
 les termes \emph{synthétisables} et les seconds les  termes
 \emph{vérifiables}. 
 
-\newcommand{\Inv}[1]{\ensuremath{\mathit{inv}(#1)}}
+\newcommand{\Inv}[1]{\ensuremath{\mathsf{inv}(#1)}}
 \newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
 
 Voici donc notre représentation des termes:
@@ -1071,8 +1071,8 @@ La représentation des termes bidirectionnels est sans surprise :
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
 
-Le type \lstinline!name! permet ci dessous nous permettra de mettre des entiers à la place 
-d'une chaîne de caractère, nous en reparlerons dans l'implémentation de l'évaluation.
+Le type \lstinline!name! permet ci-dessous nous permettra de mettre des entiers à la place 
+d'une chaîne de caractère\todo{description trop opérationnelle/peu motivée : ne pas en parler maintenant. On pourrait introduire name pour gérer les DefVars dans le non typé : cela simplifierai les choses.}, nous en reparlerons dans l'implémentation de l'évaluation.
 \codefrom{typed}{lambda}{name}
 
 
@@ -1087,27 +1087,31 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 \begin{figure}
 \label{regles typage bidirectionnel}
 
-\[\begin{array}{c}
+\[\begin{array}{c@{\qquad}c}
 \boxed{\Gamma\vdash T \ni t}
-\bigskip\\
-\inferrule[(Abs)]
-          {T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-          {\Gamma \vdash T \ni \Lam{x}{t}}
-\medskip\\
-\inferrule[(Inv)]
-          {\Gamma \vdash t \in T' \:\: T=T'}
-          {\Gamma\vdash T \ni inv(t)}
-\bigskip\\
+&
 \boxed{\Gamma\vdash t \in T}
 \bigskip\\
+%%
+&
 \inferrule[(Var)]
           {x:T \in \Gamma}
           {\Gamma \vdash x \in T }
 \medskip\\
+\inferrule[(Abs)]
+          {T = A \rightarrow B \\
+          \Gamma, x:A \vdash B \ni t}
+          {\Gamma \vdash T \ni \Lam{x}{t}}
+&
 \inferrule[(App)]
           {\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s}
           {\Gamma\vdash \App{f}{s}\in B}
 \medskip\\
+%%
+\inferrule[(Inv)]
+          {\Gamma \vdash t \in T' \:\: T=T'}
+          {\Gamma\vdash T \ni \Inv{t}}
+&
 \inferrule[(Ann)]
           {\Gamma\vdash T \ni t}
           {\Gamma\vdash \Ann{t}{T} \in T}
@@ -1124,7 +1128,7 @@ vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
 de synthèse.  Lors de la vérification, on connait le type $T$ et
 l'on souhaite déterminer si le terme $t$ est bien de ce
 type. Lors de la synthèse, on est en mesure, à partir d'un terme
-$t$ quelconque, de déterminer son type sans ambiguïté.  On vérifie
+$t$ quelconque, de déterminer son type \(T\) sans ambiguïté.  On vérifie
 aisément que ce système de type bi-directionnel est équivalent à celui
 présenté en Figure~\ref{fig:typage-simple}.
 
