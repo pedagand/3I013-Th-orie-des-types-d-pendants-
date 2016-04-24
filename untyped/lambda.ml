@@ -227,8 +227,10 @@ let beta t
 (*=End *)
 (*    | Let(t, b) -> Some (substitution b 0 t)*)
 
+(*=iota_sig *)
 let iota t 
   = match t with
+(*=End *)
 (*=bool_evaluation *)
   | IfThenElse (True, y, z) -> Some y
   | IfThenElse (False, y, z) -> Some z

@@ -704,6 +704,10 @@ Nous allons donc étendre la grammaire de nos $\lambda$-termes
 %
 ainsi que notre implémentation
 %
+\begin{lstlisting}
+type lambda_term = (...)
+\end{lstlisting}
+\vspace{-.7\baselineskip}
 \codefrom{untyped}{lambda}{bool_term}
 
 Pour la substitution des constructeurs \NTrue{} et \NFalse{}, les règles
@@ -733,6 +737,7 @@ ou \false{} :
 
 L'implémentation de cette réduction ne présente pas de difficulté
 particulière :
+\codefrom{untyped}{lambda}{iota_sig} \lstinline{(...)}
 \codefrom{untyped}{lambda}{bool_evaluation}
 
 
@@ -755,6 +760,10 @@ formelle du $\lambda$-calcul
 %
 ainsi que sa réalisation dans l'implémentation
 %
+\begin{lstlisting}
+type lambda_term = (...)
+\end{lstlisting}
+\vspace{-.7\baselineskip}
 \codefrom{untyped}{lambda}{nat_term}
 
 Ces trois constructeurs n'étant pas des lieurs, l'implémentation de la
@@ -776,6 +785,7 @@ La \(\iota\)-réduction de l'itération se définit ainsi:
 
 
 L'implémentation de l'évaluation suit cette spécification : \todo{Corriger le bug discuté par email}
+\codefrom{untyped}{lambda}{iota_sig} \lstinline{(...)}
 \codefrom{untyped}{lambda}{nat_evaluation}
 Nous rappelons donc la fonction avec cette fois-ci \fun{(f a)} et le prédécesseur de \fun{n}.
 
@@ -800,6 +810,12 @@ d'obtenir respectivement le premier élément ou le second de la paire.
   &|& \pi1\:t & \mbox{($\pi$1)} 
 \end{bnf}
 
+\todo{Introduire le code}
+
+\begin{lstlisting}
+type lambda_term = (...)
+\end{lstlisting}
+\vspace{-.7\baselineskip}
 \codefrom{untyped}{lambda}{pair_term}
 
 La substitution s'implémente trivialement car aucun de ces constructeurs 
@@ -822,6 +838,7 @@ La \(\iota\)-réduction est étendue aux projections de la façon suivante:
 \end{array}\]
 
 Implémentons donc ces règles:
+\codefrom{untyped}{lambda}{iota_sig} \lstinline{(...)}
 \codefrom{untyped}{lambda}{pair_evaluation}
 La réduction des membres de la paire se fera dans la fonction d'évaluation.
 
