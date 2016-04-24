@@ -1433,9 +1433,6 @@ intéressant de les exploiter afin de crée un interpréteur pour nos termes
 en utilisant les termes Ocaml ce qui nous permettra de ne pas à
 gérer certains méchanismes\todo{lesquels ?}.
 
-Nous allons donc devoir définir de nouveaux termes et un moyen de
-faire une bijection entre notre ancien ensemble de terme et le nouveau.
-
 Comme nous l'avons vu dans la Section~\ref{reduction_forte} \if 0 peut
 etre dans la partie safety je ne me souviens plus a voir \fi la
 réduction forte aboutie forcément à une forme normale, les termes que
@@ -1451,7 +1448,7 @@ ceux obtenus avec la réduction à petits pas
   valeurs aux formes normales.}
 
 \newcommand{\VLam}{\lstinline!VLam!}
-Voici donc le code correspondant en Ocaml:
+Voici donc le code correspondant \todo{correspondant à quoi ?} en Ocaml:
 
 \codefrom{typed}{lambda}{value}
 \codefrom{typed}{lambda}{neutral}
