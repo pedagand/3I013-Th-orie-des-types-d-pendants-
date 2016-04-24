@@ -994,33 +994,36 @@ fonction.
 
   Ce terme est donc correctement typé.
 
-  Voici un second exemple de typage
+\end{example}
+
+Le système de type tel que présenté est une \emph{spécification} :
+afin de l'implémenter, il nous faut effectuer des choix laissés libres
+par la spécification. Par exemple, la dérivation
+%
   \[
   \begin{array}{c}
     \inferrule[]
-              {\inferrule[]{}{\Gamma\vdash (\Lam{x}{x}):\bool \rightarrow \bool }%level1gauche
-               \:\:\:\inferrule[]{}{\Gamma\vdash \true:\bool}%level1droit 
+              {\inferrule{\Gamma, \Var{x} : ?_A \vdash \true : \bool}
+                         {\Gamma\vdash (\Lam{x}{\true}): ?_A \rightarrow \bool }%level1gauche
+               \:\:\:\inferrule[]{}{\Gamma\vdash \Lam{y}{\Var{y}}:?_A}%level1droit 
               }
-              {\Gamma\vdash \App{(\Lam{x}{x})}{\true}:\bool}%level0
+              {\Gamma\vdash \App{(\Lam{x}{\true})}{(\Lam{y}{\Var{y}})}:\bool}%level0
               
   \end{array}  
   \]  
+%
+ admet une infinité de choix possible pour le type
+\(?_A\) : on pourra choisir $?_A = \intg$ ou encore $?_A = \bool \times (\intg \to \intg)$.
 
-\end{example}
+Afin d'obtenir un algorithme, la règle typant l'application introduit
+donc une difficulté : il faut vérifier que le membre de gauche est de
+type $A \rightarrow B$ alors que l'on ne connait que $B$. Nous allons
+donc introduire une nouvelle représentation des termes afin de
+résoudre ce problème.
 
-Comme nous avons pu le constater dans le dernier exemple, il nous
-manque des informations sur le type de $f$. Avec la specification ce n'est pas génant
-car celle ci est manipulée par des êtres humains qui peuvent chercher cette information
-sans savoir précisément où elle se trouve.
-Pour un algorithme c'est déja beaucoup plus compliqué de trouver le type
-de la fonction, celui ci ne peut chercher que dans le contexte pour
-trouver de l'information.
-En effet lorsque l'on vérifie une application il faut vérifier que le
-membre de gauche est de type $A \rightarrow B$ alors que l'on ne
-connait que \emph{B}. Nous allons donc introduire une nouvelle
-représentation de nos termes afin de résoudre ce problème.
+\subsubsection{Syntaxe bi-directionnelle}
 
-\subsubsection{Syntaxe bi-directionnel}
+\todo{bi-directionnel $\to$ bidirectionnel}
 
 Les applications dont le membre de gauche est une abstractions posent
 problème, comme vu dans l'Exemple~\ref{probleme:type_simple}.  Nous
