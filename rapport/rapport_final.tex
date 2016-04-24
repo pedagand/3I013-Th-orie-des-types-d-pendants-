@@ -324,14 +324,28 @@ raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} o
 
 
 \begin{example}
-  Soit le terme t = \Lam{y}{\App{x}{y}} qui coresspond au terme \\
-  Ocaml \fun{Abs(``y''Appl(BoundVar 1,BoundVar 0))}.
-  Voici le déroulement de l'appel à la fonction \fun{substitution t 0 FreeVar''z''}: \\
-  -\fun{Abs(``y''Appl(BoundVar 1,BoundVar 0))}$\rightarrow$ \fun{substitution Appl(BoundVar 1,BoundVar 0) 1 FreeVar''z''} \\
-  -\fun{Appl(BoundVar 1,BoundVar 0)}$\rightarrow$ \fun{substitution (BoundVar 1) 1 FreeVar''z''} \\
-  -\fun{BoundVar 1} $\rightarrow$ \fun{FreeVar ``z''} \\ 
-  -\fun{BoundVar 0} $\rightarrow$ \fun{BoundVar 0} \\
-  Cela nous renvoie donc le terme  \fun{Abs(``y''Appl(FreeVar ``z'',BoundVar 0))}
+  Soit le terme t = \Lam{y}{\App{x}{y}} où \Var{x} est liée à
+  l'abstraction la plus proche (indice 0).
+
+  En OCaml, ce terme est représenté par 
+  %
+  \begin{lstlisting}
+    Abs ("y", Appl (BoundVar 1, BoundVar 0))
+  \end{lstlisting}
+
+  Voici le déroulement de l'appel à la fonction de substitution sur \Var{x} :
+  \begin{lstlisting}
+      substitution t 0 (FreeVar "z")
+  ->  substitution (Abs ("y", Appl (BoundVar 1, BoundVar 0))) 0 (FreeVar "z")
+  ->  Abs("y", substitution (Appl (BoundVar 1,BoundVar 0)) 1 (FreeVar "z"))
+  ->  Abs("y", Appl(substitution (BoundVar 1) 1 (FreeVar "z"), 
+                    substitution (BoundVar 0) 1 (FreeVar "z")))
+  ->  Abs("y", Appl(FreeVar "z", 
+                    substitution (BoundVar 0) 1 (FreeVar "z")))
+  ->  Abs("y", Appl(FreeVar "z", BoundVar 0))
+  \end{lstlisting}
+
+  Nous obtenons donc le terme attendu, soit \Lam{\Var{y}}{\App{\Var{z}}{\Var{y}}}.
 \end{example}
 
 \begin{proposition}
