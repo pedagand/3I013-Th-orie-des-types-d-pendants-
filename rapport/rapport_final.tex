@@ -195,7 +195,7 @@ défini récursivement de la façon suivante
 Comme les abstractions lient les variables, elles sont comunéments appelées des \emph{lieurs}
 
 \begin{example}
-  Dans le terme suivant \(\Lam{x}{\Lam{y}{\App{\App{\Var{x}}{\Var{y}}}{\Var{z}}}}\), 
+  Dans le terme \(\Lam{x}{\Lam{y}{\App{\App{\Var{x}}{\Var{y}}}{\Var{z}}}}\), 
   les variables $\Var{x}$ et $\Var{y}$ sont liées tandis que la variable $\Var{z}$ est libre 
 \end{example}
 
@@ -204,10 +204,11 @@ Un terme ne contenant aucune occurrence de variable \emph{libre} est dit \emph{c
 
 \begin{example}  
   \label{example:ouvert-clos}  
-  Dans le $\lambda$-terme \App{(\Lam{x}{\Lam{y}{\App{x}{y}}})}{\Var{y}}, la
-  variable \Var{x} est liée ainsi que la première occurence de la
-  variable \Var{y}. Cependant, la variable \Var{y} à l'extérieur des
-  parenthèse est libre.
+  Dans le $\lambda$-terme
+  \App{(\Lam{x}{\Lam{y}{\App{x}{y}}})}{\Var{y}}, la variable \Var{x}
+  ainsi que la première occurence de la variable \Var{y} sont
+  liées. Cependant, la seconde occurence de variable \Var{y} est
+  libre.
 \end{example}
 
 \begin{remark}
