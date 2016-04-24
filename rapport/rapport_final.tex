@@ -1457,7 +1457,7 @@ Le terme \fun{VLam} correspond à l'abstraction.
 Cette représentation nous permet de reconsidérer la façon de voir la 
 réduction d'une abstraction. En effet lorsque l'on applique une abstraction
 à un terme, nous avions introduit la substitution, qui consiste à remplacer les occurences 
-des variables liée à ce terme. La transformation d'une abstraction consiste donc à 
+des variables liées à ce terme. La transformation d'une abstraction consiste donc à 
 créer une fonction anonyme puis à évaluer le terme contenu dans celle-ci en ajoutant dans le 
 contexte la variable liée à cette fonction. Lors de l'évaluation d'une variable liée, on va
 retrouver dans le contexte l'argument correspondant. On aura donc bien le comportement attendu
@@ -1468,8 +1468,8 @@ variable.
   Soit le terme \(\App{\Lam{x}{\Var{x}}}{u}\), avec la méthode
   d'évaluation à petit pas, on évalue en effectuant $\subst{x}{x}{u}$
   ce qui nous donne comme résultat \emph{u}.  Avec l'évaluation à
-  grands pas on évalue le terme $\Lam{x}{x}$ en la fonction OCaml
-  \lstinline!fun arg -> arg! ce qui appliqué à la traduction $v_u$ de
+  grands pas, on évalue le terme $\Lam{x}{x}$ en la fonction OCaml
+  \lstinline!fun arg -> arg! ce qui \todo{relire :} appliqué à la traduction $v_u$ de
   $u$, retournant ainsi $v_u$ comme souhaité.
 \end{example}
 
