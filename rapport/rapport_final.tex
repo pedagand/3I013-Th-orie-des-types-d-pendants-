@@ -69,6 +69,7 @@
 
 \newcommand{\todo}[1]{\textcolor{red}{#1}}
 \newcommand{\attention}[1]{\textcolor{orange}{#1}}
+\newcommand{\question}[1]{\textcolor{green}{#1}}
 \newcommand{\etc}{\textit{etc.}}
 
 \newenvironment{bnf}
@@ -93,7 +94,7 @@
 \todo{Mettre un coup de ispell}
 
 \begin{abstract} 
-  Ce document représente l'ensemble du travail effectué durant l'unité d'enseignement 3I013 de l'\textsc{upmc}. \attention{Cet abstract n'apporte pas grand chose : le supprimer ?}
+  Ce document représente l'ensemble du travail effectué durant l'unité d'enseignement 3I013 de l'\textsc{upmc}. \todo{Cet abstract n'apporte pas grand chose : le supprimer ?}
 \end{abstract}
 
 \setcounter{tocdepth}{2}
@@ -549,7 +550,7 @@ Dans les sections suivantes, nous verrons lorsque nous introduirons
 les systèmes de type que l'on peut statiquement garantir que les
 termes acceptés par l'analyse de type sont fortement normalisants.
 
-\attention{Question classique : si tu ne peux plus écrire de
+\question{si tu ne peux plus écrire de
   programmes qui ne terminent pas, tu n'es plus Turing complet donc tu
   es strictement moins expressif que tous les langages de
   programmation existants. Est-ce gênant ?}
@@ -721,7 +722,7 @@ ou \false{} :
 \[\begin{array}{c}
   \inferrule{{}}
             {\ifte{\true}{u}{v} \Red u}
-  \medskip\\
+  \qquad
   \inferrule{{}}
             {\ifte{\false}{u}{v} \Red v}
   \medskip\\
@@ -759,12 +760,12 @@ ainsi que sa réalisation dans l'implémentation
 Ces trois constructeurs n'étant pas des lieurs, l'implémentation de la
 substitution est triviale.
 
-La \(\iota\)-réduction du terme \NIter se définit ainsi:
+La \(\iota\)-réduction de l'itération se définit ainsi:
 %
 \[\begin{array}{c}
   \inferrule{{}}
             {\iter\:(\succs\:n)\:f\:a\Red \iter\:n\:f\:(\App{f}{a})}
-  \medskip\\
+  \qquad
   \inferrule{{}}
             {\iter\:\zero\:f\:a\Red a}
   \medskip\\
@@ -774,9 +775,12 @@ La \(\iota\)-réduction du terme \NIter se définit ainsi:
 
 
 
-Voici l'implémentation de l'évaluation de iter:
+L'implémentation de l'évaluation suit cette spécification : \todo{Corriger le bug discuté par email}
 \codefrom{untyped}{lambda}{nat_evaluation}
-Nous rappelons donc la fonction avec cette fois ci \fun{(f a)} et le prédécesseur de \fun{n}.
+Nous rappelons donc la fonction avec cette fois-ci \fun{(f a)} et le prédécesseur de \fun{n}.
+
+\question{Contrairement à la spec, notre iota-réduction ne fait que
+  les étapes de calcul : pourquoi ?}
 
 \subsubsection{Les paires}
 \label{paires}
@@ -785,12 +789,12 @@ Nous rappelons donc la fonction avec cette fois ci \fun{(f a)} et le prédécess
   Pair pour construire des paires.}
 
 La paire est une construction très répandue dans les languages fonctionnelles, 
-cela nous permet de crée un ensemble de deux éléments. Afin d'utiliser nos paires 
+cela nous permet de crée un ensemble de deux éléments. Afin d'extraire les éléments d'une paire,
 nous utiliserons les projections $\pi0$ et $\pi1$. Celles ci nous permettent 
 d'obtenir respectivement le premier élément ou le second de la paire.
 
 \begin{bnf}
-  t &::= &....... &\mbox{(lambda terme)} \\
+  t &::= & (\ldots) &\mbox{(lambda terme)} \\
   &|& (t,t) & \mbox{(pair)} \\
   &|& \pi0\:t & \mbox{($\pi$0)} \\
   &|& \pi1\:t & \mbox{($\pi$1)} 
