@@ -510,13 +510,13 @@ Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
 pas tous fortement normalisable, on privilégiera la réduction en appel
 par nom.
 
-
+\todo{Utiliser les macros Lam, etc.}
 \begin{example}
   \begin{align*}
     (((\lambda x.x) (\lambda y.y)) z) &\leadsto ((\lambda y.y) z) \\
     & \leadsto z
   \end{align*}
-  Ici \Var{y} n'est plus réductible c'est donc la forme normale du terme.
+  Ici \Var{z} n'est plus réductible, c'est donc la forme normale du terme.
 \end{example}
 
 Le lambda calcul étant un modèle de calcul universel, il permet de 
