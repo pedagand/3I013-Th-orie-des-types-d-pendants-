@@ -1222,9 +1222,9 @@ libres, que l'on synthétise à partir  du type qui leur a été assigné dans l
          {\Gamma\vdash f\:s\in B}\mbox{(App)}}\\
 
   
-  Comme la spécification nous l'indique il est d'abord nécéssaire de synthétiser le type de $f$.
+  Comme la spécification nous l'indique, il est d'abord nécéssaire de synthétiser le type de $f$.
   Il faut ensuite s'assurer que le type retourné par la synthèse est bien de la forme $A\rightarrow B$
-  puis en extraire le type $A$ pour pouvoir cette fois ci vérifier $s$. Si cette vérification réussi
+  puis en extraire le type $A$ pour pouvoir cette fois-ci vérifier $s$. Si cette vérification réussi,
   on retourne le type $B$.
  
 \codefrom{typed}{lambda}{synth_appl}

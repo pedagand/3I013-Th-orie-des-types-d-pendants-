@@ -501,10 +501,8 @@ and synth contexte exT
        begin
          match fTy with
          | Fleche(a, b) -> 
-            if check contexte s a then
-              b
-            else 
-              failwith "Argument type invalid"
+            if check contexte s a then b
+            else failwith "Argument type invalid"
          | _ -> failwith "Function type invalid"
        end
 (*=End *)
