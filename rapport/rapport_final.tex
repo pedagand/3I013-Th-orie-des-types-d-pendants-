@@ -1148,6 +1148,7 @@ présenté en Figure~\ref{fig:typage-simple}.
   
   Nous disposons d'une fonction de vérification \lstinline!check!
   permettant d'éffectuer la vérification de type du terme \fun{inT}.
+  \todo{finir cette phrase.}
   où \fun{contexte} nous permet de stocker
   des paires associants une variable à son type. Il nous faut aussi
   donner le type d'entrée \fun{ty}.
@@ -1159,9 +1160,12 @@ présenté en Figure~\ref{fig:typage-simple}.
   %
   \codefrom{typed}{lambda}{check_def} 
   
-\item[$\bullet$] \boxed{\cfrac{T = A \rightarrow B \: \Gamma, x:A \vdash B \ni t}
-  {\Gamma \vdash T \ni \lambda x. t}\mbox{(Abs)}} \\
+\item[$\bullet$] \boxed{\inferrule[Abs]
+                                  {T = A \rightarrow B\\ \Gamma, x:A \vdash B \ni t}
+                                  {\Gamma \vdash T \ni \lambda x. t}} \\
   
+  \todo{relire}
+
   Une fois que l'on veut vérifier le terme cotnenus dans une abstraction il nous libérer l'ensemble des variables
   qui lui sont associées. Avec notre représentation ``locally nameless'' nous somme obliger d'effectuer une substitution
   contrairement à une représentation composé uniquement des indices de de Bruijn.
@@ -1181,7 +1185,7 @@ présenté en Figure~\ref{fig:typage-simple}.
 
 Afin de tester l'égalité de type, l'égalité structurelle de OCaml est
 suffisante puisque les types sont purement statiques (contrairement
-aux types dépendants qui, eux, calculent).
+aux types dépendants qui, eux, calculeront).
 %
 \codefrom{typed}{lambda}{check_inv}
   

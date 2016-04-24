@@ -464,11 +464,7 @@ let rec check contexte inT ty
        end
 (*=End *)
 (*=check_inv *)
-    | Inv(t) -> 
-       let tyT = synth contexte t in
-       begin 
-       tyT = ty
-       end 
+    | Inv(t) -> ty = synth contexte t
 (*=End *)
 (*=inTm_extensions *)
     | True -> if ty = Bool then true else false
