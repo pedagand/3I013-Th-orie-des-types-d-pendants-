@@ -1251,13 +1251,15 @@ Section~\ref{calculer_dans_le_lambda_calcul}.
 
 \subsubsection{Méta-théorie}
 
+\todo{Il y a encore des emph pour écrire des maths}
+
 Le typage permet d'obtenir, à la compilation, des garanties quant à la
 bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés complementaires d'un système de type :
 \begin{description}
 \item[Progrès :] si un terme \(t\) est correctement typé alors soit \(t\) est une valeur, soit il
  existe une réduction telle que \(t \leadsto t'\)
 \item[Préservation :] si un terme \emph{t} a le type \emph{T}
-et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type \emph{T}
+et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type~\emph{T}
 \end{description}
 
 La conjonction de ces deux propriétés donne le slogan ``un programme
