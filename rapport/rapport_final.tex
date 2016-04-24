@@ -1424,6 +1424,7 @@ L'algorithme de typage suit litéralement sa spécification bidirectionnelle :
 
 \subsection{Réduction forte à grands pas}
 
+\todo{Utiliser/définir des macros pour mentionner le code. Ne pas utiliser emph.}
 
 Dans cette section, nous décrivons une implémentation alternative de
 la réduction forte qui exploite le fait que nous implémentons notre évaluateur dans un language fonctionnel.
@@ -1473,18 +1474,24 @@ variable.
   $u$, retournant ainsi $v_u$ comme souhaité.
 \end{example}
 
+\todo{Attention à ne pas jeter du code en pâture au lecteur : il doit
+  y avoir une cohérence entre le texte et le code.}
 
-\codefrom{typed}{lambda}{big_step_eval_exTm_ann}
-Comme nous l'avons vu précédement le type contenue dans une \emph{annotation} n'est pas utile lors de l'évaluation.
+Comme nous l'avons vu précédement le type contenue dans une annotation n'est pas utile lors de l'évaluation.
 Il nous faut simplement évalué le terme \fun{x} contenue dans celle ci.
+%
+\codefrom{typed}{lambda}{big_step_eval_exTm_ann}
+
+\todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_var}
 
 La fonction \emph{VFree} permet simplement à partir d'un nom de créer
-une \emph{NFree} à l'intérieure d'un \emph{VNeutral}. Nous avons besoins
-de crée des \fun{neutral} pour tous les termes dont l'évaluation est terminé.
-Cette opération pouvant être utile assez régulièrement on décide d'implémenter
-une fonction à part entière dont voici le code:
+une \emph{NFree} à l'intérieure d'un \emph{VNeutral} \todo{cela ne
+  veut rien dire : donne le rôle de cette fonction, pas ce qu'elle fait.}. Nous avons besoins de crée des \fun{neutral} pour
+tous les termes dont l'évaluation est terminé.  Cette opération
+pouvant être utile assez régulièrement on décide d'implémenter une
+fonction à part entière dont voici le code:
 \codefrom{typed}{lambda}{vfree}
 
 Pour les variables liées il faut retrouvé dans le contexte la variable à laquel elle est associé.
