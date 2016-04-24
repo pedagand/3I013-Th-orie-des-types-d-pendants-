@@ -1296,14 +1296,17 @@ nos termes bidirectionnels vers les termes non typés est transparente
   \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport}
 \end{example}
 
-\paragraph{Implémentation:}
-%\label{reduction_petits_pas}
+\paragraph{Implémentation :}
+\label{reduction_petits_pas}
 
+La fonction de réduction forte est très similaire à la fonction
+d'évaluation précédente
+%
 \codefrom{untyped}{lambda}{reduction_forte}
-
-La fonction de réduction forte est très similaire à la fonction d'évaluation précédente.
-Avec les garanties offertes par notre système de type nous pouvons à présent évaluer l'ensemble du
-terme. 
+%
+Avec les garanties offertes par notre
+système de type nous pouvons à présent contracter \emph{tous} les
+redexes d'un terme sans risque de divergence.
 
 
 
