@@ -439,8 +439,16 @@ normal \(t'\) tel que \(t \Conv t'\). Un terme \(t\) est
 réduction à partir de \(t\). Un terme fortement normalisable est,
 \textit{a fortiori}, un terme normalisable.
 
-\begin{example}[Terme non normalisable]
-  \todo{\(\omega = \Lam{\Var{x}}{\App{(\App{x}{x})}{(\App{x}{x})}}\)}
+\begin{example}
+ \label{paradoxe}
+  Le terme suivant n'admet pas de forme normale :
+  %
+  \begin{align*}
+    \omega &\triangleq (\lambda x. x\: x) (\lambda x. x\: x) \\
+           &\leadsto (x x)[x \mapsto \lambda x. x\: x] \\
+           &\leadsto (\lambda x. x\: x) (\lambda x. x\: x) \\
+           &\leadsto \ldots \\
+  \end{align*}
 \end{example}
 
 \begin{example}[Terme normalisable mais pas fortement normalisable]
@@ -517,21 +525,6 @@ par nom.
     & \leadsto z
   \end{align*}
   Ici \Var{z} n'est plus réductible, c'est donc la forme normale du terme.
-\end{example}
-
-Le lambda calcul étant un modèle de calcul universel, il permet de 
-d'écrire des termes/programmes qui ne terminent pas : ceux-ci n'ont pas 
-de forme normale. 
-
-\begin{example}
- \label{paradoxe}
-  Le terme suivant n'admet pas de forme normale :
-  %
-  \begin{align*}
-  (\lambda x. x\: x) (\lambda x. x\: x) &\leadsto (x x)[x \mapsto \lambda x. x\: x] \\
-                                        &\leadsto (\lambda x. x\: x) (\lambda x. x\: x) \\
-                                        &\leadsto \ldots \\
-  \end{align*}
 \end{example}
 
 
