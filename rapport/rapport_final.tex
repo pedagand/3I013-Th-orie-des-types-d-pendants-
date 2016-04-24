@@ -1029,16 +1029,11 @@ Les applications dont le membre de gauche est une abstractions posent
 problème car il faut leur calculer un type sans nécessairement avoir cette information à disposition immédiate.  Nous
 allons donc partitionner les \(\lambda\)-termes en deux catégories :
 d'une part, les termes dont on peut automatiquement synthétiser le
-type (et que l'on peut donc placer à gauche d'une application) et ceux
-pour lesquels il faudra fournir une annotation de type.
-
-
-Nous nomerons les termes pouvant se trouver à gauche d'une application
-les termes \emph{synthétisables} et les autres termes
-\emph{vérifiables}.  Le problème étant le manque d'information quant
-au type des termes inférables nous allons étendre le langage des
-termes avec une \emph{annotation} permettant de spécifier cette
-information.
+type (que l'on peut donc placer à gauche d'une application) et ceux
+pour lesquels il faudra fournir une annotation de type (annotation que l'on saura vérifier efficacement).
+Nous nomerons les premiers
+les termes \emph{synthétisables} et les seconds les  termes
+\emph{vérifiables}. 
 
 \newcommand{\Inv}[1]{\ensuremath{\mathit{inv}(#1)}}
 \newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
