@@ -348,7 +348,6 @@ raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} o
   Nous obtenons donc le terme attendu, soit \Lam{\Var{y}}{\App{\Var{z}}{\Var{y}}}.
 \end{example}
 
-
 \subsubsection{$\beta$-réduction}
 \label{reduction}
 
@@ -390,11 +389,12 @@ t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
 \ldots \Red t'\).
 
 \begin{example}
-  Soit le terme \(\App{(\Lam{x}{\Lam{y}{\App{y}{x}}})}{z}\).  Ce terme est
-  sous la forme d'une application ayant une abstraction comme membre
-  de gauche. La réduction consiste à substituer la variable liée dans
-  la première abstraction par le membre droit de l'application. On obtient donc 
-   \(\Lam{y}{\App{y}{z}}\)
+  Soit le terme \(\App{(\Lam{x}{\Lam{y}{\App{y}{x}}})}{z}\).  Ce terme
+  contient un redex : il est composé d'une application ayant une
+  abstraction comme membre de gauche. La réduction consiste à
+  substituer la variable liée dans la première abstraction par le
+  membre droit de l'application. Son contracté est
+  \(\Lam{y}{\App{y}{z}}\)
 \end{example}
 
 \begin{example}
