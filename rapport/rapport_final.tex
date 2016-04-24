@@ -211,17 +211,19 @@ Un terme ne contenant aucune occurrence de variable \emph{libre} est dit \emph{c
   libre.
 \end{example}
 
-\begin{remark}
-\label{problemelibreliee}
-Le problème avec cette représentation est que le terme \Lam{\Var{x}}{\Var{x}} et \Lam{\Var{y}}{\Var{y}} sont considérés comme distincts 
-à cause du nom de leurs variable, or ce n'est pas le cas. Il faut donc introduire la notion 
-d'$\alpha$-équivalence.
-\end{remark}
 
 \subsubsection{$\alpha$-équivalence}
 \label{alpha_equiv}
+\label{problemelibreliee}
 
 \newcommand{\equivAlpha}{\mathop{\equiv_\alpha}}
+
+Le problème avec cette représentation est que les termes
+\Lam{\Var{x}}{\Var{x}} et \Lam{\Var{y}}{\Var{y}} sont \textit{a
+  priori} distincts du fait des noms de variable utilisés. Or cette
+distinction n'est pas souhaitable : ces deux termes représentent de
+façon équivalent la fonction identité, indépendamment du choix de nom
+de variable. Nous introduisons donc la notion d'$\alpha$-équivalence.
 
 On considère que deux termes sont \(\alpha\)-équivalents si et seulement si ils sont 
 égaux au renommage de leur variables liées près. 
