@@ -150,6 +150,9 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 \newcommand{\ifte}[3]{\ensuremath{\mathsf{if}\: #1\: \mathsf{then}\: #2\: \mathsf{else}\: #3}}
 \newcommand{\true}{\ensuremath{\mathsf{true}}}
 \newcommand{\false}{\ensuremath{\mathsf{false}}}
+\newcommand{\zero}{\ensuremath{\mathsf{zero}}} 
+\newcommand{\succs}{\ensuremath{\mathsf{succ}}}
+\newcommand{\iter}{\ensuremath{\mathsf{iter}}}
 
 
 \begin{bnf}
@@ -734,34 +737,30 @@ particulière :
 
 \subsubsection{Les entiers}
 
-\newcommand{\zero}{\ensuremath{\mathit{zero}}} 
-\newcommand{\succs}{\ensuremath{\mathit{succ}}}
-\newcommand{\iter}{\ensuremath{\mathit{iter}}}
 \newcommand{\nat}{\ensuremath{\mathit{nat}}}
 \newcommand{\NZero}{\lstinline!Zero!}
 \newcommand{\NSucc}{\lstinline!Succ!}
 \newcommand{\NIter}{\lstinline!Iter!}
 
-Tout comme pour les booléens, il nous faut enrichire notre grammaire:
-
+Tout comme pour les booléens, il nous faut enrichire la grammaire
+formelle du $\lambda$-calcul
+%
 \begin{bnf}
   t &::= & (\ldots) &\mbox{(lambda terme)} \\
   &|& \zero & \mbox{(zero)} \\
   &|& \succs\: t & \mbox{(succ)} \\
   &|& \iter\: t\:t\:t & \mbox{(iter)}
 \end{bnf}
-
-Voici les trois constructeurs primitifs \zero{},\succs{} et \iter{} dans notre 
-implémentation.
-
-
+%
+ainsi que sa réalisation dans l'implémentation
+%
 \codefrom{untyped}{lambda}{nat_term}
 
-Ces trois constructeurs ne sont pas non plus considérer comme des lieurs, nous 
-n'incrémenterons donc pas la valeur de \fun{var}
+Ces trois constructeurs n'étant pas des lieurs, l'implémentation de la
+substitution est triviale.
 
 La \(\iota\)-réduction du terme \NIter se définit ainsi:
-
+%
 \[\begin{array}{c}
   \inferrule{{}}
             {\iter\:(\succs\:n)\:f\:a\Red \iter\:n\:f\:(\App{f}{a})}
