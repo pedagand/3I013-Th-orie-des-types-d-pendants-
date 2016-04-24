@@ -1281,28 +1281,16 @@ d'évaluation en appel par nom car nous n'avions pas la garantie que
 les termes réduits soient fortement normalisants.  D'après les
 propriétés de la section précédente nous disposons de la certitude que
 les termes acceptés par le type-checker sont fortement
-normalisants. De plus, les types ne sont plus utiles lors de
-l'évaluation.  Nous allons donc implémenter une stratégie de réduction
-forte sur les \(\lambda\)-termes non typés de la
-Section~\ref{sec:untyped}. La réduction forte du \(\lambda\)-calcul
-simplement typé sera donc obtenue par plongement des termes
-bidirectionnels dans le fragment fortement normalisant du
-\(\lambda\)-calcul non typé.
+normalisants.
 
-\todo{Mort au cfracs}
-\begin{align*}
-  &\cfrac{}
-  {x \Downarrow x}&\mbox{Var} \\
-  &\cfrac{t \Downarrow \: \lambda x.v \:\: \subst{v}{x}{t'}\Downarrow v'}
-  {t\:t'\Downarrow \: v'}&\mbox{Appl redex} \\
-  &\cfrac{t \Downarrow \: n \:\: v \Downarrow v'}
-  {t\:t'\Downarrow \: n \: v'}&\mbox{Appl} \\
-  &\cfrac{e \Downarrow \: v}
-  {\lambda x.t \Downarrow \: \lambda x.v}&\mbox{Abs}
-\end{align*}
-
-La traduction de nos termes bidirectionnels vers les termes non typés
-est transparente : il suffit d'effacer les annotations de type.
+De plus, les types ne sont plus utiles lors de l'évaluation.  Nous
+allons donc implémenter une stratégie de réduction forte sur les
+\(\lambda\)-termes non typés de la Section~\ref{sec:untyped}. La
+réduction forte du \(\lambda\)-calcul simplement typé sera donc
+obtenue par plongement des termes bidirectionnels dans le fragment
+fortement normalisant du \(\lambda\)-calcul non typé. La traduction de
+nos termes bidirectionnels vers les termes non typés est transparente
+: il suffit d'effacer les annotations de type.
 
 \begin{example}
   \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport}
