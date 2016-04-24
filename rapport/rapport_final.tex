@@ -802,18 +802,23 @@ d'obtenir respectivement le premier élément ou le second de la paire.
 
 \codefrom{untyped}{lambda}{pair_term}
 
-La substitution s'éffectue sans incrémenter \fun{var} car aucuns de ces constructeurs 
-ne sont des lieurs.
-L'évaluation d'une paire ainsi que celle des projections est la suivante:
+La substitution s'implémente trivialement car aucun de ces constructeurs 
+n'est un lieur.
+La \(\iota\)-réduction est étendue aux projections de la façon suivante:
+%
 \[\begin{array}{c}
-  \inferrule{{t\Red t'\:\:\:\:u\Red u'}}
-            {(t,u)\Red (t',u')}
+  \inferrule{}
+            {\Fst{\Pair{u}{v}} \Red u}
+  \qquad
+  \inferrule{}
+            {\Snd{\Pair{u}{v}} \Red v}
   \medskip\\
-  \inferrule{{t \Red (u,v)}}
-            {\pi0 t\Red u}
-  \medskip\\
-  \inferrule{{t \Red (u,v)}}
-            {\pi1 t\Red v}
+  \inferrule{t \Red t'}
+            {\Fst{t} \Red \Fst{t'}}
+  \qquad
+  \inferrule{t \Red t'}
+            {\Snd{t} \Red \Snd{t'}}
+
 \end{array}\]
 
 Implémentons donc ces règles:
