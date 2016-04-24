@@ -317,10 +317,10 @@ La substitution de la variable liée \lstinline!var! par le terme
 %
 \codefrom{untyped}{lambda}{substitution}
 
-L'argument \fun{var} va nous permettre de compter le nombre de \emph{lieurs} traversés.
-Cette valeur correspondra donc à la valeur de la variable liée à substituer. C'est pour cette
+L'argument \fun{var} compte le nombre de \emph{lieurs} traversés.
+Cette valeur correspond donc à la valeur de la variable liée à substituer. C'est pour cette
 raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} on test l'égalité entre 
-\fun{var} et \fun{x}.
+\fun{var} et \fun{x} et effectue la substitution le cas échéant.
 
 
 \begin{example}
