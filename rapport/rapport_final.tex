@@ -148,7 +148,7 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 \newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
 \newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
 \newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
-\newcommand{\ifte}[3]{\ensuremath{\mathsf{if}\: #1\: \mathsf{then}\: #2\: \mathsf{else}\: #3}}
+\newcommand{\ifte}[4][]{\ensuremath{\mathsf{if}_{#1}\: #2\: \mathsf{then}\: #3\: \mathsf{else}\: #4}}
 \newcommand{\true}{\ensuremath{\mathsf{true}}}
 \newcommand{\false}{\ensuremath{\mathsf{false}}}
 \newcommand{\zero}{\ensuremath{\mathsf{zero}}} 
@@ -1367,32 +1367,21 @@ Nous pouvons désormais typer nos booléens de la manière suivante:
 \medskip\\
 \inferrule[(If-else)]
           {\Gamma\vdash \bool\ni t1{} \\
-           \Gamma\vdash t2\in T \\
-           \Gamma\vdash t3\in T}
-         {\Gamma\vdash \ifte{t1}{t2}{t3} : T}
+           \Gamma\vdash t2\in A \\
+           \Gamma\vdash t3\in A}
+         {\Gamma\vdash \ifte[A]{t1}{t2}{t3} : A}
 \end{array}
 \]
 
 \subsubsection{Le produit cartésien}
 \label{produit_cartesien}
 
-\todo{Roman :changer ces commandes elles sont nuls mais ça bugue}
-\newcommand{\pair}[2]{\ensuremath{#1,#2}}
-\newcommand{\produit}[2]{\ensuremath{#1\times#2}}
-\newcommand{\projun}[1]{\ensuremath{\pi0.#1}}
-\newcommand{\projdeux}[1]{\ensuremath{\pi1.#1}}
+%% \newcommand{\pair}[2]{\ensuremath{#1,#2}}
+%% \newcommand{\produit}[2]{\ensuremath{#1\times#2}}
+%% \newcommand{\projun}[1]{\ensuremath{\pi0.#1}}
+%% \newcommand{\projdeux}[1]{\ensuremath{\pi1.#1}}
 
-
-Nous ne disposons actuellement pas d'un type permettant de caractériser nos \emph{paires},
-introduisons donc un type \emph{produit cartésien} \produit{A}{B}.
-\begin{bnf}
-  T &::= &....... &\mbox{(Types)} \\
-  &|& T\times T & \mbox{(Produit cartésien)} \\
-\end{bnf}
-
-Pour l'évaluation les règles sont les mêmes que en section~\ref{paires}.
-
-Règle de typages des paires: 
+Règle de typages des paires\todo{ il va falloir en dire un peu plus}:  \todo{Non aux cfracs!} \todo{Utiliser les macros Pair, Fst et Snd}
 \begin{align*}
   &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
   {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
@@ -1401,8 +1390,12 @@ Règle de typages des paires:
   &\cfrac{\Gamma\vdash p \in A\times B} 
   {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
 \end{align*}
-Pour les \emph{projections} il nous faut vérifier le fait que l'argument est bien de type \emph{produit} afin de
-retourner le type du membre de gauche ou droit.
+
+Pour les projections, il nous faut vérifier le fait que l'argument est
+bien de type produit afin de retourner le type du membre de gauche ou
+droit.
+
+Concernant l'évaluation, les règles sont les mêmes qu'en Section~\ref{paires}.
 
 \paragraph{Implémentation :}
 Nous allons maintenant implémenté le produit cartésien afin d'enrichir
