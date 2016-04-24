@@ -1322,7 +1322,7 @@ Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé
 cependant, maintenant que nous disposons de termes bi-directionnels, il est important
 de préciser leur phase.
 
-\todo{Utiliser les macros nat, succs, zero, etc.} \todo{stop aux cfracs}
+\todo{Utiliser les macros intga, succs, zero, iter, etc.} \todo{stop aux cfracs}
 
 %alors la il me faut une justification peut etre plus précise car j'en vois une pour les types dépendants mais pas pour ici
 %Pour les types dépendants je dirais que ceux dans les exTm c'est parceque on veut pouvoir avoir de la dépendance
@@ -1330,7 +1330,7 @@ de préciser leur phase.
 \succs{} et \zero{} sont des termes \todo{inférables} étant donné que
 leur type sera toujours \emph{Nat}. À l'inverse, on exige que l'itérateur soit annoté par son type de retour :
 celui-ci est donc  synthétisable.
-Les règles de typage bidirectionnelles sont donc :
+Les règles de typage bidirectionnel sont donc :
 \begin{align*}
   &\cfrac{\:}
   {\Gamma\vdash Nat \ni \mathrm{Zero}}&\mbox{(Zero)} \\
@@ -1339,7 +1339,7 @@ Les règles de typage bidirectionnelles sont donc :
   &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A\rightarrow A \ni f}
   {\Gamma\vdash \mathrm{iter}\: A\: n\: f\: a \in A}&\mbox{(Iter)} \\
 \end{align*}
-Les arguments de \emph{Iter} sont composés d'un type $A$ qui correspond au type de retour et de termes vérifiables.
+%
 Les règles d'évaluations restent inchangés. 
 
 \subsubsection{Les booléens}
