@@ -901,7 +901,7 @@ sont normalisables. Le but est donc de formaliser une règle de typage pour chac
 
 \subsubsection{Spécification}
 
-Afin de faciliter la lecture et la compréhension nous allons dans 
+Afin de faciliter la lecture et la compréhension, nous allons dans 
 un premier temps donner les règles de typage pour les termes appartenants au noyau 
 du language. Nous donnerons les autres règles dans les sections suivantes.
 
@@ -941,22 +941,21 @@ liste ordonnée de paires variable/type :
 
 
 Les règles de typage sont définies en
-Figure~\ref{fig:typage-simple}. La règle (\textsc{Var}) spécifie le typage
-des variables. Cette expression se lit en partant du numérateur pour
-déduire le dénumérateur : supposons que la variable \Var{x} de type
-\Var{T} soit présente dans le contexte, alors on conclut que le type
-de la variable \Var{x} est \Var{T}.  La règle (\textsc{Abs}) spécifie
-le typage des lambda abstractions. L'abstraction construit un type de
-la forme \(A \Rightarrow B\) : il faut donc que la variable associée
-au lambda terme soit de type \(A\) et le résultat de type \(B\).  La
-règle (\textsc{App}) spécifie le typage de l'application.  Dans la
-Section~\ref{reduction:call_by_name}, nous avions vu que seul les
-redex étaient réductible. Dans un language de programmation appliquer
-un terme n'étant pas une fonction n'a pas de sens. C'est pour cette
-raison qu'il nous faut vérifier que le membre gauche de notre application
-est bien est bien une abstraction de type $A\rightarrow B$.
-De plus on vérifie que le membre droit est bien du type $A$ afin de
-vérifier si celui ci est applicable à notre fonction.
+Figure~\ref{fig:typage-simple}. La règle (\textsc{Var}) spécifie le
+typage des variables. Cette expression se lit en partant du numérateur
+pour déduire le dénumérateur : supposons que la variable \Var{x} de
+type \Var{T} soit présente dans le contexte, alors on conclut que le
+type de la variable \Var{x} est \Var{T}.  La règle (\textsc{Abs})
+spécifie le typage des lambda abstractions. L'abstraction construit un
+type fonction de la forme \(A \Rightarrow B\) : il faut donc que la
+variable associée au lambda terme soit de type \(A\) et le résultat de
+type \(B\).  La règle (\textsc{App}) spécifie le typage de
+l'application.  Dans un language de programmation, appliquer un terme
+n'étant pas une fonction n'a pas de sens. On s'assure donc que le
+membre gauche de notre application est bien de type $A\rightarrow B$,
+pour $A$ et $B$ quelconque.  De plus on vérifie que l'argument de la
+fonction est bien de type $A$, correspondant au domaine de la
+fonction.
 
 
 \begin{example}
