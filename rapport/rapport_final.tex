@@ -1201,9 +1201,8 @@ terme synthétisable et renvoie le type de celui-ci.
                               {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}} \\
 
   Nous somme ici en synthèse c'est à dire que nous devons retourner un type.
-  Essayons de traduire la spécification de façon algorithmique. Si la vérification
-  de $t$ de type $T$ est vraie alors il nous faut retourner $T$
-  
+  Si $t$ est effectivement de type $T$, alors il suffit de retourner $T$.
+  %
 \codefrom{typed}{lambda}{synth_ann}
 
 
