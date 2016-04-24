@@ -1482,6 +1482,10 @@ Il nous faut simplement évalué le terme \fun{x} contenue dans celle ci.
 %
 \codefrom{typed}{lambda}{big_step_eval_exTm_ann}
 
+Il en est de même pour l'inversion :
+\codefrom{typed}{lambda}{big_step_eval_inTm_inv}
+
+
 \todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_var}
@@ -1498,27 +1502,30 @@ Pour les variables liées il faut retrouvé dans le contexte la variable à laqu
 Cela nous permettra de définire cette variable comme un argument de la fonction anonyme que nous avons
 crée avec l'évaluation de l'abstraction.
 
+\todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
+
 \codefrom{typed}{lambda}{big_step_eval_exTm_app}
 
-Pour évaluer l'application d'un coup, il est nécessaire de créer une fonction externe \emph{vapp}.
-Nous appelons donc cette fonction avec le couple formé de l'évaluation des deux membres de l'application.
-Si le membre de gauche est une \emph{VLam}, il nous suffit d'appliquer celle-ci \emph{dans Ocaml},
-étant donné qu'elle est encodée par une fonction anonyme OCaml. Sinon l'évaluation ne peut pas continuer
-il faut donc crée un terme neutre \fun{NApp} contenant nos deux arguments. Voici donc le code de
-la fonction \fun{vapp}:
+Pour évaluer l'application d'un coup, il est nécessaire de créer une
+fonction externe \todo{qu'est-ce qu'une ``fonction externe'' ?}
+\emph{vapp}.  Nous appelons donc cette fonction avec le couple formé
+par l'évaluation de la fonction et son argument.  Si la fonction est une abstraction, il nous suffit d'appliquer celle-ci
+\emph{dans Ocaml}, étant donné qu'elle est encodée par une fonction
+anonyme OCaml. Sinon l'évaluation est bloquée sur un terme neutre, il faut donc
+crée un nouveau terme neutre contenant la fonction suspendue. Voici
+donc le code de la fonction \fun{vapp}:
 
 \codefrom{typed}{lambda}{vapp}
 
-\codefrom{typed}{lambda}{big_step_eval_inTm_inv}
-Pour \emph{l'inversion} il nous faut évaluer le \emph{terme synthétisable} que ce constructeur contient.
+\todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
 
 \codefrom{typed}{lambda}{big_step_eval_inTm_abs}
-Comme nous l'avons vu précédement, nous avons crée une \fun{value} correspondant
+\todo{Incompréhensible :} Comme nous l'avons vu précédement, nous avons créé une \fun{value} correspondant
 à l'abstraction, \fun{VLam}. Nous avons déja vu son rôle, ici il sera simplement question
 de crée une fonction anonyme Ocaml dont le corp correpond à l'évaluation du terme
 contenu dans l'abstraction.
 
-Une fois nos termes évaluées dans OCaml, il nous faut maintenant les
+Une fois nos termes évalués dans OCaml, il s'agit de
 \emph{réifier} sous forme de termes de notre
 $\lambda$-calcul. Cette fonction doit nécéssairement prendre un argument de
 type{value} afin de nous retourner un \emph{terme synthétisable}.
