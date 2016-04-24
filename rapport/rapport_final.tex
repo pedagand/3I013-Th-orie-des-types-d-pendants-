@@ -1210,12 +1210,12 @@ terme synthétisable et renvoie le type de celui-ci.
 \item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
                                {\Gamma \vdash x \in T }\mbox{(Var)}}\\
 
-Dans la spécification formelle on ne fait pas de distinction entre les variables libres et liées.
-Comme nous l'avons vu dans la règle de typage de l'abstraction, l'ensemble des variables
-liées à chaqu'un des lieurs sont libérées. La spécification parle donc bien des variables libres,
-et il n'est pas donc possible synhtéthiser le type d'une variable liée. Si l'on rencontre une variable
-le terme n'est pas bien formé, il faut donc le rejeter.
-
+Dans la spécification formelle, on ne fait pas de distinction entre
+les variables libres et liées.  Comme nous l'avons vu dans la règle de
+typage de l'abstraction, l'ensemble des variables liées à chaqu'un des
+lieurs sont libérées. La spécification parle donc bien des variables
+libres, que l'on synthétise à partir  du type qui leur a été assigné dans le contexte.
+%
 \codefrom{typed}{lambda}{synth_var}
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }

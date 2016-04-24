@@ -493,8 +493,8 @@ and synth contexte exT
 (*=End *)
 (*=synth_var *)
     | FVar(x) -> List.assoc x contexte
-    | BVar x -> failwith "Bvar is not possible at this moment"
 (*=End *)
+    | BVar x -> failwith "Bvar is not possible at this moment"
 (*=synth_appl *)
     | Appl(f, s) -> 
        let fTy = synth contexte f in
