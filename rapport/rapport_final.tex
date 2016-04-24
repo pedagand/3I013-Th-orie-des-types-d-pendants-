@@ -859,8 +859,8 @@ les utiliser en définissant des règles de typage pour nos termes.
 \label{simple_type}
 
 
-\newcommand{\intg}{\ensuremath{\mathit{int}}}
-\newcommand{\bool}{\ensuremath{\mathit{bool}}}
+\newcommand{\intg}{\ensuremath{\mathsf{int}}}
+\newcommand{\bool}{\ensuremath{\mathsf{bool}}}
 
 Il est important avant tout de définir ce qu'est un type. Les types
 que nous considérons dans cette partie sont décrits par la grammaire
@@ -888,13 +888,14 @@ suivante :
 
 \paragraph{Implémentation :}
 
-La spécification des types se traduit naturellement en OCaml :
+La spécification des types se traduit naturellement en OCaml : \todo{il manque le produit}
 %
 \codefrom{typed}{lambda}{Type}
 
 
 \subsection{Système de type}
 
+\todo{Stylistiquement bof.}
 Il est maintenant temps d'introduire notre système de type. Celui-ci va nous permettre de vérifier que nos termes 
 sont normalisables. Le but est donc de formaliser une règle de typage pour chacuns de nos termes.
 
