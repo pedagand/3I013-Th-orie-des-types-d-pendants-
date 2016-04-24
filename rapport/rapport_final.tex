@@ -998,8 +998,8 @@ fonction.
   \[
   \begin{array}{c}
     \inferrule[]
-              {\inferrule[]{}{\Gamma\vdash (\Lam{x}{x}):A\rightarrow \bool }%level1gauche
-               \:\:\:\inferrule[]{}{\Gamma\vdash true:A}%level1droit 
+              {\inferrule[]{}{\Gamma\vdash (\Lam{x}{x}):\bool \rightarrow \bool }%level1gauche
+               \:\:\:\inferrule[]{}{\Gamma\vdash \true:\bool}%level1droit 
               }
               {\Gamma\vdash \App{(\Lam{x}{x})}{\true}:\bool}%level0
               
