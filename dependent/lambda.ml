@@ -604,7 +604,6 @@ let rec contexte_to_string contexte =
 
 
      
-(*=check_abs *)
 let rec check contexte inT ty steps = 
   match inT with 
   | Abs(x,y) -> 
@@ -614,8 +613,6 @@ let rec check contexte inT ty steps =
 		     check (((Global freshVar),s)::contexte) (substitution_inTm y (FVar(Global(freshVar))) 0) (t (vfree (Global freshVar))) (pretty_print_inTm inT [] ^ ";"^ steps) 
        | _ -> create_report false (contexte_to_string contexte) steps "Abs type must be a Pi"
      end 
-(*=End *)
-(*=check_inv *)
   | Inv(x) -> 
      let ret = synth contexte x (pretty_print_inTm inT [] ^ ";" ^ steps) in 
      if res_debug_synth ret
@@ -626,16 +623,12 @@ let rec check contexte inT ty steps =
 	 else create_report false (contexte_to_string contexte) steps "Inv: ret and ty are not equal"
        end
      else create_report false (contexte_to_string contexte) steps ("Inv: Synth of x goes wrong \n ----Rapport du Inv---\n" ^ print_report_synth ret ^ "\n------Fin Rapport Inv---\n")
-(*=End *)
-(*=check_star *)
   | Star -> 
      begin 
       match ty with 
 	| VStar -> create_report true (contexte_to_string contexte) steps "No"
 	| _ -> create_report false (contexte_to_string contexte) steps "Star : ty must be of type Star"
      end
-(*=End *)
-(*=check_pi *)
   | Pi (v,s,t) -> 
      begin 
        match ty with 
@@ -645,7 +638,6 @@ let rec check contexte inT ty steps =
 		  else create_report false (contexte_to_string contexte) steps "Pi : S is not of type Star"
        | _ -> create_report false (contexte_to_string contexte) steps "Pi : ty must be of type Star"
      end 
-(*=End *)
   | Nat -> 
      begin 
        match ty with
@@ -664,7 +656,6 @@ let rec check contexte inT ty steps =
 	 | VNat -> check contexte x VNat (pretty_print_inTm inT [] ^ ";"^ steps)
 	 | _ -> create_report false (contexte_to_string contexte) steps "Succ : ty must be VNat"
      end 
-(*=check_vec *)
   | Vec(alpha,n) -> 
      begin        
        match ty with 
@@ -674,8 +665,6 @@ let rec check contexte inT ty steps =
 		  else create_report false (contexte_to_string contexte) steps "Vec : alpha must be of type star"
        | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be VStar"
      end
-(*=End *)
-(*=check_dnil *)
   | DNil(alpha) -> 
      begin
        match ty with
@@ -685,8 +674,6 @@ let rec check contexte inT ty steps =
 				else create_report false (contexte_to_string contexte) steps "DNil : Alpha must be the sames"
        | _ -> create_report false (contexte_to_string contexte) steps "Vec : ty must be a VVec"       
      end 
-(*=End *)
-(*=check_dcons *)
   | DCons(a,xs) -> 
      begin 
        match ty with 
@@ -695,9 +682,12 @@ let rec check contexte inT ty steps =
 				 then check contexte a alpha (pretty_print_inTm inT [] ^ ";"^ steps)
 				 else create_report false (contexte_to_string contexte) steps "DCons : xs must be of type (VVec alpha n)"
        | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
-     end 
-(*=End *)
-  | What -> create_report false (contexte_to_string contexte) steps ("What : we try to push this terme " ^ (pretty_print_inTm (value_to_inTm 0 ty)  []))
+     end
+  (*=check_what *)
+  | What -> create_report false (contexte_to_string contexte) steps
+     ("What : we try to push this terme " ^
+	 (pretty_print_inTm (value_to_inTm 0 ty)  []))
+  (*=End *)
   | Id(gA,a,b) -> let check_gA = check contexte gA VStar (pretty_print_inTm inT [] ^ ";"^ steps) in 		  
 		  let eval_gA = big_step_eval_inTm gA [] in 
 		  let check_a = check contexte a eval_gA (pretty_print_inTm inT [] ^ ";"^ steps) in 
