@@ -1556,7 +1556,7 @@ nous allons découvrir les types dépendants.
 \subsection{Automatisation de démonstration de preuve}
 Durant les deux premières parties du rapport nous avons présenté le $\lambda$-calcul
 qui nous à permis d'introduire un système de type. Cependant nous avions une vision 
-informatique des type. En effet notre seul but était de vérifier que nos $\lambda$-termes
+calculatoire des type. En effet notre seul but était de vérifier que nos $\lambda$-termes
 pouvaient se réduire. 
 Un des aspects primordiale des système de type est la correspondance de Curry-Howard.
 Celle ci permet de d'établire des relations entre la logique propositionnelle et les systèmes 
@@ -1566,8 +1566,9 @@ Tout d'abord intéressons nous aux bases de la logique propositionnelle.
 \subsubsection{La logique propositionnelle}
 
 Les règles de la logique propositionnelle associes à chaque constructeur 
-une règle d'introduction qui permet de CREUSER, une élimination qui permet d'utiliser 
-les hypothèse contenants ce constructeurs ainsi qu'une règle de calcul.
+une règle d'introduction qui à partire des hypothèses de formuler une conclusion.
+Chaque constructeur possède aussi une règle d'éliminiation qui permet d'éliminer le constructeurs dans les hypothèses afin de
+formuler une nouvelle conclusion, ainsi qu'une règle de calcul.
 
 Tout comme les règles de typage on lire les règles suivantes de cette façon:''Si l'on suppose le numérateur
 alors le dénominateur est vrai'' ou encore ``Pour prouver le dénominateur il nous faut prouver le numérateur''
@@ -1623,7 +1624,8 @@ et \emph{snd} les projections.
 Pour l'instant nous n'avons pas établie de lien réel entre ces connecteurs et nos termes, c'est l'enjeu de la
 section suivante.
 
-\subsubsection{correspondance de Curry Howard bis}
+\subsubsection{correspondance de Curry Howard}
+\label{corres_curry_howard}
 
 Dans la section précédente nous avons regarder quelques intuitions permettant de voir le lien entre la logique
 et l'informatique au travers des systèmes de type.
@@ -1633,19 +1635,27 @@ les systèmes de type de la logique combinatoire.
 
 Voici un tableau montrant les différents liens entre la logique et le $\lambda$-calcul.
 
-\todo{roman: mettre un tableau de correspondance (que j'ai en photo) mais je ne sais pas quelle est la meilleure présentation}
+\todo{c'est super moche il faut que je trouve une structure pour le présenter}
+\begin{lstlisting}
+  Logique ------------- lambda calcul
+  Axiom ----------> variable
+  regles dintroductions ----------> constructeurs 
+  regles deliminations ----------> Elminateurs 
+  Normalisation des preuves ------> normalisation  
+\end{lstlisting}
+
 
 
 Le fait d'avoir séparé nos termes permets de rendre ces correspondances plus aisées. En effet les constructeur
 correspondent aux \emph{termes vérifiables} tandis que les \emph{termes synthétisables} sont les destructeurs.
+En ajoutant de nouveaux termes dans notre $\lambda$-calcul à permis d'introduire de nouveaux constructeurs
+de la logique dans notre système. Nous allons suivre la même motivation en introduisant les types dépendants.
 
-\todo{j'aurais des questions à posé jeudi pour finir cette partie}
-
-
-
-
-
-
+Si nous souhaitons prouver une proposition c'est à dire un type, il nous faudra trouver
+un terme accepter par notre vérificateur de type.
+Ceci permet d'aider grandement la recherche de démonstration étant donné que notre logiciel
+de vérificateur de type nous assiste dans la création de nos termes nottament grâce à une amélioration
+que nous verrons dans la section \ref{ex_preuves}.
 
 
 
@@ -2127,7 +2137,25 @@ et trans
 
 
 \subsection{Exemples de preuves}
+\label{ex_preuves}
 
+Dans la section \ref{corres_curry_howard} nous avons parler de l'utilisation des vérificateurs de types
+pour assister la démonstration de propositions logiques. Nous allons étendre notre implémentation afin
+de faciliter cette tâche.
+Nous verrons ensuite un exemple de démonstration de la proposition 
+``2 + 2 = 4'' qui était l'objectif initiale de ce projet.
+
+
+\subsubsection{Amélioration du vérificateur}
+\todo{je met cette section car je pense que ça ouvre l'esprit sur le fait que l'on peut rajouter beaucoup de choses dans notre type-checker
+  pour faciliter les démonstrations}
+
+Afin que notre vérificateur de type permette d'assister dans la recherche de preuves
+nous allons implémenter un nouveau constructeur: $?$.
+Cette implémentation est un début, il existe de nombreuses autre extensions possibles
+pour assister les démonstrations. 
+
+\subsubsection{2 + 2 = 4}
 
 
 
