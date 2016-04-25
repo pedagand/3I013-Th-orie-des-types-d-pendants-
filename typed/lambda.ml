@@ -358,37 +358,37 @@ let rec reduction_forte t i  =
        end
 
 (*=big_step_eval_exTm_ann *)
-let rec big_step_eval_exTm t envi = 
+let rec eval_exTm t envi = 
   match t with
-    | Ann(x,_) -> big_step_eval_inTm x envi
+    | Ann(x,_) -> eval_inTm x envi
 (*=End *)
 (*=big_step_eval_exTm_var *) 
     | FVar v -> vfree v 
     | BVar v -> List.nth envi v
 (*=End *)
 (*=big_step_eval_exTm_app *)
-    | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))
+    | Appl(x,y) -> vapp((eval_exTm x envi),(eval_inTm y envi))
 (*=End *)
-    | Iter(n,f,a) -> viter(big_step_eval_inTm n envi, 
-                           big_step_eval_inTm f envi,
-                           big_step_eval_exTm a envi)
+    | Iter(n,f,a) -> viter(eval_inTm n envi, 
+                           eval_inTm f envi,
+                           eval_exTm a envi)
     | Ifte(c,thens,elses) ->
-       let cond  = big_step_eval_inTm c envi in
+       let cond  = eval_inTm c envi in
        begin 
 	 match cond with 
-	 | VTrue -> big_step_eval_exTm thens envi
-	 | VFalse -> big_step_eval_exTm elses envi 
+	 | VTrue -> eval_exTm thens envi
+	 | VFalse -> eval_exTm elses envi 
 	 | _ -> failwith "Impossible" 
        end 
     | P0(x) ->
        begin 
-       match big_step_eval_exTm x envi with  
+       match eval_exTm x envi with  
 	       | VPair(a,b) -> a
 	       | _ -> failwith "Impossibl: P0 can't be applied to something else then a pair"
        end 
     | P1(x) ->
        begin 
-       match big_step_eval_exTm x envi with  
+       match eval_exTm x envi with  
 	       | VPair(a,b) -> a
 	       | _ -> failwith "Imposibl: P1 can't be applied to something else then a pair"
        end 				      
@@ -405,16 +405,16 @@ and vapp v =
   | _ -> failwith "Impossible (vapp)"
 (*=End *)
 (*=big_step_eval_inTm_inv *)
-and big_step_eval_inTm t envi = 
+and eval_inTm t envi = 
   match t with 
-  | Inv(i) -> big_step_eval_exTm i envi
+  | Inv(i) -> eval_exTm i envi
 (*=End *)
 (*=big_step_eval_inTm_abs *)
-  | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg :: envi)))
+  | Abs(x,y) -> VLam(function arg -> (eval_inTm y (arg :: envi)))
 (*=End *)
   | Zero -> VZero
-  | Succ n -> VSucc (big_step_eval_inTm n envi)
-  | Pair(x,y) -> VPair((big_step_eval_inTm x envi),(big_step_eval_inTm y envi))
+  | Succ n -> VSucc (eval_inTm n envi)
+  | Pair(x,y) -> VPair((eval_inTm x envi),(eval_inTm y envi))
   | True -> VTrue 
   | False -> VFalse 
 		
@@ -446,8 +446,9 @@ let gensym =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
 
+    
 (*=check_def *)
-let rec check contexte inT ty
+let rec check contexte ty inT
     = match inT with
 (*=End *)
 (*=check_abs *)
@@ -457,7 +458,8 @@ let rec check contexte inT ty
          | Fleche(s, t) -> 
             (* XXX: open the de Bruijn binder *)
             let freshVar = gensym () in
-            check ((Global(freshVar), s) :: contexte) (substitution_inTm b (FVar (Global(freshVar))) 0) t
+            check ((Global(freshVar), s) :: contexte) t
+	      (substitution_inTm b (FVar (Global(freshVar))) 0) 
          | _ -> failwith "SAbstraction forced into a non-functional type"
        end
 (*=End *)
@@ -468,14 +470,14 @@ let rec check contexte inT ty
     | True -> if ty = Bool then true else false
     | False -> if ty = Bool then true else false
     | Zero -> if ty = Nat then true else false 
-    | Succ x -> if ty = Nat then check contexte x Nat else false
+    | Succ x -> if ty = Nat then check contexte Nat x else false
 (*=End *)
 (*=check_pair *)
     | Pair(x,y) -> 
        begin 
 	 match ty with 
-	 | Croix(a,b) -> if check contexte x a
-                            && check contexte y b then true
+	 | Croix(a,b) -> if check contexte a x
+                            && check contexte b y then true
 			 else failwith "In Pair(x,y) x is not of type a"				  
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
@@ -486,7 +488,7 @@ and synth contexte exT
 (*=End *)
 (*=synth_ann *)
     | Ann(tm, ty) ->
-       if check contexte tm ty then ty 
+       if check contexte ty tm then ty 
        else failwith "Wrong annotation"
 (*=End *)
 (*=synth_var *)
@@ -499,13 +501,13 @@ and synth contexte exT
        begin
          match fTy with
          | Fleche(a, b) -> 
-            if check contexte s a then b
+            if check contexte a s then b
             else failwith "Argument type invalid"
          | _ -> failwith "Function type invalid"
        end
 (*=End *)
 (*=exTm_extensions *)
-    | Ifte(x,y,z) -> if check contexte x Bool then 
+    | Ifte(x,y,z) -> if check contexte Bool x then 
 		       begin 
 			 let ttrue = synth contexte y in 
 			 let tfalse = synth contexte z in 
@@ -513,10 +515,10 @@ and synth contexte exT
 			 else failwith "Ifte type of argument not the same"
 		       end 
 		     else failwith "Ifte first param need to be a bool"
-    | Iter(n,f,a) -> if check contexte n Nat then
+    | Iter(n,f,a) -> if check contexte Nat n then
 		       begin 
 			 let type_a = synth contexte a in 
-			 if check contexte f (Fleche (type_a,type_a))
+			 if check contexte (Fleche (type_a,type_a)) f
 			 then type_a
 			 else failwith "Iter 2nd arg must be of type_a -> type_a"
 		       end 

@@ -1498,7 +1498,9 @@ Il en est de même pour l'inversion :
 \codefrom{typed}{lambda}{big_step_eval_inTm_inv}
 
 
-\todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
+Pour les variables liées il faut retrouvé dans le contexte la variable à laquel elle est associé.
+Cela nous permettra de définire cette variable comme un argument de la fonction anonyme que nous avons
+crée avec l'évaluation de l'abstraction.
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_var}
 
@@ -1507,32 +1509,23 @@ tous les termes dont l'évaluation est terminé. C'est le rôle de la fonction
 \fun{vfree} dont voici le code:
 \codefrom{typed}{lambda}{vfree}
 
-Pour les variables liées il faut retrouvé dans le contexte la variable à laquel elle est associé.
-Cela nous permettra de définire cette variable comme un argument de la fonction anonyme que nous avons
-crée avec l'évaluation de l'abstraction.
 
-\todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
-
-\codefrom{typed}{lambda}{big_step_eval_exTm_app}
-
-Pour évaluer l'application d'un coup, il est nécessaire de créer une
-fonction externe \todo{qu'est-ce qu'une ``fonction externe'' ?}
-\emph{vapp}.  Nous appelons donc cette fonction avec le couple formé
+Pour évaluer l'application d'un coup, définissons une fonction 
+\fun{vapp} permettant d'effectuer la réduction.  Nous appelons donc cette fonction avec le couple formé
 par l'évaluation de la fonction et son argument.  Si la fonction est une abstraction, il nous suffit d'appliquer celle-ci
 \emph{dans Ocaml}, étant donné qu'elle est encodée par une fonction
 anonyme OCaml. Sinon l'évaluation est bloquée sur un terme neutre, il faut donc
-crée un nouveau terme neutre contenant la fonction suspendue. Voici
-donc le code de la fonction \fun{vapp}:
+crée un nouveau terme neutre contenant la fonction suspendue.
+Voici le cas de l'application dans notre fonction d'évaluation:
 
+\codefrom{typed}{lambda}{big_step_eval_exTm_app}
+Ainsi que le code de \fun{vapp}: 
 \codefrom{typed}{lambda}{vapp}
 
-\todo{Introduire le bout de code qui suit, ou faire passer le texte avant le code}
-
-\codefrom{typed}{lambda}{big_step_eval_inTm_abs}
-\todo{Incompréhensible :} Comme nous l'avons vu précédement, nous avons créé une \fun{value} correspondant
-à l'abstraction, \fun{VLam}. Nous avons déja vu son rôle, ici il sera simplement question
-de crée une fonction anonyme Ocaml dont le corp correpond à l'évaluation du terme
-contenu dans l'abstraction.
+Comme nous l'avons vu précédement, nous avons créé une \fun{value} correspondant
+à l'abstraction, \fun{VLam} prenant en argument une fonction de type \fun{value} $\rightarrow$ \fun{value}.
+L'évaluation de l'abstraction consiste donc à transformer celle-ci en une fonction.
+\codefrom{typed}{lambda}{big_step_eval_inTm_abs} 
 
 Une fois nos termes évalués dans OCaml, il s'agit de les
 \emph{réifier} sous forme de termes de notre
@@ -1550,8 +1543,7 @@ Afin de transformer une valeur \lstinline!VLam f! en
 \emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
 de reification, que l'on distinguera des autres variables libres grace au type \fun{name}.
 On s'assure que les variables ainsi introduites sont fraîches en utilisant la fonction \fun{gensym}.
-Nous allons pouvoir \todo{c'est quoi ``ceci'' ?} exploiter ceci avec l'aide de
-la fonction \fun{boundfree} dont voici le code:
+La fonction \fun{boundfree} va nous permettre de relier les \fun{NFree} dont la variable est un \fun{Quote}.
 \codefrom{typed}{lambda}{boundfree}
 
 
