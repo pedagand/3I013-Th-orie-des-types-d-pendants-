@@ -6,8 +6,10 @@ type name =
   | Bound of int 
   | Quote of int
 
-(*=inTm *) 
-type inTm = 
+(*=inTm_head *) 
+type inTm =
+  (*=End *)
+  (*=inTm *)
   | Abs of name * inTm
   | Inv of exTm
   | Pi of name * inTm * inTm 
@@ -27,8 +29,10 @@ type inTm =
   | Vec of inTm * inTm
   | DNil (* TODO: remove A *)  of inTm
   | DCons (* TODO: remove A *) of inTm * inTm 
-(*=End *)
+  (*=End *)
+  (*=what *)      
   | What
+  (*=End *)
   | Id of inTm * inTm * inTm
   | Refl (* TODO: remove *) of inTm 
 (*=exTm *) 
