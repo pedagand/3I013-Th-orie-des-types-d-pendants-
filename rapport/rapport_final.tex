@@ -1267,7 +1267,6 @@ Section~\ref{calculer_dans_le_lambda_calcul}.
 
 \subsubsection{Méta-théorie}
 \label{meta_theorie}
-\todo{Il y a encore des emph pour écrire des maths}
 
 Le typage permet d'obtenir, à la compilation, des garanties quant à la
 bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés complementaires d'un système de type :
@@ -1279,7 +1278,7 @@ et que $t \leadsto t'$ alors $t'$ est de type~$T$
 \end{description}
 
 La conjonction de ces deux propriétés donne le slogan ``un programme
-bien typé ne plante jamais'' \todo{(citation Milner)} tout programme
+bien typé ne plante jamais'' \todo{citation milner}. tout programme
 bien typé réduit vers une valeur de ce type.
 
 \begin{example}
@@ -1338,29 +1337,31 @@ Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé
 cependant, maintenant que nous disposons de termes bidirectionnels, il est important
 de préciser leur phase.
 
-\todo{Utiliser les macros intga, succs, zero, iter, etc.} \todo{stop aux cfracs}
-
-%alors la il me faut une justification peut etre plus précise car j'en vois une pour les types dépendants mais pas pour ici
-%Pour les types dépendants je dirais que ceux dans les exTm c'est parceque on veut pouvoir avoir de la dépendance
-%sur eux mais je sais pas si ici je peux en parler
-\succs{} et \zero{} sont des termes \todo{vérifiables} étant donné que
+\succs{} et \zero{} sont des termes vérifiables étant donné que
 leur type sera toujours \emph{Nat}. À l'inverse, on exige que l'itérateur soit annoté par son type de retour :
 celui-ci est donc  synthétisable.
 Les règles de typage bidirectionnel sont donc :
-\begin{align*}
-  &\cfrac{\:}
-  {\Gamma\vdash Nat \ni \mathrm{Zero}}&\mbox{(Zero)} \\
-  &\cfrac{\Gamma\vdash Nat \ni t}
-  {\Gamma\vdash Nat \ni \mathrm{Succ(t)}}&\mbox{(Succ)} \\
-  &\cfrac{\Gamma\vdash Nat \ni n \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A\rightarrow A \ni f}
-  {\Gamma\vdash \mathrm{iter}\: A\: n\: f\: a \in A}&\mbox{(Iter)} \\
-\end{align*}
+\[
+\begin{array}{c}
+\inferrule[(Zero)]%
+             {\:}%
+             {\Gamma\vdash Nat \ni \zero} 
+\medskip\\
+\inferrule[(Succ)]%
+          {\Gamma\vdash Nat \ni \Var{t}}%
+          {\Gamma\vdash Nat \ni \succs\:\Var{t}}
+\qquad
+\inferrule[(Iter)]%
+          {\Gamma\vdash Nat \ni n \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A\rightarrow A \ni f}%
+          {\Gamma\vdash \iter\: \Var{A}\: \Var{n}\: \Var{f}\: \Var{a} \in \Var{A}}
+\end{array}
+\]
+
 %
 Les règles d'évaluations restent inchangés. 
 
 \subsubsection{Les booléens}
 
-\todo{Utiliser les macros true, false, ifte,...}
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
 En suivant la meme demarche que  pour les entiers les 
@@ -1368,24 +1369,23 @@ constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes véri
 et le constructeur \emph{Ifte} un \emph{terme synthétisable}
 
 Nous pouvons désormais typer nos booléens de la manière suivante:
-\todo{incorrect : il faut les $\ni$ et les $\in$ pour indiquer les
-  phases}
+
 %
 \[
 \begin{array}{c}
 \inferrule[(true)]
           {{}}
-          {\Gamma\vdash \true{} : \bool{}}
+          {\bool \ni \Gamma\vdash \true{}}
 \qquad
 \inferrule[(false)]
           {{}}
-          {\Gamma\vdash \false{} : \bool{}}
+          {\bool \ni \Gamma\vdash \false{} }
 \medskip\\
 \inferrule[(If-else)]
           {\Gamma\vdash \bool\ni t1{} \\
            \Gamma\vdash t2\in A \\
            \Gamma\vdash t3\in A}
-         {\Gamma\vdash \ifte[A]{t1}{t2}{t3} : A}
+         {\Gamma\vdash \ifte[A]{t1}{t2}{t3} \in A}
 \end{array}
 \]
 
@@ -1402,14 +1402,22 @@ leur type dépend de la paire sur laquelle ils sont appliqués. La paire
 un \emph{terme vérifiable} car chaque paire à un type statique.
 
 Règle de typages des paires\todo{ il va falloir en dire un peu plus comme, par exemple, qui est synthétisable et pourquoi.}:  \todo{Non aux cfracs!} \todo{Utiliser les macros Pair, Fst et Snd}
-\begin{align*}
-  &\cfrac{\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
-  {\Gamma\vdash A\times B \ni a,b}&\mbox{(Paire)} \\
-  &\cfrac{\Gamma\vdash p \in A\times B} 
-  {\Gamma\vdash p.\pi 0 \in A}&\mbox{($\pi 0$)} \\
-  &\cfrac{\Gamma\vdash p \in A\times B} 
-  {\Gamma\vdash p.\pi 1 \in B}&\mbox{($\pi 1$)} \\
-\end{align*}
+
+\[
+\begin{array}{c}
+\inferrule[(Paire)]
+          {\Gamma\vdash A\ni a \:\: \Gamma\vdash B\ni b}
+          {\Gamma\vdash A\times B \ni \Pair{a}{b}}
+\qquad
+\inferrule[($\pi_0$)]
+          {\Gamma\vdash p \in A\times B}
+          {\Gamma\vdash \Fst{p} \in A}
+\medskip\\
+\inferrule[($\pi_1$)]
+          {\Gamma\vdash p \in A\times B}
+          {\Gamma\vdash \Snd{p} \in A}
+\end{array}
+\]
 
 Pour les projections, il nous faut vérifier le fait que l'argument est
 bien de type produit afin de retourner le type du membre de gauche ou
