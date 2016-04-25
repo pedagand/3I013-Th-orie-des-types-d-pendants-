@@ -1398,10 +1398,10 @@ Nous pouvons désormais typer nos booléens de la manière suivante:
 %% \newcommand{\projdeux}[1]{\ensuremath{\pi1.#1}}
 
 Les projections sont des \emph{termes synthétisables} étant donné que
-leur type dépend de la paire sur laquelle ils sont appliqués. La paire
+leur type dépend de la paire sur laquelle ils sont appliqués. La paire est
 un \emph{terme vérifiable} car chaque paire à un type statique.
 
-Règle de typages des paires\todo{ il va falloir en dire un peu plus comme, par exemple, qui est synthétisable et pourquoi.}:  \todo{Non aux cfracs!} \todo{Utiliser les macros Pair, Fst et Snd}
+Règle de typages des paires:
 
 \[
 \begin{array}{c}
@@ -1448,32 +1448,22 @@ L'algorithme de typage suit litéralement sa spécification bidirectionnelle :
 
 \subsection{Réduction forte à grands pas}
 
-\todo{Utiliser/définir des macros pour mentionner le code. Ne pas utiliser emph.}
 
 Dans cette section, nous décrivons une implémentation alternative de
 la réduction forte qui exploite le fait que nous implémentons notre évaluateur dans un language fonctionnel.
-\todo{finir cette phrase :} Etant donné que nous utilisons un language de programmation utilisant déja
-des mechanismes de définition de fonction ou d'application .Il est
-intéressant de les exploiter afin de crée un interpréteur pour nos termes
+Il est intéressant d'exploiter les méchanismes d'Ocaml. Nous allons crée un interpréteur pour nos termes
 en utilisant les termes Ocaml ce qui nous permettra de ne pas à
-gérer certains méchanismes\todo{lesquels ?}.
+gérer les méchanismes de définition de fonction et d'application.
 
 Comme nous l'avons vu dans la Section~\ref{reduction_forte} \if 0 peut
 etre dans la partie safety je ne me souviens plus a voir \fi la
 réduction forte aboutie forcément à une forme normale, les termes que
-nous obtenons par la réduction à grand pas seront donc les memes que
+nous obtenons par la réduction à grand pas, seront donc les mêmes que
 ceux obtenus avec la réduction à petits pas
 (Section~\ref{reduction_petits_pas}).
 
-\todo{Traditionnellement, la fonction que tu appelles
-  \lstinline!big_step_eval_*! est appelée \lstinline!eval_*! :
-  utiliser cette terminologie (et changer le texte si besoin). On
-  parle de la ``fonction d'évaluation'' pour aller des termes aux
-  valeurs, puis de la ``fonction de réification'' pour aller des
-  valeurs aux formes normales.}
-
 \newcommand{\VLam}{\lstinline!VLam!}
-Voici donc le code correspondant \todo{correspondant à quoi ?} en Ocaml:
+Voici donc le code correspondant à la nouvelle représentation de nos termes en Ocaml:
 
 \codefrom{typed}{lambda}{value}
 \codefrom{typed}{lambda}{neutral}
@@ -1492,14 +1482,12 @@ variable.
 \begin{example}
   Soit le terme \(\App{\Lam{x}{\Var{x}}}{u}\), avec la méthode
   d'évaluation à petit pas, on évalue en effectuant $\subst{x}{x}{u}$
-  ce qui nous donne comme résultat \emph{u}.  Avec l'évaluation à
+  ce qui nous donne comme résultat $u$.  Avec l'évaluation à
   grands pas, on évalue le terme $\Lam{x}{x}$ en la fonction OCaml
-  \lstinline!fun arg -> arg! ce qui \todo{relire :} appliqué à la traduction $v_u$ de
-  $u$, retournant ainsi $v_u$ comme souhaité.
+  \lstinline!fun arg -> arg!. Cette fonction une fois appliquée à la traduction $v_u$ de
+  $u$,  nous retourne $v_u$ comme souhaité.
 \end{example}
 
-\todo{Attention à ne pas jeter du code en pâture au lecteur : il doit
-  y avoir une cohérence entre le texte et le code.}
 
 Comme nous l'avons vu précédement le type contenue dans une annotation n'est pas utile lors de l'évaluation.
 Il nous faut simplement évalué le terme \fun{x} contenue dans celle ci.
@@ -1514,12 +1502,9 @@ Il en est de même pour l'inversion :
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_var}
 
-La fonction \emph{VFree} permet simplement à partir d'un nom de créer
-une \emph{NFree} à l'intérieure d'un \emph{VNeutral} \todo{cela ne
-  veut rien dire : donne le rôle de cette fonction, pas ce qu'elle fait.}. Nous avons besoins de crée des \fun{neutral} pour
-tous les termes dont l'évaluation est terminé.  Cette opération
-pouvant être utile assez régulièrement \todo{le lecteur se  fiche de ce détail} on décide d'implémenter une
-fonction à part entière dont voici le code:
+Nous avons besoins de crée des \fun{neutral} pour
+tous les termes dont l'évaluation est terminé. C'est le rôle de la fonction
+\fun{vfree} dont voici le code:
 \codefrom{typed}{lambda}{vfree}
 
 Pour les variables liées il faut retrouvé dans le contexte la variable à laquel elle est associé.
