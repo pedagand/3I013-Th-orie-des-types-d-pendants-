@@ -135,7 +135,7 @@ En 1936, Alonzo Church introduit le $\lambda$-calcul non typé
 ~\citep{church:lambda-calcul}. Le $\lambda$-calcul est
 un modèle de calcul universel, tout comme les machines de Turing. Celui-ci repose
 sur une syntaxe minimaliste capturant exactement la notion de fonction. Ce formalisme est au c\oe{}ur de nombreuses recherches dans le domaine de la 
-programmation fonctionnelle. Le lambda calcul non typé a connu un formidable 
+programmation fonctionnelle. Le $\lambda$-calcul non typé a connu un formidable 
 succès pratique, donnant lieu à de multiples variantes dont on trouvera une présentation
  moderne et synthétique dans l'ouvrage de ~\citet{pierce:tapl}.
 
@@ -186,12 +186,11 @@ succession de fonctions à un seul argument.
 
 \newcommand{\IsFree}{\mathrm{isFree}}
 
-\todo{Erreur courrante : celle ci $\to$ celle-ci, pareil au masculin, pluriel, \etc}
 
-Une variable est \emph{liée} lorsque celle ci est déclarée dans le corps d'un
-lambda. Dans l'Exemple~\ref{example:id}, $x$ était ainsi une variable \emph{liée}.
+Une variable est \emph{liée} lorsque celle-ci est déclarée dans le corps d'un
+lambda. Dans l'Exemple~\ref{example:id}, $x$ était ainsi une variable liée.
 Si la variable n'a pas été déclarée, elle est dite
-\emph{libre}. Formellement, l'ensemble des variables \emph{libres} d'un terme est
+\emph{libre}. Formellement, l'ensemble des variables libres d'un terme est
 défini récursivement de la façon suivante
 %
 \begin{align*}
@@ -255,9 +254,6 @@ d'abstractions entre la variable et l'abstraction qui l'introduit.
   et le terme $\Lam{x}{\Lam{y}{x}}$ est représenté par $\lambda.\lambda.1$ 
 \end{example}
 
-\todo{Ne pas trop utiliser emph dans le texte. On l'utilisera, par
-  exemple, la première fois que l'on définit un terme.}
-
 Tandis que les variables liées seront representées par des
 indices de de Bruijn, les variables libres quant à elle seront
 représentées par un (unique) nom de variable, comme dans la
@@ -266,15 +262,19 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
 
 \begin{example}
   \todo{Donner l'exemple de réduction sous un binder}
-  Soit \Var{x} une variable libre.
-  \todo{roman: je ne me suis jamais penché sur ce problème il faut que je lise pierce}
-  En théorie :
+  Soit \Var{x} une variable libre. 
+  En théorie : 
   \(\App{(\Lam{\Var{y}}{\Var{y}})}{\Var{x}} \leadsto \Var{x}\)
 
   En pratique avec des de Bruijn : \todo{montrer le problème et parler des shifts}
+  Cette opération est appelée par Pierce les ``shifts''
 
-  En pratique avec du locally nameless : \todo{montrer l'absence de problème}
+  En pratique avec du locally nameless : $\App{(\Lam{}{0})}{\Var{x}}\leadsto \Var{x}$
 
+  Il n'est plus nécéssaires d'éffectuer des ``shifts'', cette représentation
+  possède les avantages de la représentation avec les indices de de Bruijn et
+  s'afranchit du problème de la valeur des variables libres.
+  
 \end{example}
 
 Voici le code Ocaml traduisant cette définition inductive des termes :
@@ -321,7 +321,6 @@ Formellement, la substitution est définie par récursion sur le $\lambda$-terme
 \paragraph{Implémentation :} 
 La substitution de la variable liée \lstinline!var! par le terme
 \lstinline!tsub! dans \lstinline!term! est implémentée par la fonction suivante:
-\todo{Retirer le Let, au moins dans le code présenté. Caché DefVar du code présenté : c'est une source de complexité inutile.}
 %
 \codefrom{untyped}{lambda}{substitution}
 
@@ -438,7 +437,7 @@ de la forme
 où les \(t_j\) sont eux-mêmes des termes normaux.
 
 \begin{example}[Terme en forme normale]
-  \todo{\(\Lam{\Var{x}}{\Var{x}}\)}
+  \(\Lam{\Var{x}}{\Var{x}}\)
 \end{example}
 
 On dira qu'un terme \(t\) est \emph{normalisable} s'il existe un terme
@@ -460,7 +459,7 @@ réduction à partir de \(t\). Un terme fortement normalisable est,
 \end{example}
 
 \begin{example}[Terme normalisable mais pas fortement normalisable]
-  \todo{\(\App{(\Lam{\Var{x}}{0})}{\omega}\)}
+  \(\App{(\Lam{\Var{x}}{0})}{\omega}\)
 \end{example}
 
 Un terme normalisable (mais pas \emph{fortement} normalisable) pourra
@@ -526,11 +525,10 @@ Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
 pas tous fortement normalisable, on privilégiera la réduction en appel
 par nom.
 
-\todo{Utiliser les macros Lam, etc.}
 \begin{example}
   \begin{align*}
-    (((\lambda x.x) (\lambda y.y)) z) &\leadsto ((\lambda y.y) z) \\
-    & \leadsto z
+    (\App{(\App{(\Lam{x}{\Var{x}})}{(\Lam{y}{y})})}{\Var{z}}) & \leadsto (\App{(\Lam{y}{\Var{y}})}{\Var{z}}) \\    
+    & \leadsto \Var{z}
   \end{align*}
   Ici \Var{z} n'est plus réductible, c'est donc la forme normale du terme.
 \end{example}
@@ -550,10 +548,15 @@ Dans les sections suivantes, nous verrons lorsque nous introduirons
 les systèmes de type que l'on peut statiquement garantir que les
 termes acceptés par l'analyse de type sont fortement normalisants.
 
-\question{si tu ne peux plus écrire de
-  programmes qui ne terminent pas, tu n'es plus Turing complet donc tu
-  es strictement moins expressif que tous les langages de
-  programmation existants. Est-ce gênant ?}
+\begin{remark}
+  Le fait d'obtenir la garantie que l'ensemble de nos termes sont fortement normalisant signifie que
+  notre language n'est plus \emph{Turing complet}. En effet nous ne pourrons plus exprimé les programmes
+  qui ne terminent pas. Cependant ce n'est pas génant car nous ne cherchons pas à écrire ce genre de
+  programmes dans notre système. Nous verrons dans les sections suivantes pourquoi il est important
+  de ne pas être Turing complet.
+\end{remark}
+
+
 
 
 \paragraph{Implémentation :}
@@ -570,9 +573,10 @@ sinon le terme est retourné sans modifications.
 Passons maintenant à l'évaluation:
 
 \codefrom{untyped}{lambda}{evaluation}
+\codefrom{untyped}{lambda}{evaluation_bis}
 
-La fonction \fun{eval} nous permet de détecter les applications afin den évaluer le membre de gauche.
-Nous .......... \todo{à finir.}
+La fonction \fun{eval} à pour but de détecter les applications et d'en évaluer le memebre de gauche.
+Une fois le membre de gauche évaluer nous pouvons tenter de réduire l'ensemble de l'application.
 
 \subsection{Encodages à la Church}
 
@@ -621,14 +625,21 @@ pouvons donc pas garantire la bonne évaluation de notre terme.
   Les languages orientés objets permettent de représenter ce type d'encodage d'une manière particulière.
   Voici la représentation avec le language Java:
   \begin{lstlisting}[language=java]
-    class foo {
-      String bar(int x, int y){
-        return 0;
+    Interface Bool<A>{
+      A ifte(A x,A y);
+    }
+    
+    class True<A> implements Bool<A>{
+      A ifte(A x,A y){
+        return x;
       }
     }
+    class False<A> implements Bool<A>{
+      A ifte(A x,A y){
+        return y;
+      }
+    }    
   \end{lstlisting}
-
-  \todo{Roman: je ne sais pas encore avec quel moyen je vais le rediger}
 \end{remark}
 
 
@@ -784,33 +795,33 @@ La \(\iota\)-réduction de l'itération se définit ainsi:
 
 
 
-L'implémentation de l'évaluation suit cette spécification : \todo{Corriger le bug discuté par email}
+L'implémentation de l'évaluation suit cette spécification :
 \codefrom{untyped}{lambda}{iota_sig} \lstinline{(...)}
 \codefrom{untyped}{lambda}{nat_evaluation}
 Nous rappelons donc la fonction avec cette fois-ci \fun{(f a)} et le prédécesseur de \fun{n}.
 
-\question{Contrairement à la spec, notre iota-réduction ne fait que
-  les étapes de calcul : pourquoi ?}
+Ici la iota-réduction n'éffectue que les étapes de calcul d'iter sans effectuer l'évaluation
+des applications. En effet cela n'est pas le role de la iota-réduction mais de la $\beta$-réduction
+de réduire les applications.
+
 
 \subsubsection{Les paires}
 \label{paires}
 
-\todo{Utiliser les macros Fst et Snd pour écrire les projections, et
-  Pair pour construire des paires.}
 
 La paire est une construction très répandue dans les languages fonctionnelles, 
 cela nous permet de crée un ensemble de deux éléments. Afin d'extraire les éléments d'une paire,
-nous utiliserons les projections $\pi0$ et $\pi1$. Celles ci nous permettent 
+nous utiliserons les projections $\pi_0$ et $\pi_1$. Celles ci nous permettent 
 d'obtenir respectivement le premier élément ou le second de la paire.
 
 \begin{bnf}
   t &::= & (\ldots) &\mbox{(lambda terme)} \\
-  &|& (t,t) & \mbox{(pair)} \\
-  &|& \pi0\:t & \mbox{($\pi$0)} \\
-  &|& \pi1\:t & \mbox{($\pi$1)} 
+  &|& \Pair{t}{t} & \mbox{(pair)} \\
+  &|& \Fst{t} & \mbox{($\pi_0$)} \\
+  &|& \Snd{t} & \mbox{($\pi_1$)} 
 \end{bnf}
 
-\todo{Introduire le code}
+Ce qui se traduit dans notre programme par l'ajout des termes suivants:
 
 \begin{lstlisting}
 type lambda_term = (...)
@@ -840,9 +851,11 @@ La \(\iota\)-réduction est étendue aux projections de la façon suivante:
 Implémentons donc ces règles:
 \codefrom{untyped}{lambda}{iota_sig} \lstinline{(...)}
 \codefrom{untyped}{lambda}{pair_evaluation}
-La réduction des membres de la paire se fera dans la fonction d'évaluation.
+L'évaluation des membres de la paire s'effectue dans la fonction \fun{eval}:
+\codefrom{untyped}{lambda}{evaluation_sig} \lstinline{(...)}
+\codefrom{untyped}{lambda}{evaluation_pair}
 
-\todo{Roman: implémenter les paires dans le prog}
+
 
 \section{Le $\lambda$-calcul simplement typé}
 
@@ -888,16 +901,17 @@ suivante :
 
 \paragraph{Implémentation :}
 
-La spécification des types se traduit naturellement en OCaml : \todo{il manque le produit}
+La spécification des types se traduit naturellement en OCaml :
 %
 \codefrom{typed}{lambda}{Type}
 
 
 \subsection{Système de type}
 
-\todo{Stylistiquement bof.}
-Il est maintenant temps d'introduire notre système de type. Celui-ci va nous permettre de vérifier que nos termes 
-sont normalisables. Le but est donc de formaliser une règle de typage pour chacuns de nos termes.
+Un système de type est un système formelle permettant de vérifier que l'ensemble de nos termes sont
+correctement typés. Il sera question de définir un ensemble de règles pour chacuns des termes de notre language.
+Le typage nous apportera certaines propriétés quant à la normalisation de nos termes comme nous le verrons
+dans la section \ref{meta_theorie}. 
 
 \subsubsection{Spécification}
 
@@ -1021,9 +1035,8 @@ type $A \rightarrow B$ alors que l'on ne connait que $B$. Nous allons
 donc introduire une nouvelle représentation des termes afin de
 déterminiser la spécification et obtenir un algorithme.
 
-\subsubsection{Syntaxe bi-directionnelle}
+\subsubsection{Syntaxe bidirectionnelle}
 
-\todo{bi-directionnel $\to$ bidirectionnel}
 
 Les applications dont le membre de gauche est une abstractions posent
 problème car il faut leur calculer un type sans nécessairement avoir cette information à disposition immédiate.  Nous
@@ -1052,9 +1065,7 @@ Voici donc notre représentation des termes:
 
 
 On a ainsi introduit l'inversion \Inv{ex}, qui permet d'inclure les
-termes synhtétisables dans le monde des termes inférables\todo{il
-  n'existe pas de termes ``inférables'', ce sont les termes
-  ``vérifiables''.}, et l'annotation \Ann{in}{T}, qui inclut les termes
+termes synhtétisables dans le monde des termes vérifiables, et l'annotation \Ann{in}{T}, qui inclut les termes
 vérifiables dans le monde des termes synthétisables en fournissant
 l'information de typage manquante.
 
@@ -1076,7 +1087,7 @@ d'une chaîne de caractère\todo{description trop opérationnelle/peu motivée :
 \codefrom{typed}{lambda}{name}
 
 
-\subsubsection{Système de type bi-directionnel}
+\subsubsection{Système de type bidirectionnel}
 
 À partir de cette nouvelle présentation de la syntaxe, on adapte
 aisément les règles de typage
@@ -1129,13 +1140,23 @@ de synthèse.  Lors de la vérification, on connait le type $T$ et
 l'on souhaite déterminer si le terme $t$ est bien de ce
 type. Lors de la synthèse, on est en mesure, à partir d'un terme
 $t$ quelconque, de déterminer son type \(T\) sans ambiguïté.  On vérifie
-aisément que ce système de type bi-directionnel est équivalent à celui
+aisément que ce système de type bidirectionnel est équivalent à celui
 présenté en Figure~\ref{fig:typage-simple}.
 
 \begin{example}
-  Voici maintenant la même dérivation mais avec notre système de type bi-directionnel:
+  Voici maintenant la même dérivation mais avec notre système de type bidirectionnel:
   problème précédement.
-  \todo{roman: faire l'exemple de fred avec le new système}
+  \[
+  \begin{array}{c}
+    \inferrule[]
+              {\inferrule{\Gamma, \Var{x} : \intg\rightarrow\intg \vdash \true : \bool}%level2droit
+                         {\Gamma\vdash \Ann{\Lam{x}{\true}}{(\intg\rightarrow\intg)\rightarrow \bool}\in (\intg\rightarrow\intg)\rightarrow \bool }%level1gauche
+                         \:\:\:\inferrule[]{\inferrule[]{}{\Gamma,y:\intg\vdash \intg \ni y}%level2droit
+                         }{\Gamma\vdash \intg\rightarrow\intg \ni \Lam{y}{\Var{y}}}%level1droit 
+              }
+              {\Gamma\vdash \App{\Ann{(\Lam{x}{\true})}{(\intg\rightarrow\intg)\rightarrow\bool}}{(\Lam{y}{\Var{y}})}\in\bool}%level0
+  \end{array}  
+  \]  
 \end{example}
 
 \paragraph{Implémentation :}
@@ -1250,7 +1271,7 @@ restent identique aux définitions introduites en
 Section~\ref{calculer_dans_le_lambda_calcul}.
 
 \subsubsection{Méta-théorie}
-
+\label{meta_theorie}
 \todo{Il y a encore des emph pour écrire des maths}
 
 Le typage permet d'obtenir, à la compilation, des garanties quant à la
@@ -1259,7 +1280,7 @@ bonne exécution des programmes.  Formellement, ces garanties se traduisent en d
 \item[Progrès :] si un terme \(t\) est correctement typé alors soit \(t\) est une valeur, soit il
  existe une réduction telle que \(t \leadsto t'\)
 \item[Préservation :] si un terme \emph{t} a le type \emph{T}
-et que \emph{t} $\leadsto$ \emph{t'} alors \emph{t'} est de type~\emph{T}
+et que $t \leadsto t'$ alors $t'$ est de type~$T$
 \end{description}
 
 La conjonction de ces deux propriétés donne le slogan ``un programme
@@ -1319,7 +1340,7 @@ nous verrons ici la façon de les représenter ainsi que leurs règles de typage
 \label{entier_type}
 
 Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé 
-cependant, maintenant que nous disposons de termes bi-directionnels, il est important
+cependant, maintenant que nous disposons de termes bidirectionnels, il est important
 de préciser leur phase.
 
 \todo{Utiliser les macros intga, succs, zero, iter, etc.} \todo{stop aux cfracs}
@@ -1327,7 +1348,7 @@ de préciser leur phase.
 %alors la il me faut une justification peut etre plus précise car j'en vois une pour les types dépendants mais pas pour ici
 %Pour les types dépendants je dirais que ceux dans les exTm c'est parceque on veut pouvoir avoir de la dépendance
 %sur eux mais je sais pas si ici je peux en parler
-\succs{} et \zero{} sont des termes \todo{inférables} étant donné que
+\succs{} et \zero{} sont des termes \todo{vérifiables} étant donné que
 leur type sera toujours \emph{Nat}. À l'inverse, on exige que l'itérateur soit annoté par son type de retour :
 celui-ci est donc  synthétisable.
 Les règles de typage bidirectionnel sont donc :
@@ -1348,7 +1369,7 @@ Les règles d'évaluations restent inchangés.
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
 En suivant la meme demarche que  pour les entiers les 
-constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes inférables}
+constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes vérifiables}
 et le constructeur \emph{Ifte} un \emph{terme synthétisable}
 
 Nous pouvons désormais typer nos booléens de la manière suivante:
@@ -1636,7 +1657,7 @@ Voici un tableau montrant les différents liens entre la logique et le $\lambda$
 
 
 Le fait d'avoir séparé nos termes permets de rendre ces correspondances plus aisées. En effet les constructeur
-correspondent aux \emph{termes inférables} tandis que les \emph{termes synthétisables} sont les destructeurs.
+correspondent aux \emph{termes vérifiables} tandis que les \emph{termes synthétisables} sont les destructeurs.
 
 \todo{j'aurais des questions à posé jeudi pour finir cette partie}
 
@@ -1741,14 +1762,14 @@ voici les nouvelles règles de typage en Figure~\ref{fig:typage dependant}.
   \label{fig:typage dependant} 
 \end{figure}
 
-Les deux nouvelles constructions \emph{Pi} et \emph{Star} sont des \emph{termes inférables} étant donné
+Les deux nouvelles constructions \emph{Pi} et \emph{Star} sont des \emph{termes vérifiables} étant donné
 que l'on possède toute l'information nécéssaire pour les vérifier. De manière générale les types seront 
-des \emph{termes inférables}.
+des \emph{termes vériable}.
 
-Si l'introduction d'un système bi-directionnel dans le $\lambda$-calcul pouvait ne pas etre indispensable, elle prend tout son 
+Si l'introduction d'un système bidirectionnel dans le $\lambda$-calcul pouvait ne pas etre indispensable, elle prend tout son 
 sens avec les types dépendants.
-Cependant nous ne pouvons pas parler de types dépendants sans un système bi-directionnel, ce sont dans les 
-\emph{termes inférables} que nous allons définir la dépendances que nous allons utilisé dans les 
+Cependant nous ne pouvons pas parler de types dépendants sans un système bidirectionnel, ce sont dans les 
+\emph{termes vérifiables} que nous allons définir la dépendances que nous allons utilisé dans les 
 \emph{termes synthétisables}.
 Mis à part la dépendance introduite dans l'abstraction notre language ne comporte pas de termes exploitant 
 l'expressivité des types dépendants. Nous verrons au fur et à mesur des extensions toute leur richesse.
@@ -1814,7 +1835,7 @@ $\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
 Le principal changement de cette implémentation est le changement d'égalité. 
 En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut 
 tester l'égalité avec la simple fonction d'ocaml. Il nous faut donc d'abord transformer 
-nos \emph{value} en \emph{termes inférables}. Le second problème est que le nom associé 
+nos \emph{value} en \emph{termes vérifiables}. Le second problème est que le nom associé 
 aux différents binder tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
 meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv}sur l'$\alpha$-équivalence 
 deux termes sont égaux meme si le nom de leur variables est différents. 
@@ -1928,7 +1949,7 @@ Comme nous l'énoncions précédement les types sont maintenant des termes, il n
 
 Dans le $\lambda$-calcul simplement typé \ref{entier_type} nous avions besoin que l'argument \emph{a} soit un \emph{terme synthétisable}
 afin de déterminer le type de retour de cette construction.
-Maintenant l'ensemble des arguments de iter sont des termes inférables car l'introduction d'un prédicat
+Maintenant l'ensemble des arguments de iter sont des termes vériables car l'introduction d'un prédicat
 \emph{P} nous permet de connaitre le type de retour de iter et donc de vérifier les autres termes. 
 Ce prédicat nous permet d'une part de crée de la dépendance et d'autre part de rajouter de l'information.
 

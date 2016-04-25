@@ -12,10 +12,8 @@ type typ =
   | Bool
   | Nat 
   | Fleche of typ * typ
-  (*=End *)
-  (*=type_pair *)
   | Croix of typ * typ 
-(*=End *)
+  (*=End *)
 		     
 (* Correspondance avec le papier 
 Abs = Lam

@@ -131,6 +131,7 @@ let rec lambda_term_to_Sexpr t l =
        "(iter " ^ lambda_term_to_Sexpr n l ^ lambda_term_to_Sexpr f l ^ lambda_term_to_Sexpr a l ^ ")"
     | Let (t, b) -> let var = gensym() in 
 		    "(let (" ^ var ^ " " ^ lambda_term_to_Sexpr t l ^ ") " ^ lambda_term_to_Sexpr b (var::l) ^ ")"
+    | _-> failwith "later"
 
 module PrettyT =
   struct
@@ -161,14 +162,14 @@ module PrettyT =
 let rec substitution term var tsub 
     = match term with 
     | FreeVar v -> FreeVar v 
-    | DefVar v -> DefVar v 
     | BoundVar v when v = var -> tsub
     | BoundVar v -> BoundVar v
     | Abs (va,x) -> Abs (va,(substitution x (var+1) tsub))
     | Appl (x,y) -> Appl (substitution x var tsub,
                           substitution y var tsub)
+    (*=End *)
     | Let (t, b) -> Let((substitution t var tsub),(substitution b (var+1) tsub))
-(*=End *)
+    | DefVar v -> DefVar v 
 (*=bool_substitution *)
     | True -> True
     | False -> False
@@ -183,6 +184,7 @@ let rec substitution term var tsub
     | Iter(n,f,a) -> Iter(substitution n var tsub,
                           substitution f var tsub,
                           substitution a var tsub)
+    | _ -> failwith "later"
 (*=End *)
 
 let () = Printf.printf "%s" (lambda_term_to_Sexpr (substitution (read "(lambda x x)") (-1) (DefVar "y") ) [])
@@ -237,9 +239,9 @@ let iota t
 (*=End *)
 (*=nat_evaluation *)
     | Iter(Zero,f,a) -> Some a
-    | Iter(Succ num, f, a) -> Some (Appl(f, a))
+    | Iter(Succ num, f, a) -> Some (Iter(num,f,(Appl(f, a))))
 (*=End *)
-(*=pair_evaluation *) 
+    (*=pair_evaluation *)    
     |Pi0(Pair(x,y)) -> Some x
     |Pi1(Pair(x,y)) -> Some y
 (*=End *)
@@ -268,14 +270,22 @@ let reduction env t =
 
 (*=evaluation *)
 let evaluation env t 
-  = 
+    =
+  (*=evaluation_sig *)
   let rec eval t =
-    match t with 
+    match t with
+    (*=End *)
     | Appl(f, v) -> 
       let vf = eval f in
       try_reduction (Appl(vf, v))
+    (*=End *)
+    (*=evaluation_pair *)
+    | Pair(x,y) -> Pair((try_reduction x),(try_reduction y))
+    (*=End *)
+    (*=evaluation_bis *)
     | x ->
-      try_reduction x
+       try_reduction x
+
   and try_reduction t = 
     match reduction env t with
     | Some t' -> eval  t'
@@ -330,6 +340,7 @@ let rec bind i bv t =
   | Zero -> Zero 
   | Succ(n) -> Succ(bind i bv n)
   | Iter(n,f,a) -> Iter((bind i bv n),(bind i bv f),(bind i bv a))
+  | _ -> failwith "later"
 
 (*=reduction_forte *)
 let reduction_forte env t 
