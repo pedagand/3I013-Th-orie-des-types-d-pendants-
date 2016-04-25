@@ -428,8 +428,11 @@ and equal_exTm t1 t2 =
 
 
 
+(*=check_head *)      
 let rec lcheck contexte ty inT =
   match inT with
+  (*=End *)
+    (*=check_abs *)      
   | Abs(x,y) ->
      begin
        match ty with
@@ -439,6 +442,8 @@ let rec lcheck contexte ty inT =
 		       (substitution_inTm y (FVar(Global(freshVar))) 0)
        | _ -> false
      end
+  (*=End *)
+  (*=check_inv *)
   | Inv(x) -> 
      let ret = lsynth contexte x in
 	 if equal_inTm (value_to_inTm 0 (ty)) (value_to_inTm 0 ret)
@@ -460,7 +465,8 @@ let rec lcheck contexte ty inT =
        match ty with 
        | VStar -> let freshVar = gensym () in 
 		  lcheck contexte VStar s 
-		  && lcheck (((Global freshVar),(big_step_eval_inTm s []))::contexte)
+		  && lcheck (((Global freshVar),
+			      (big_step_eval_inTm s []))::contexte)
 		    VStar
 		    (substitution_inTm t (FVar(Global(freshVar))) 0)
        | _ -> false

@@ -1797,16 +1797,10 @@ Nous avons désormais une forme normale pour les types, il est donc intérressan
 fournire cette forme normale directement au type-checker. La fonction \fun{check} prend donc maintenat
 un contexte, un \emph{terme inférable} ainsi qu'une value.
 
-
+\codefrom{dependent}{lambda}{check_head}
 \codefrom{dependent}{lambda}{check_abs}
 $\cfrac{\Gamma,x:S\vdash T \ni t}
     {\Gamma \vdash \forall x:S.T \ni \lambda x. t}$
-
-
-
-\codefrom{dependent}{lambda}{check_inv}
-$\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-    {\Gamma\vdash T \ni inv(t)}$
 
 Le principal changement de cette implémentation est le changement d'égalité. 
 En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut 
@@ -1818,6 +1812,12 @@ deux termes sont égaux meme si le nom de leur variables est différents.
 La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
 du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les memes.
 
+\codefrom{dependent}{lambda}{check_inv}
+$\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+    {\Gamma\vdash T \ni inv(t)}$
+
+
+
 \codefrom{dependent}{lambda}{check_star}
 $\cfrac{}
     {\Gamma \vdash * \ni *}$
@@ -1827,9 +1827,6 @@ $\cfrac{}
 \codefrom{dependent}{lambda}{check_pi}
 $\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
     {\Gamma\vdash * \ni \forall x:S.T}$
-
-
-
 
 
 \codefrom{dependent}{lambda}{synth_var}
@@ -2176,6 +2173,7 @@ Nous refusons donc le terme et retournons le type que l'on essaye de vérifier a
 où l'on rencontre le $?$.
 
 \subsubsection{2 + 2 = 4}
+
 
 
 
