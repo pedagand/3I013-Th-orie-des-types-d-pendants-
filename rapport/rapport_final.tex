@@ -1161,33 +1161,28 @@ présenté en Figure~\ref{fig:typage-simple}.
 
 \paragraph{Implémentation :}
 
-\todo{Dans cette section, importer le code du type-checker ``rapide'', ie. sans traitement des erreurs.}
-
 \begin{itemize}
   
 \item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni t}}\\
   
   Nous disposons d'une fonction de vérification \lstinline!check!
-  permettant d'éffectuer la vérification de type du terme \fun{inT}.
-  \todo{finir cette phrase.}
-  où \fun{contexte} nous permet de stocker
+  permettant d'éffectuer de vérifier que le terme \fun{inT} est bien de type
+  \fun{ty}.
+  Le \fun{contexte} est une liste qui nous permet de stocker
   des paires associants une variable à son type. Il nous faut aussi
   donner le type d'entrée \fun{ty}.
     
-  %
-  \todo{Permuter \lstinline!inT! et \lstinline!ty! dans la définition de
-    \lstinline!check! de telle sorte que cela corresponde à l'ordre du
-    jugement de typage.}
-  %
+  
+  
   \codefrom{typed}{lambda}{check_def} 
   
 \item[$\bullet$] \boxed{\inferrule[Abs]
-                                  {T = A \rightarrow B\\ \Gamma, x:A \vdash B \ni t}
-                                  {\Gamma \vdash T \ni \lambda x. t}} \\
+  {T = A \rightarrow B\\ \Gamma, x:A \vdash B \ni t}
+  {\Gamma \vdash T \ni \lambda x. t}} \\
   
   \todo{relire}
 
-  Une fois que l'on veut vérifier le terme cotnenus dans une abstraction il nous libérer l'ensemble des variables
+  Lorsque que l'on veut vérifier le terme contenus dans une abstraction il nous faut libérer l'ensemble des variables
   qui lui sont associées. Avec notre représentation ``locally nameless'' nous somme obliger d'effectuer une substitution
   contrairement à une représentation composé uniquement des indices de de Bruijn.
   
@@ -1262,7 +1257,7 @@ cette méthode dans l'implémentation des types dépendants. \todo{Est-ce
 
 
 
-\subsection{Normalisation} %en gros calculer dans le lambda calcul non typé
+\subsection{Normalisation} 
 
 Dans cette section nous verrons certaines propriétés offertent par les
 systèmes de type, et nous parlerons de l'évaluation. Nous ne
@@ -1279,7 +1274,7 @@ bonne exécution des programmes.  Formellement, ces garanties se traduisent en d
 \begin{description}
 \item[Progrès :] si un terme \(t\) est correctement typé alors soit \(t\) est une valeur, soit il
  existe une réduction telle que \(t \leadsto t'\)
-\item[Préservation :] si un terme \emph{t} a le type \emph{T}
+\item[Préservation :] si un terme $t$ a le type $T$
 et que $t \leadsto t'$ alors $t'$ est de type~$T$
 \end{description}
 
