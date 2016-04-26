@@ -1768,7 +1768,7 @@ La fonction de réification est étendue sans surprise \todo{donner le contexte 
 
 \subsubsection{Formalisation}
 
-Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons maintenant enrichire notre language.
+Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons maintenant enrichir notre language.
 Les règles de typage sont présentées en style bidirectionnel en Figure~\ref{fig:typage dependant}.
 
 \begin{figure}
@@ -1858,8 +1858,8 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
 
 \begin{itemize}
   
-\item[$\bullet$] \boxed{\cfrac{\Gamma,x:S\vdash T \ni t}
-  {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)}}\\
+\item[$\bullet$] \boxed{\inferrule[Abs]{\Gamma,x:S\vdash T \ni t}
+  {\Gamma \vdash \forall x:S.T \ni \lambda x. t}}\\
 
   Pour l'abstraction il nous faut désormais libérer les occurences de $x$ dans $T$.
   Etant donné que nous avons désormais des variables liées dans le type \emph{Pi} il nous faut
