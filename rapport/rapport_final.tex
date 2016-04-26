@@ -1958,16 +1958,7 @@ Nous commencerons par mettre à jour les types de données courants. Nous prése
 
 \subsubsection{Les entiers}
 
-Nous avons désormais besoin de modifier notre grammaire des entiers dans notre language:
-\begin{bnf}
-  t &::= &....... &\mbox{(termes vérifiables)} \\
-  &|& \nat & \mbox{(nat)} \\
-  &|& \zero & \mbox{(zero)} \\
-  &|& \succs\:t & \mbox{(succ)} \\
-  s &::= &....... &\mbox{(termes synthétisables)} \\
-  &|& \iter\:t\:t\:t\:t & \mbox{(iter)}
-\end{bnf}
-Maintenant iter possède un argument de plus que précédement nous verrons sont role dans le typage des entiers.
+\attention{À vérifier mais, en principe : non, tout colle pile poil. En ce cas, supprimer ce texte complètement.} Maintenant iter possède un argument de plus que précédement nous verrons sont role dans le typage des entiers.
 \codefrom{dependent}{lambda}{terme_nat}
 \codefrom{dependent}{lambda}{terme_iter}
 
