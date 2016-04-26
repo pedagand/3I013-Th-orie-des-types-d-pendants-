@@ -1768,7 +1768,7 @@ La fonction de réification est étendue sans surprise \todo{donner le contexte 
 
 \subsubsection{Formalisation}
 
-Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons maintenant enrichir notre language.
+Maintenant que nous avons l'intuition des nouveaux constructeurs, nous pouvons maintenant enrichir notre language.
 Les règles de typage sont présentées en style bidirectionnel en Figure~\ref{fig:typage dependant}.
 
 \begin{figure}
@@ -1811,17 +1811,17 @@ Les règles de typage sont présentées en style bidirectionnel en Figure~\ref{f
   \label{fig:typage dependant} 
 \end{figure}
 
-Les deux nouvelles constructions \emph{Pi} et \emph{Star} sont des \emph{termes vérifiables} étant donné
-que l'on possède toute l'information nécéssaire pour les vérifier. De manière générale les types seront 
-des \emph{termes vériable}.
+Les deux nouvelles constructions \todo{encore emph} \emph{Pi} et
+\emph{Star} sont des termes vérifiables étant donné que l'on possède
+toute l'information nécéssaire pour les vérifier efficacement. De
+manière générale les types seront des termes vériable.  Le caractère
+bidirectionnel du langage du langage est utilisé ici de façon cruciale
+pour obtenir une présentation algorithmique du test de conversion : il
+est tout simplement traité par le changement de phase (règle
+\textsc{Ann}).
 
-Si l'introduction d'un système bidirectionnel dans le $\lambda$-calcul pouvait ne pas etre indispensable, elle prend tout son 
-sens avec les types dépendants.
-Cependant nous ne pouvons pas parler de types dépendants sans un système bidirectionnel, ce sont dans les 
-\emph{termes vérifiables} que nous allons définir la dépendances que nous allons utilisé dans les 
-\emph{termes synthétisables}.
-Mis à part la dépendance introduite dans l'abstraction notre language ne comporte pas de termes exploitant 
-l'expressivité des types dépendants. Nous verrons au fur et à mesur des extensions toute leur richesse.
+Pour le moment, mis à part la dépendance introduite par l'abstraction, notre language ne comporte pas de termes exploitant 
+l'expressivité des types dépendants. Nous découvrirons leur richesse au fur et à mesure des extensions.
 
 En général le connecteur $\forall$ est appelé \emph{Pi} nous garderons cette convention.
 Les deux notations suivantes sont équivalentes: 
