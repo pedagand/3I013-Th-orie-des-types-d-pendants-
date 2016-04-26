@@ -2030,12 +2030,12 @@ Commençons par enrichire notre grammaire:
 \newcommand{\dfold}{\mathit{dfold}}
 
 \begin{bnf}
-  t &::= &....... &\mbox{(termes vérifiables)} \\
-  &|& \vect\:t\:t & \mbox{(vec)} \\
-  &|& \dnil\:t & \mbox{(dnil)} \\
-  &|& \dcons\:t\:t & \mbox{(dcons)} \\
-  s &::= &....... &\mbox{(termes synthétisables)} \\
-  &|& \dfold\:t\:t\:t\:t\:t\:t & \mbox{(dfold)}
+  t &::= & (\ldots) &\mbox{(termes vérifiables)} \\
+  &|& \vect\:t\:t & \mbox{(type des vecteurs)} \\
+  &|& \dnil\:t & \mbox{(vecteur vide)} \\
+  &|& \dcons\:t\:t & \mbox{(concaténation)} \\
+  s &::= & (\ldots) &\mbox{(termes synthétisables)} \\
+  &|& \dfold\:t\:t\:t\:t\:t\:t & \mbox{(itérateur)}
 \end{bnf}
 
 Ce qui se traduit dans notre programme par le code suivant:
