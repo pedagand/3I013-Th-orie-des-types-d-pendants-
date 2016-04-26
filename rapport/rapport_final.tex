@@ -1795,34 +1795,44 @@ choses dans l'architecture du programme.
 
 Nous avons désormais une forme normale pour les types, il est donc intérressant de 
 fournire cette forme normale directement au type-checker. La fonction \fun{check} prend donc maintenat
-un contexte, un \emph{terme inférable} ainsi qu'une value.
+un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
 
-\codefrom{dependent}{lambda}{check_head}
-\codefrom{dependent}{lambda}{check_abs}
-$\cfrac{\Gamma,x:S\vdash T \ni t}
-    {\Gamma \vdash \forall x:S.T \ni \lambda x. t}$
+\begin{itemize}
+  
+\item[$\bullet$] \boxed{\cfrac{\Gamma,x:S\vdash T \ni t}
+  {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)}}\\
 
-Le principal changement de cette implémentation est le changement d'égalité. 
-En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut 
-tester l'égalité avec la simple fonction d'ocaml. Il nous faut donc d'abord transformer 
-nos \emph{value} en \emph{termes vérifiables}. Le second problème est que le nom associé 
-aux différents binder tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
-meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv}sur l'$\alpha$-équivalence 
-deux termes sont égaux meme si le nom de leur variables est différents. 
-La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
-du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les memes.
+  Pour l'abstraction il nous faut désormais libérer les occurences de $x$ dans $T$.
+  Etant donné que nous avons désormais des variables liées dans les types il nous faut
+  effectuer la même opération que pour l'abstraction à savoir une substitution avec une variable
+  fraiche. Comme nous 
 
-\codefrom{dependent}{lambda}{check_inv}
-$\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-    {\Gamma\vdash T \ni inv(t)}$
+  \codefrom{dependent}{lambda}{check_head}
+  \codefrom{dependent}{lambda}{check_abs}
+  
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+  {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}}\\
+  
+  Le principal changement de cette implémentation est le changement d'égalité. 
+  En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut 
+  tester l'égalité avec la simple fonction d'ocaml. Il nous faut donc d'abord transformer 
+  nos \emph{value} en \emph{termes vérifiables}. Le second problème est que le nom associé 
+  aux différents binder tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
+  meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv}sur l'$\alpha$-équivalence 
+  deux termes sont égaux meme si le nom de leur variables est différents. 
+  La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
+  du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les memes.
 
+  \codefrom{dependent}{lambda}{check_inv}
 
-
+         
+    
+    
 \codefrom{dependent}{lambda}{check_star}
 $\cfrac{}
     {\Gamma \vdash * \ni *}$
 
-
+    
 
 \codefrom{dependent}{lambda}{check_pi}
 $\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
@@ -1849,6 +1859,8 @@ $\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
 
 Etant donné que nos termes et nos types sont équivalents il faut maintenant vérifier que 
 $T$ est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
+
+\end{itemize}
 
 \subsubsection{Mise à jour de l'évaluation}
 
