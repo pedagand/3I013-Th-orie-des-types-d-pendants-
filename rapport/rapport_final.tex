@@ -1888,14 +1888,20 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
 
   Tout comme dans l'implémentation précédente il n'est pas possible de rencontrer de variable 
   liée lors de la vérification de type.
-  
-\codefrom{dependent}{lambda}{synth_var}
+
+    \codefrom{dependent}{lambda}{synth_head}
+  \codefrom{dependent}{lambda}{synth_var}
 
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
     {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)}}\\    
 
-\codefrom{dependent}{lambda}{synth_app}
+  Si la synthèse de $f$ nous donne bien un \emph{Pi} et que l'on vérifie $s$ de type
+  $S$ alors il nous faut retourner $T$ en substitutant les occurences de variables liées.  
+  Etant donné que \emph{Pi} est sous forme normale cette subsitution s'effectue
+  comme dans la règle de l'abstraction, par application de fonction Ocaml.
+  
+  \codefrom{dependent}{lambda}{synth_app}
 
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
