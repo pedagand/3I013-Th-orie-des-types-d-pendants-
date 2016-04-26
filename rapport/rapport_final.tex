@@ -1892,20 +1892,19 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
 \codefrom{dependent}{lambda}{synth_var}
 
 
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
+    {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)}}\\    
+
 \codefrom{dependent}{lambda}{synth_app}
 
-$\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
-    {\Gamma\vdash f\:s\in \subst{T}{s}{x}}$
 
-
-
-\codefrom{dependent}{lambda}{synth_ann}
-
-$\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
-    {\Gamma\vdash (t:T) \in T}$
+\item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
+    {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}}\\
 
 Etant donné que nos termes et nos types sont équivalents il faut maintenant vérifier que 
 $T$ est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
+  
+\codefrom{dependent}{lambda}{synth_ann}
 
 \end{itemize}
 
