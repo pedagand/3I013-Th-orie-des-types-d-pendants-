@@ -1734,11 +1734,13 @@ Nous allons donc dorénavant noté \attention{Ha non, tu recommences ! C'est $\s
 
 
 
-\subsubsection{Mise à jour de l'évaluation}
+\subsubsection{Réduction}
 \label{maj_eval}
 
-Etant donné que nos types sont désormais des termes et que l'on peut les normaliser il nous faut
-d'abord parler de l'évaluation.
+Etant donné que nos types sont désormais des termes et que l'on peut
+les normaliser il nous faut d'abord parler de l'évaluation. \todo{Il
+  va falloir en dire un peu plus que je me jeter ces règles à la
+  figure}
 
 \[\begin{array}{c}
   \inferrule{{}}
@@ -1747,23 +1749,19 @@ d'abord parler de l'évaluation.
   \inferrule{{p\Downarrow t\:\:\:p'\Downarrow t'}}
             {\forall x:p.p'\Downarrow \forall x:t.t'}
 \end{array}\]
-La spécification de ces évaluations est très classique cependant pour leur implémentation
-nous allons utilisé une stratégie plus similaire à l'implémentation précédente \ref{red_forte_grand_pas}. 
-Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont:
+
+L'implémentation suit la stratégie de normalisation par évaluation présentée en Section~\ref{red_forte_grand_pas}. 
+Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont: \todo{donner le contexte dans lequel ces définitions sont introduites, sinon on est perdu}
 \codefrom{dependent}{lambda}{value_pi_star}
 
 En suivant le meme raisonnement que pour l'évaluation d'une abstraction avec la
 fonction \fun{big_step_eval}, nous allons transformer le second membre de $\forall$
 en fonction anonyme. 
-
+\todo{donner le contexte dans lequel ces définitions sont introduites, sinon on est perdu}\todo{Faire tenir le code agréablement sur la page}
 \codefrom{dependent}{lambda}{big_step_new}
-Le premier membre est évalué simplement tandisque le second est bien évalué en fonction anonyme,
-car comme pour l'abstraction, cela nous permet de pouvoir substituer dans notre type 
-directement.
+Le premier membre est évalué simplement tandis que le second est evalue vers une fonction anonyme puis, comme pour l'abstraction, cela nous permet de pouvoir directement substituer les valeurs normalisées dans notre type.
 
-Pour terminer voici la fonction permettant de remettre nos \emph{values} dans le monde
-des termes vérifiables:
-
+La fonction de réification est étendue sans surprise \todo{donner le contexte dans lequel ces définitions sont introduites, sinon on est perdu}
 \codefrom{dependent}{lambda}{value_to_inTm_new}
 
 
