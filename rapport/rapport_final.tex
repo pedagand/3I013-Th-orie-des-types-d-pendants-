@@ -1560,8 +1560,8 @@ calculatoire des types. En effet notre seul but était de nous assurer que nos $
 étaient fortement normalisants. 
 Un des aspects primordiale des système de type est la correspondance de Curry-Howard.
 Celle ci permet de d'établire des relations entre la logique propositionnelle et les systèmes 
-de type. Nous verrons que ``t est une preuve de P'' est équivalent à \attention{je vais t'étrangler avec tes emph} \emph{t:P} c'est à dire
-\attention{pareil avec les variables mathématiques dans le texte} t est de type P.
+de type. Nous verrons que ``t est une preuve de P'' est équivalent à  $t:P$ c'est à dire
+\attention{pareil avec les variables mathématiques dans le texte} $t$ est de type $P$.
 Tout d'abord intéressons nous aux bases de la logique propositionnelle.
 \subsubsection{La logique propositionnelle}
 
@@ -1577,7 +1577,7 @@ la règle d'introduction de l'implication est
 %
 \todo{MORT AU CFRACS. UTILISER LES MACROS.}
 \begin{align*}
-  \cfrac{\Gamma, A \vdash B}
+  \inferrule[]{\Gamma, A \vdash B}
         {\Gamma \vdash A \Rightarrow B}
 \end{align*}
 
@@ -1608,7 +1608,8 @@ part $B$ :
           {\Gamma A \land B}
 \end{align*}
 
-La règle d'élimination \todo{décrire ces règles} 
+Si l'on désire prouver une proposition $A$ et que l'on suppose $A\land B$ alors celle-ci 
+est vraie. Ce raisonnement est aussi valable pour une propriété $B$.
 \begin{align*}
 \inferrule{\Gamma \vdash A \land B}
           {\Gamma \vdash A}
@@ -1620,7 +1621,7 @@ La règle d'élimination \todo{décrire ces règles}
 On reconnait ici le produit cartésien que l'on avait introduit dans
 notre $\lambda$-calcul simplement typé : la règle d'introduction
 correspond au constructeur de paires tandis que les éliminateurs
-correspondent aux projections \todo{on a défini des macros pour \Fst{} et \Snd{}} \emph{fst} et \emph{snd} les
+correspondent aux projections \Fst{} et \Snd{} les
 projections.
 
 
@@ -1665,9 +1666,8 @@ nous allons introduire un nouveau lien entre logique et typage : le quantificate
 \label{presentation_type_dependants}
 
 Jusqu'à présent, nous avions d'une part l'ensemble des types et l'ensemble des termes. Cette séparation 
-avait un sens car les termes et les types ne se comportaient pas de la meme façon. \todo{Qu'est-ce que tu veux dire ?} La plus grande différence 
-était au niveau de l'évaluation, en effet nos types étant statiques il n'était pas nécéssaire de les réduire
-ou d'effectuer des calculs sur eux %nul.
+avait un sens car les termes et les types ne se comportaient pas de la meme façon et n'avaient pas les memes propriétés. 
+La plus grande différence se situait au niveau de l'évaluation, en effet nos types étant statiques il n'était pas nécéssaire de les évaluer.
 Cependant certains termes ne peuvent pas s'exprimer dans un système de type statique, prenons par exemple
 la fonction identité. 
 \begin{example}
@@ -1682,14 +1682,11 @@ On souhaiterais écrire une fonction polymorphe dont le type de retour est influ
 
 Il existe différentes façon de permettre l'écriture de fonctions comme celles ci. Inspirons nous de la
 logique, le quantificateur $\forall$ nous permet d'écrire ce type de termes.
-\attention{Ce n'est surtout pas $\forall x : A \rightarrow A$ qui ne veut pas dire grand chose.}
 \begin{example}
   On souhaiterais pouvoir écrire une fonction identité de la manière suivante :
   \begin{align*}
     \Lam{A}{\Lam{x}{x}}\::(\forall A, A \rightarrow A)
   \end{align*}
-  %
-%  où $\star$ est le type des types.
 \end{example}
 
 \newcommand{\nil}{\ensuremath{\mathsf{nil}}}
@@ -1729,7 +1726,7 @@ $\star$, le type des types.
   tendance à garder son type (nécessairement $\star$) implicite.
 
 \end{example}
-Nous allons donc dorénavant noté \attention{Ha non, tu recommences ! C'est $\star$.} \emph{*} le type des types.
+Nous allons donc dorénavant noté $\star$ le type des types.
 
 
 
@@ -1738,9 +1735,9 @@ Nous allons donc dorénavant noté \attention{Ha non, tu recommences ! C'est $\s
 \label{maj_eval}
 
 Etant donné que nos types sont désormais des termes et que l'on peut
-les normaliser il nous faut d'abord parler de l'évaluation. \todo{Il
-  va falloir en dire un peu plus que je me jeter ces règles à la
-  figure}
+les normaliser il nous faut d'abord parler de l'évaluation. 
+L'évaluation du terme $\star$ est triviale car ce terme est déja en forme normale.
+Pour $\forall$, il nous faut évaluer ses deux arguments.
 
 \[\begin{array}{c}
   \inferrule{{}}
@@ -1750,18 +1747,39 @@ les normaliser il nous faut d'abord parler de l'évaluation. \todo{Il
             {\forall x:p.p'\Downarrow \forall x:t.t'}
 \end{array}\]
 
+\newcommand{\Pis}[3]{\ensuremath{\Pi#1 : #2. #3}}
+
+En général le connecteur $\forall$ se note $\Pi$, nous garderons cette convention. 
+
+
+Les deux notations suivantes sont équivalentes: 
+\begin{align*}  
+  \forall x:S.T \Leftrightarrow \Pis{x}{S}{T}
+\end{align*}
+
+Afin d'alléger la syntaxe, un $\Pi$ anonyme sera noté comme une simple implication :
+\begin{align*}
+  & \forall x:Nat.Nat \Leftrightarrow \Pis{x}{Nat}{Nat} \Leftrightarrow (Nat \rightarrow Nat) \\
+\end{align*}
+
 L'implémentation suit la stratégie de normalisation par évaluation présentée en Section~\ref{red_forte_grand_pas}. 
-Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont: \todo{donner le contexte dans lequel ces définitions sont introduites, sinon on est perdu}
+Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont:
+
+\codefrom{dependent}{lambda}{value_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{value_pi_star}
 
 En suivant le meme raisonnement que pour l'évaluation d'une abstraction avec la
 fonction \fun{big_step_eval}, nous allons transformer le second membre de $\forall$
 en fonction anonyme. 
-\todo{donner le contexte dans lequel ces définitions sont introduites, sinon on est perdu}\todo{Faire tenir le code agréablement sur la page}
+
+\codefrom{dependent}{lambda}{big_step_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{big_step_new}
+
+
 Le premier membre est évalué simplement tandis que le second est evalue vers une fonction anonyme puis, comme pour l'abstraction, cela nous permet de pouvoir directement substituer les valeurs normalisées dans notre type.
 
-La fonction de réification est étendue sans surprise \todo{donner le contexte dans lequel ces définitions sont introduites, sinon on est perdu}
+La fonction de réification est étendue sans surprise:
+\codefrom{dependent}{lambda}{value_to_inTm_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{value_to_inTm_new}
 
 
@@ -1811,8 +1829,8 @@ Les règles de typage sont présentées en style bidirectionnel en Figure~\ref{f
   \label{fig:typage dependant} 
 \end{figure}
 
-Les deux nouvelles constructions \todo{encore emph} \emph{Pi} et
-\emph{Star} sont des termes vérifiables étant donné que l'on possède
+Les deux nouvelles constructions $Pi$ et
+$\star$ sont des termes vérifiables étant donné que l'on possède
 toute l'information nécéssaire pour les vérifier efficacement. De
 manière générale les types seront des termes vériable.  Le caractère
 bidirectionnel du langage du langage est utilisé ici de façon cruciale
@@ -1822,17 +1840,6 @@ est tout simplement traité par le changement de phase (règle
 
 Pour le moment, mis à part la dépendance introduite par l'abstraction, notre language ne comporte pas de termes exploitant 
 l'expressivité des types dépendants. Nous découvrirons leur richesse au fur et à mesure des extensions.
-
-En général le connecteur $\forall$ est \todo{définir une macro pour Pi. Je préfèrerais que cela apparaisse comme $\Pi x : S. T$.} appelé \emph{Pi} nous garderons cette convention.
-Les deux notations suivantes sont équivalentes: 
-\begin{align*}  
-  \forall x:S.T \Leftrightarrow Pi\: x\: S\: T
-\end{align*}
-
-Afin d'alléger la syntaxe, un \emph{Pi} anonyme sera noté comme une simple implication :
-\begin{align*}
-  & \forall x:Nat.Nat \Leftrightarrow Pi\: x\: Nat\: Nat \Leftrightarrow (Nat \rightarrow Nat) \\
-\end{align*}
 
 Avant de poursuivre, il est important de se convaincre que l'ensemble des termes exprimables avec un système 
 de type simple est inclus dans l'ensemble des termes exprimable dans un système de type dépendant.
@@ -1845,9 +1852,10 @@ de type simple est inclus dans l'ensemble des termes exprimable dans un système
 
 \paragraph{Implémentation :} 
 
-\todo{il manque un verbe que ceci soit une phrase }La représentation de nos termes vérifiables et synthétisables dans le programme:
+Représentons nos termes vérifiables et synthétisables dans le programme:
 \codefrom{dependent}{lambda}{inTm_head}
 \codefrom{dependent}{lambda}{inTm}
+\codefrom{dependent}{lambda}{exTm_head}
 \codefrom{dependent}{lambda}{exTm}
 
 Nous n'avons rajouter que deux nouveaux termes dans le noyau de notre language mais 
@@ -1867,19 +1875,19 @@ un contexte, un terme vérifiable ainsi qu'un type en forme normale. \todo{expli
 
   \codefrom{dependent}{lambda}{check_head}
 
-\item[$\bullet$] \boxed{\inferrule[Abs]{\Gamma,x:S\vdash T \ni t}
+\item[$\bullet$] \boxed{\inferrule[(Abs)]{\Gamma,x:S\vdash T \ni t}
   {\Gamma \vdash \forall x:S.T \ni \lambda x. t}}\\
 
   Pour l'abstraction il nous faut désormais libérer les occurences de $x$ dans $T$.
-  Etant donné que nous avons désormais des variables liées dans le type \emph{Pi} il nous faut
+  Etant donné que nous avons désormais des variables liées dans le type $\Pi$ il nous faut
   effectuer la même opération que pour l'abstraction à savoir une substitution avec une variable
   fraiche. Notre type étant sous forme normale sont second membre est une fonction
   anonyme comme vu en Section~\ref{maj_eval}. La substitution s'effectue donc au travers de l'application de fonction en Ocaml.
 
   \codefrom{dependent}{lambda}{check_abs}
   
-\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-  {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}}\\
+\item[$\bullet$] \boxed{\inferrule[(Inv)]{\Gamma \vdash t \in T' \:\: T=T'}
+  {\Gamma\vdash T \ni inv(t)}}\\
   
   Le principal changement de cette implémentation est le changement d'égalité. 
   En effet, ici les types sont des valeurs OCaml d'ordre supérieur (pouvant contenir des fonctions anonymes) dont on ne peut 
@@ -1905,7 +1913,7 @@ un contexte, un terme vérifiable ainsi qu'un type en forme normale. \todo{expli
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
     {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}}\\    
   
-  Ici,  \emph{Pi} n'est pas sous forme normale étant donné qu'il est le terme
+  Ici,  $\Pi$ n'est pas sous forme normale étant donné qu'il est le terme
   à vérifier. Nous somme donc obliger d'effectuer la substitution de $x$ dans $T$
   avec notre fonction \fun{substitution}:
   
@@ -1913,7 +1921,8 @@ un contexte, un terme vérifiable ainsi qu'un type en forme normale. \todo{expli
 
 \item[$\bullet$] \boxed{\boxed{\Gamma\vdash t \in T}}
 
-\todo{Expliquer les arguments de la fonction de synthèse.}
+Notre fonction de synthèse nécéssite un contexte \fun{ctxt}qui est de meme type que celui de la fonction
+\fun{check} ainsi qu'un terme synthétisable \fun{exT}
 
     \codefrom{dependent}{lambda}{synth_head}
 
@@ -1929,9 +1938,9 @@ un contexte, un terme vérifiable ainsi qu'un type en forme normale. \todo{expli
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
     {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)}}\\    
 
-  Si la synthèse de $f$ nous donne bien un \emph{Pi} et que l'on vérifie $s$ de type
+  Si la synthèse de $f$ nous donne bien un $\Pi$ et que l'on vérifie $s$ de type
   $S$ alors il nous faut retourner $T$ en substitutant les occurences de variables liées.  
-  Etant donné que \emph{Pi} est sous forme normale cette subsitution s'effectue
+  Etant donné que $\Pi$ est sous forme normale cette subsitution s'effectue
   comme dans la règle de l'abstraction, par application de fonction dans Ocaml.
   
   \codefrom{dependent}{lambda}{synth_app}
@@ -1958,30 +1967,31 @@ Nous commencerons par mettre à jour les types de données courants. Nous prése
 
 \subsubsection{Les entiers}
 
-\attention{À vérifier mais, en principe : non, tout colle pile poil. En ce cas, supprimer ce texte complètement.} Maintenant iter possède un argument de plus que précédement nous verrons sont role dans le typage des entiers.
+
+La représentation de nos termes n'a pas changé:
+\codefrom{dependent}{lambda}{inTm_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{terme_nat}
+\codefrom{dependent}{lambda}{exTm_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{terme_iter}
 
 
-
-Passons maintenant aux règles de typages: \todo{Utiliser les macros}
-
+Passons maintenant aux règles de typages: 
 \[\begin{array}{c}
-  \inferrule[(Nat)]{}
+  \inferrule[(Nat)]{\:}
             {\Gamma\vdash * \ni Nat}
   \qquad
-  \inferrule[(Zero)]{}
-            {\Gamma\vdash Nat \ni Zero}
+  \inferrule[(Zero)]{\:}
+            {\Gamma\vdash Nat \ni \zero}
   \qquad
   \inferrule[(Succ)]{\Gamma\vdash Nat \ni n}
-            {\Gamma\vdash Nat \ni Succ\:n}
+            {\Gamma\vdash Nat \ni \succs\:n}
   \medskip\\
   \inferrule[(Iter)]
             {\Gamma\vdash Nat\rightarrow *\ni P \\
               \Gamma\vdash Nat\ni n\\
-              \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\\
-              \Gamma\vdash P\:Zero\ni a}
-            {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}
+              \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(\succs\:n))\ni f\\
+              \Gamma\vdash P\:\zero\ni a}
+            {\Gamma\vdash \iter \: P\: n\:f\:a\in P\:n}
 
 \end{array}\]
 Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
@@ -2003,7 +2013,7 @@ Afin d'aléger la syntaxe nous utiliserons dorénavant \lstinline!(+ n m)! corre
 
 \paragraph{Implémentation :} 
 
-Commençons par les règles de vérifications: \todo{Simplifier le code : c'est souvent \lstinline!ty = VStar! ou  \lstinline!ty = VNat!}
+Commençons par les règles de vérifications:
 \codefrom{dependent}{lambda}{check_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{check_nat}
 
@@ -2011,10 +2021,18 @@ Pour \emph{iter} si l'ensemble des des hypothèses sont vérifiées il nous faut
 du prédicat $P$ sur $n$.
 \codefrom{dependent}{lambda}{synth_iter}
 
+Dans l'implémentation ~\ref{entier_type} nous n'avons pas présenté l'évaluation à grand pas des entiers naturels, 
+voici donc le code correspondant:
+\codefrom{dependent}{lambda}{big_step_nat}
 
-Les règles d'évaluations n'ont pas changées depuis la dernière implémentation \todo{faire une ref au lieu de dire ``dernière''} mis à part le fait que  
-nous n'avons pas besoin d'évaluer le prédicat d'iter.
+Pour l'évaluation de \fun{iter} nous utilisons la meme techniques que pour 
+l'application. On évalue l'ensemble des arguments puis on appelle la fonction \fun{vitter}
+\codefrom{dependent}{lambda}{big_step_iter}
 
+Le prédicat ne sert pas dans l'évaluation mais étant donné que l'on doit retourner 
+un terme neutre si le terme contient des variables libres nous le gardons dans les arguments de la
+fonction.
+\codefrom{dependent}{lambda}{vitter}
 
 \subsubsection{Les vecteurs}
 
@@ -2045,27 +2063,38 @@ Ce qui se traduit dans notre programme par le code suivant:
 
 
 Les arguments des différents constructeurs seront expliqué une fois que nous aurrons vu les 
-règles de typage:\todo{les mettre ensemble dans une figure.}
-\begin{align*}
-  &\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
-  {\Gamma\vdash * \ni Vec\: \alpha\:n }&\mbox{(Vec)} \\
-\end{align*}
-
-
-
-
-Ici $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
-Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
-de taille précise il faut effectuer un test à l'entrée de la fonction. \todo{Phrase étrange} C'est un des aspects très intéressant des types dépendants dans 
-l'utilisation des types dépendants. 
-Comme pour les listes, les vecteurs ont deux constructeurs : \todo{Mort aux cfracs. Tous les cfracs.}
-\begin{align*}
-  &\cfrac{}
-  {\Gamma\vdash Vec\:\alpha\:\zero \ni dnil\:\alpha}&\mbox{(dnil)} 
+règles de typage présente en figure \ref{fig:typage_vec}.
+\begin{figure}
+\[
+\begin{array}{c}
+  
+  \inferrule[(Vec)]%
+             {\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}%
+             {\Gamma\vdash * \ni Vec\: \alpha\:n }  
   \medskip\\
-  &\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
-  {\Gamma\vdash Vec\:\alpha\:(\succs\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
-\end{align*}
+
+  \inferrule[(dnil)]%
+            {\:}%
+            {\Gamma\vdash Vec\:\alpha\:\zero \ni dnil\:\alpha}  
+  \medskip\\
+  \inferrule[(dcons)]%
+            {\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}%
+            {\Gamma\vdash Vec\:\alpha\:(\succs\:n)\ni dcons\:a\:v}  
+
+\end{array}
+\]
+\label{fig:typage_vec}
+\end{figure} 
+ 
+ 
+
+
+
+Dans la règle \emph{vec} $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
+Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
+de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants qui
+permettent d'assister les programmeurs dans la vérification de leurs programmes.
+
 
 Le terme \emph{dnil} correspond au vecteur vide, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
 \begin{example}
@@ -2076,9 +2105,9 @@ Le terme \emph{dnil} correspond au vecteur vide, et \emph{dcons} qui nous permet
 \end{example}
 
 Nous pouvons maintenant créer des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utiliser. Nous allons 
-implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold} dont voici une définition intuitive:
+implémenter une fonction bien connue des programmeurs fonctionnels, dfold dont voici une définition intuitive:
 \fun{dfold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
-Définissons maintenant l'éliminateur \todo{mort aux emph} \emph{dfold} comme un terme synthétisable:
+Définissons maintenant l'éliminateur dfold comme un terme synthétisable:
 
 \[\begin{array}{c}
   \inferrule[(Dfold)]{\Gamma\vdash *\ni\alpha\:
@@ -2108,7 +2137,7 @@ Voici donc le code du type-checker correpondant:
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
   {\Gamma\vdash * \ni Vec\: \alpha\:n }\mbox{(Vec)}}\\
   
-  \todo{texte manquant} \todo{simplifier le code en faisant \fun{ty = VStar && (..)} au lieu du match}
+  Il nous faut vérifier les deux arguments du terme \fun{Vec}.
   %texte pour vec 
   \codefrom{dependent}{lambda}{check_vec}
 

@@ -23,20 +23,22 @@ type inTm =
   | Pair of inTm * inTm 
   | Cross of inTm * inTm
   | List of inTm 
-  | Nil (* TODO: remove A *) of inTm 
-  | Cons  (* TODO: remove A *) of inTm * inTm * inTm 
+  | Nil of inTm 
+  | Cons of inTm * inTm * inTm 
 (*=terme_vector *)
   | Vec of inTm * inTm
-  | DNil (* TODO: remove A *)  of inTm
-  | DCons (* TODO: remove A *) of inTm * inTm 
+  | DNil of inTm
+  | DCons of inTm * inTm 
   (*=End *)
   (*=what *)      
   | What
   (*=End *)
   | Id of inTm * inTm * inTm
   | Refl (* TODO: remove *) of inTm 
-(*=exTm *) 
+(*=exTm_head *) 
 and exTm = 
+(*=End *)
+(*=exTm *) 
   | Ann of inTm * inTm 
   | BVar of int 
   | FVar of name 
@@ -52,8 +54,9 @@ and exTm =
   | DFold of inTm * inTm * inTm * inTm * inTm * inTm 
 (*=End *)
  
-
+(*=value_head *)
 type value = 
+(*=End *)
   | VLam of (value -> value)
   | VNeutral of neutral 
 (*=value_pi_star *)
@@ -303,19 +306,25 @@ and substitution_exTm  t tsub var =
 
 let vfree n = VNeutral(NFree n)
   
-(*=big_step_inv *) 
+(*=big_step_head *)
 let rec big_step_eval_inTm t envi = 
+(*=End *)
   match t with 
+(*=big_step_inv *)
   | Inv(i) -> big_step_eval_exTm i envi
 (*=End *)
   | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
 (*=big_step_new *)
   | Star -> VStar
-  | Pi (v,x,y) -> VPi ((big_step_eval_inTm x envi),(function arg -> (big_step_eval_inTm y (arg :: envi))))
+  | Pi (v,x,y) -> 
+     VPi ((big_step_eval_inTm x envi),
+	  (function arg -> (big_step_eval_inTm y (arg :: envi))))
 (*=End *)
+(*=big_step_nat *) 
   | Nat -> VNat
   | Zero -> VZero
   | Succ(n) -> VSucc(big_step_eval_inTm n envi)
+(*=End *)
 (*=big_step_vec *) 
   | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
   | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
@@ -329,11 +338,13 @@ and vapp v =
   | ((VLam f),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v))
   | _ -> failwith "must not append" 
+(*=vitter *)
 and vitter (p,n,f,a) =
   match n,f with
   | (VZero,VLam fu) -> a
   | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
   | _ -> VNeutral(NIter(p,n,f,a))
+(*=End *)
 (*=vfold *) 
 and vfold(alpha,p,n,xs,f,a) = 
   match xs,f,n with
@@ -347,10 +358,12 @@ and big_step_eval_exTm t envi =
   | FVar(v) -> vfree v 
   | BVar(v) -> List.nth envi v 
   | Appl(x,y) -> vapp((big_step_eval_exTm x envi),(big_step_eval_inTm y envi))    
+(*=big_step_iter *)
   | Iter(p,n,f,a) -> vitter ((big_step_eval_inTm p envi),
 			     (big_step_eval_inTm n envi),
 			     (big_step_eval_inTm f envi),
 			     (big_step_eval_inTm a envi))
+(*=End *)
   | DFold(alpha,p,n,xs,f,a) -> vfold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
 				      (big_step_eval_inTm n envi),(big_step_eval_inTm xs envi),
 				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi))				      
@@ -364,15 +377,18 @@ let boundfree i n =
 let gensym =
   let c = ref 0 in
   fun () -> incr c; "x" ^ string_of_int !c
-
+(*=value_to_inTm_head *)
 let rec value_to_inTm i v =
   match v with 
+(*=End *)
   | VLam f -> value_to_inTm (i+1) (f (vfree(Quote i)))
   | VNeutral n -> Inv(neutral_to_exTm i n)
 (*=value_to_inTm_new *)		     
   | VPi(x,f) -> let var = gensym () in 
 		begin
-		  Pi(Global(var),(value_to_inTm i x),(value_to_inTm (i+1) (f(vfree(Quote i)))))
+		  Pi(Global(var),
+		     (value_to_inTm i x),
+		     (value_to_inTm (i+1) (f(vfree(Quote i)))))
 		end
 (*=End *)
   | VStar -> Star
@@ -473,18 +489,8 @@ let rec lcheck contexte ty inT =
      end 
   (*=End *)
   (*=check_nat *)
-  | Nat -> 
-     begin 
-       match ty with
-       | VStar -> true
-       | _ -> false
-     end 
-  | Zero -> 
-     begin 
-       match ty with 
-       | VNat -> true 
-       | _ -> false 
-     end
+  | Nat -> ty = VStar
+  | Zero -> ty = VNat
   | Succ(x) -> 
      begin 
        match ty with 
@@ -493,13 +499,9 @@ let rec lcheck contexte ty inT =
      end
   (*=End *)
 (*=check_vec *)
-  | Vec(alpha,n) -> 
-     begin        
-       match ty with 
-       | VStar -> lcheck contexte VStar alpha  &&
-	  	  lcheck contexte VNat n   
-       | _ -> false 
-     end
+  | Vec(alpha,n) -> ty = VStar && 
+		      lcheck contexte VStar alpha  &&
+	  		lcheck contexte VNat n   			       
 (*=End *)
 (*=check_dnil *)
   | DNil(alpha) -> 
