@@ -1632,27 +1632,22 @@ section suivante.
 
 Dans la section précédente nous avons regarder quelques intuitions permettant de voir le lien entre la logique
 et l'informatique au travers des systèmes de type.
-Nous avons étudié le $\lambda$-calcul qui permet de faire le lien avec la déduction naturelle. Il existe d'autre
-modèles de calculs permettants de faire des liens similaires comme par exemple les Système à la Hilbert et 
-les systèmes de type de la logique combinatoire.
-
+Nous avons étudié le $\lambda$-calcul qui permet de faire le lien avec la déduction naturelle. 
 Voici un tableau montrant les différents liens entre la logique et le $\lambda$-calcul.
 
-\todo{c'est super moche il faut que je trouve une structure pour le présenter}
-\begin{lstlisting}
-  Logique ------------- lambda calcul
-  Axiom ----------> variable
-  regles dintroductions ----------> constructeurs 
-  regles deliminations ----------> Elminateurs 
-  Normalisation des preuves ------> normalisation  
-\end{lstlisting}
+\begin{tabular}{c@{\quad$\leftrightarrow$\quad}c}
+  logique & $\lambda$-calcul \\
+  axiome & variable \\
+  règles d'introduction & constructeurs \\
+  règles d'élimination & destructeurs \\
+  normalisation des preuves & réduction du calcul \\
+\end{tabular}
+\\
 
 
-
-Le fait d'avoir séparé nos termes permets de rendre ces correspondances plus aisées. En effet les constructeur
+Le fait d'avoir séparé nos termes permet de rendre ces correspondances plus aisées. En effet les constructeur
 correspondent aux \emph{termes vérifiables} tandis que les \emph{termes synthétisables} sont les destructeurs.
-En ajoutant de nouveaux termes dans notre $\lambda$-calcul à permis d'introduire de nouveaux constructeurs
-de la logique dans notre système. Nous allons suivre la même motivation en introduisant les types dépendants.
+Introduire de nouveaux termes dans notre $\lambda$-calcul nous a ainsi permis d'introduire de nouveaux connecteurs logiques dans notre système. Nous allons suivre la même motivation en introduisant les types dépendants.
 
 Si nous souhaitons prouver une proposition c'est à dire un type, il nous faudra trouver
 un terme accepter par notre vérificateur de type.
