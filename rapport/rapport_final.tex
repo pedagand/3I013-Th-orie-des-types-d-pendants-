@@ -2045,7 +2045,7 @@ Ce qui se traduit dans notre programme par le code suivant:
 
 
 Les arguments des différents constructeurs seront expliqué une fois que nous aurrons vu les 
-règles de typage:
+règles de typage:\todo{les mettre ensemble dans une figure.}
 \begin{align*}
   &\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
   {\Gamma\vdash * \ni Vec\: \alpha\:n }&\mbox{(Vec)} \\
@@ -2056,19 +2056,18 @@ règles de typage:
 
 Ici $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
 Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
-de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants dans 
-l'utilisation des types dépendants. Si l'on possédait ce genre de constructions dans un language comme Java par exemple, nous
-pourrions crée une surchage sur des fonctions qui permettrait de traiter différement les vecteurs de grande taille pour le tri par exemple.
-Certains tris étant beaucoup plus efficaces sur de grands vecteurs et inversements. 
-Voici maintenant deux constructeurs pour les vecteurs:
+de taille précise il faut effectuer un test à l'entrée de la fonction. \todo{Phrase étrange} C'est un des aspects très intéressant des types dépendants dans 
+l'utilisation des types dépendants. 
+Comme pour les listes, les vecteurs ont deux constructeurs : \todo{Mort aux cfracs. Tous les cfracs.}
 \begin{align*}
   &\cfrac{}
-  {\Gamma\vdash Vec\:\alpha\:\zero \ni dnil\:\alpha}&\mbox{(dnil)} \\
+  {\Gamma\vdash Vec\:\alpha\:\zero \ni dnil\:\alpha}&\mbox{(dnil)} 
+  \medskip\\
   &\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
   {\Gamma\vdash Vec\:\alpha\:(\succs\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
 \end{align*}
 
-Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
+Le terme \emph{dnil} correspond au vecteur vide, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
 \begin{example}
   Voici un vecteur de taille trois et dont les éléments sont des entiers:
   \begin{align*}
@@ -2076,10 +2075,10 @@ Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui n
   \end{align*}  
 \end{example}
 
-Nous pouvons maintenant crée des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utilisers. Nous allons 
+Nous pouvons maintenant créer des vecteurs mais nous ne possédons pas encore d'éliminateur pour les utiliser. Nous allons 
 implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold} dont voici une définition intuitive:
-\fun{fold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
-Définissons maintenant l'éliminateur \emph{dfold} comme un \emph{terme synthétisable}:
+\fun{dfold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
+Définissons maintenant l'éliminateur \todo{mort aux emph} \emph{dfold} comme un terme synthétisable:
 
 \[\begin{array}{c}
   \inferrule[(Dfold)]{\Gamma\vdash *\ni\alpha\:
@@ -2095,9 +2094,13 @@ de rendre le type de retour dépendant des différents arguments.
 
 Il existe de nombreuses façon d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
 Voici le terme correspondant à cette utilisation:
-\begin{align*}
-  somme_liste\:=\:(lambda\:v (lambda n(dfold\:N\:(lambda\:n\:(lambda\:xs\:N))\:n\:v\:(lambda\:n(lambda\:xs\:(lambda\:a\:(lambda\:x\:(+\:a\:x)))))\:zero)))
-\end{align*}
+\begin{lstlisting}
+somme_liste = 
+  (lambda v (lambda n 
+    (dfold N (lambda n (lambda xs N)) n v
+      (lambda n (lambda xs (lambda a (lambda x (+ a x))))) 
+      zero)))
+\end{lstlisting}
 
 Voici donc le code du type-checker correpondant:
 \begin{itemize}
@@ -2105,6 +2108,7 @@ Voici donc le code du type-checker correpondant:
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
   {\Gamma\vdash * \ni Vec\: \alpha\:n }\mbox{(Vec)}}\\
   
+  \todo{texte manquant} \todo{simplifier le code en faisant \fun{ty = VStar && (..)} au lieu du match}
   %texte pour vec 
   \codefrom{dependent}{lambda}{check_vec}
 
@@ -2112,7 +2116,7 @@ Voici donc le code du type-checker correpondant:
 \item[$\bullet$] \boxed{\cfrac{}
   {\Gamma\vdash Vec\:\alpha\:\zero\ni dnil\:\alpha}\mbox{(Dnill)}}\\
   Afin de vérifier le terme \emph{Dnill} il nous faut simplement vérifier que les terme $\alpha$
-  sont égaux.  
+  sont égaux.  \todo{Le code match sur \fun{DNil(alpha)} mais c'est un entier n en fait}
   \codefrom{dependent}{lambda}{check_dnil}
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
@@ -2141,35 +2145,16 @@ Voici donc le code du type-checker correpondant:
 Avant d'implémenter l'évaluation dans notre programme il nous faut tout d'abord
 rajouter les \emph{valeurs} suivantes à notre language.
 \codefrom{dependent}{lambda}{Value_Vector}
+
 Passons maintenant à l'évaluation des vecteurs, nos trois constructeurs 
 n'ont pas d'évaluation particulière:
-\[\begin{array}{c}
-  \inferrule{{\alpha\Downarrow \alpha'\:\:\:n\Downarrow n'}}
-            { \vect\:\alpha\:n\Downarrow \vect\:\alpha'\:n'}
-  \medskip\\
-  \inferrule{{\alpha\Downarrow \alpha'}}
-            {\dnil\:\alpha\Downarrow \dnil\:\alpha'}
-  \medskip\\
-  \inferrule{{a \Downarrow a'\:\:\:xs \Downarrow xs'}}
-            {\dcons\:a\:xs\Downarrow \dcons\:a'\:xs'}
-\end{array}\]
-
-Ce qui se traduit dans notre algorithme de la façon suivante:
 \codefrom{dependent}{lambda}{big_step_vec}
 
-L'évaluation de \emph{dfold} s'effectue de la manière suivante:
-\[\begin{array}{c}
-  \inferrule{{xs\Downarrow \dnil\:\alpha\:\:\:n\Downarrow \zero}}
-            {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow a}
-  \medskip\\
-  \inferrule{{xs\Downarrow \dcons\:e\:xs'\:\:\:n\Downarrow\succs\:n'}}
-            {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow \App{\App{(f}{(n\:xs\:e))}}{(\dfold\:\alpha\:P\:n'\:xs'\:f\:a)}}           
-\end{array}\]
-
 Si $dfold$ contient des variables libres il nous faut un élément neutre à retourner:
-
+%
 \codefrom{dependent}{lambda}{neutral_fold}
-Pour l'implémentation, de la meme façon que avec iter nous avons crée une fonction \fun{vfold}
+
+Pour l'implémentation, comme pour \iter, nous avons crée une fonction \fun{vfold}
 qui nous permet d'éffectuer l'évaluation:
 
 \codefrom{dependent}{lambda}{vfold}
