@@ -540,27 +540,27 @@ let rec lcheck contexte ty inT =
      end
   | _ -> failwith "HEHEHEHEHE"
 (*=synth_head *)     
-and lsynth contexte exT =
+and lsynth ctxt exT =
   match exT with
   (*=End *)
   (*=synth_var *)
   | BVar x -> failwith "Impossible to check a BoundVar"
-  | FVar x -> List.assoc x contexte
+  | FVar x -> List.assoc x ctxt
   (*=End *)
 (*=End *)
 (*=synth_ann *) 
   | Ann(x,t) -> let eval_t = big_step_eval_inTm t [] in
-		if lcheck contexte VStar t 
-		  && lcheck contexte (big_step_eval_inTm t []) x 
+		if lcheck ctxt VStar t 
+		  && lcheck ctxt (big_step_eval_inTm t []) x 
 		then eval_t 		    		   
 		else failwith "fail synth Ann"  
 (*=End *)
 (*=synth_app *) 
   | Appl(f,s) -> 
-     let synth_f = lsynth contexte f in
+     let synth_f = lsynth ctxt f in
      begin
        match synth_f with
-       | VPi(s_pi,fu) -> if lcheck contexte s_pi s 
+       | VPi(s_pi,fu) -> if lcheck ctxt s_pi s 
 		     then (fu (big_step_eval_inTm s [])) 
 		     else failwith "fail synth Appl"
        | _ -> failwith "fail synth Appl"
@@ -570,40 +570,43 @@ and lsynth contexte exT =
   | Iter(p,n,f,a) ->
      let big_p = big_step_eval_inTm p [] in
      let big_n = big_step_eval_inTm n [] in 
-     if lcheck contexte (big_step_eval_inTm (read "(-> N *)") []) p &&
-       lcheck contexte (big_step_eval_inTm (read "N") []) n &&
-       lcheck contexte (big_step_eval_inTm
+     if lcheck ctxt (big_step_eval_inTm (read "(-> N *)") []) p &&
+       lcheck ctxt (big_step_eval_inTm (read "N") []) n &&
+       lcheck ctxt (big_step_eval_inTm
 			  (Pi(Global("n"),Nat,
 			      Pi(Global("NO"),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),n))),
 				 (Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])
        f &&
-       lcheck contexte (vapp(big_p,VZero)) a 
+       lcheck ctxt (vapp(big_p,VZero)) a 
      then (vapp(big_p,big_n))
      else failwith "Iter synth fail"
   (*=End *)
+  (*=synth_dfold *)
   | DFold(alpha,p,n,xs,f,a) ->
      let type_p = (Pi(Global"n",Nat,(Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
-     if lcheck contexte VStar alpha &&
-       lcheck contexte (big_step_eval_inTm type_p []) p &&
-       lcheck contexte VNat n &&
-       lcheck contexte (big_step_eval_inTm (Vec(alpha,n)) []) xs &&
-       lcheck contexte (big_step_eval_inTm 
-			  (Pi(Global"n",Nat,
-			      Pi(Global"xs",Vec(alpha,Inv(BVar 0)),
-				 Pi(Global"a",alpha,
-				    Pi(Global"NO",Inv(Appl(Appl(Ann(p,type_p),n),xs)),
-				       Inv(Appl(Appl(Ann(p,type_p),Succ(n)),DCons(a,xs)))))))) []) f &&
-       lcheck contexte (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) []) a				 
+     if lcheck ctxt VStar alpha &&
+       lcheck ctxt (big_step_eval_inTm type_p []) p &&
+       lcheck ctxt VNat n &&
+       lcheck ctxt (big_step_eval_inTm (Vec(alpha,n)) []) xs &&
+       lcheck ctxt
+       (big_step_eval_inTm 
+	  (Pi(Global"n",Nat,
+	      Pi(Global"xs",Vec(alpha,Inv(BVar 0)),
+		 Pi(Global"a",alpha,
+		    Pi(Global"NO",Inv(Appl(Appl(Ann(p,type_p),n),xs)),
+		       Inv(Appl(Appl(Ann(p,type_p),Succ(n)),DCons(a,xs)))))))) []) f &&
+       lcheck ctxt (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) []) a				 
      then (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
-     else failwith "DFOld synth something goes wrong" 
+     else failwith "DFOld synth something goes wrong"
+  (*=End *)
   | Trans(gA,p,a,b,q,x) ->
      let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
-     if lcheck contexte VStar gA &&
-       lcheck contexte (big_step_eval_inTm gA []) a &&
-       lcheck contexte (big_step_eval_inTm gA []) b &&
-       lcheck contexte  (big_step_eval_inTm (Id(gA,a,b)) []) q &&  
-       lcheck contexte (big_step_eval_inTm type_p []) p && 
-       lcheck contexte (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) x
+     if lcheck ctxt VStar gA &&
+       lcheck ctxt (big_step_eval_inTm gA []) a &&
+       lcheck ctxt (big_step_eval_inTm gA []) b &&
+       lcheck ctxt  (big_step_eval_inTm (Id(gA,a,b)) []) q &&  
+       lcheck ctxt (big_step_eval_inTm type_p []) p && 
+       lcheck ctxt (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) x
      then (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
      else failwith "Trans synth fail"           			       
   | _ -> failwith "HAHAHAHAHAHAHA"

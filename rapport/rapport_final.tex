@@ -737,7 +737,7 @@ ou \false{} :
 \[\begin{array}{c}
   \inferrule{{}}
             {\ifte{\true}{u}{v} \Red u}
-  \qquad
+  \qquad 
   \inferrule{{}}
             {\ifte{\false}{u}{v} \Red v}
   \medskip\\
@@ -2079,13 +2079,14 @@ Voici donc le code du type-checker correpondant:
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
   {\Gamma\vdash * \ni Vec\: \alpha\:n }\mbox{(Vec)}}\\
   
-  %texte pour vec  
+  %texte pour vec 
   \codefrom{dependent}{lambda}{check_vec}
 
   
 \item[$\bullet$] \boxed{\cfrac{}
   {\Gamma\vdash Vec\:\alpha\:\zero\ni dnil\:\alpha}\mbox{(Dnill)}}\\
-  %texte pour dnill
+  Afin de vérifier le terme \emph{Dnill} il nous faut simplement vérifier que les terme $\alpha$
+  sont égaux.  
   \codefrom{dependent}{lambda}{check_dnil}
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
@@ -2093,9 +2094,16 @@ Voici donc le code du type-checker correpondant:
   %texte pour dcons
   \codefrom{dependent}{lambda}{check_dcons}
 
-  
-  \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
-    {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}\mbox{(Dcons)}}\\
+
+\item[$\bullet$] \boxed{  \inferrule[]{\Gamma\vdash *\ni\alpha\:
+    \Gamma\vdash Nat \ni n \\ 
+    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P \\
+    \Gamma\vdash Vec\:\alpha\:n\ni v \\
+    \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
+            {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}\mbox{(Dfold)}}\\
+  Il nous faut tout d'abord vérifier l'ensemble des hypothèses puis retourner l'application du terme $P$
+  aux termes $n$ et $v$
+  \codefrom{dependent}{lambda}{synth_dfold}
 
     
 \end{itemize}
@@ -2129,7 +2137,7 @@ L'évaluation de \emph{dfold} s'effectue de la manière suivante:
             {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow a}
   \medskip\\
   \inferrule{{xs\Downarrow \dcons\:e\:xs'\:\:\:n\Downarrow\succs\:n'}}
-            {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow \App{\App{f}{(n\:xs\:e)}}{(\dfold\:\alpha\:P\:n'\:xs'\:f\:a)}}           
+            {\dfold\:\alpha\:P\:n\:xs\:f\:a \Downarrow \App{\App{(f}{(n\:xs\:e))}}{(\dfold\:\alpha\:P\:n'\:xs'\:f\:a)}}           
 \end{array}\]
 
 Si $dfold$ contient des variables libres il nous faut un élément neutre à retourner:
@@ -2145,36 +2153,36 @@ qui nous permet d'éffectuer l'évaluation:
 
 Pour implémenter l'égalité au sein de notre language il faut nous tourner vers la logique. 
 Leibniz philosophe du XVII siècle énonça que deux éléments sont identiques si elles ont les memes propriétés.
-\todo{expliquer plus en détail en faisant un parallèle avec la logique}
+C'est ce que nous allons essayer de traduire dans notre système.
 
-On peut maintenant introduire le type identité:
-\begin{align*}
-  &\cfrac{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
-  {\Gamma\vdash * \ni Id\:A\:a\:b}&\mbox{(Id)}
-\end{align*}
-
-refl
-\begin{align*}
-  &\cfrac{\Gamma\vdash A \ni a}
-  {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}&\mbox{(refl)}
-\end{align*}
-
-et trans
-\begin{align*}
-  &\cfrac{
-    \Gamma\vdash * \ni A
-    \Gamma\vdash A\ni a
-    \Gamma\vdash A \ni b
-    \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *)
-    \Gamma\vdash Id\:A\:a\:b \ni q
-    \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
-    {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}&\mbox{(trans)}
-\end{align*}
-
-\todo{roman: a finir quand j'aurais mieux compris}
+\todo{mettre une introduction de règles issues de la logique}
 
 
+Nous allons donc maintenant énoncer les règles équivalentes dans notre système de type:
+\[\begin{array}{c}
 
+
+  \inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
+            {\Gamma\vdash * \ni Id\:A\:a\:b}
+
+  \qquad
+ 
+
+  \inferrule[(Refl)]{\Gamma\vdash A \ni a}
+            {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}
+
+  \medskip\\            
+
+\inferrule[(Trans)]{
+  \Gamma\vdash * \ni A \\
+  \Gamma\vdash A\ni a  \\
+  \Gamma\vdash A \ni b \\
+  \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *) \\
+  \Gamma\vdash Id\:A\:a\:b \ni q \\
+  \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
+          {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}
+          
+\end{array}\]
 
 
 \subsection{Exemples de preuves}
