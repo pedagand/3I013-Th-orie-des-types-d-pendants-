@@ -367,7 +367,7 @@ and big_step_eval_exTm t envi =
   | DFold(alpha,p,n,xs,f,a) -> vfold((big_step_eval_inTm alpha envi),(big_step_eval_inTm p envi),
 				      (big_step_eval_inTm n envi),(big_step_eval_inTm xs envi),
 				      (big_step_eval_inTm f envi),(big_step_eval_inTm a envi))				      
-  | _ -> failwith "Chaques choses en son temps nottamment DFold"			    
+  | _ -> failwith "a faire Trans"			    
 
 let boundfree i n = 
   match n with 
@@ -525,11 +525,15 @@ let rec lcheck contexte ty inT =
      end 
 (*=End *)
   | What -> false 
+(*=check_id *)
   | Id(gA,a,b) ->
      let eval_gA = big_step_eval_inTm gA [] in
+     ty = VStar &&
      lcheck contexte VStar gA  &&
        lcheck contexte eval_gA a  &&
        lcheck contexte eval_gA b 
+(*=End *)
+(*=check_refl *)
   | Refl(a) ->
      begin
        match ty with 
@@ -540,6 +544,7 @@ let rec lcheck contexte ty inT =
 	  else false
        | _ -> false
      end
+(*=End *)
   | _ -> failwith "HEHEHEHEHE"
 (*=synth_head *)     
 and lsynth ctxt exT =
@@ -601,6 +606,7 @@ and lsynth ctxt exT =
      then (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
      else failwith "DFOld synth something goes wrong"
   (*=End *)
+  (*=synth_trans *)
   | Trans(gA,p,a,b,q,x) ->
      let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
      if lcheck ctxt VStar gA &&
@@ -611,6 +617,7 @@ and lsynth ctxt exT =
        lcheck ctxt (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) x
      then (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
      else failwith "Trans synth fail"           			       
+  (*=End *)
   | _ -> failwith "HAHAHAHAHAHAHA"
     
 
@@ -708,7 +715,7 @@ let rec check contexte inT ty steps =
        | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
      end
   (*=check_what *)
-  | What -> create_report false (contexte_to_string contexte) steps
+  | What -> create_report true (contexte_to_string contexte) steps
      ("What : we try to push this terme " ^
 	 (pretty_print_inTm (value_to_inTm 0 ty)  []))
   (*=End *)

@@ -2123,7 +2123,7 @@ de rendre le type de retour dépendant des différents arguments.
 
 Il existe de nombreuses façon d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
 Voici le terme correspondant à cette utilisation:
-\begin{lstlisting}
+\begin{lstlisting} 
 somme_liste = 
   (lambda v (lambda n 
     (dfold N (lambda n (lambda xs N)) n v
@@ -2133,7 +2133,7 @@ somme_liste =
 
 Voici donc le code du type-checker correpondant:
 \begin{itemize}
-  
+   
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
   {\Gamma\vdash * \ni Vec\: \alpha\:n }\mbox{(Vec)}}\\
   
@@ -2165,7 +2165,7 @@ Voici donc le code du type-checker correpondant:
   \codefrom{dependent}{lambda}{synth_dfold}
 
     
-\end{itemize}
+\end{itemize} 
 
 
 
@@ -2191,47 +2191,54 @@ qui nous permet d'éffectuer l'évaluation:
 
 \subsubsection{L'égalite} 
 
+\newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
+
 Pour implémenter l'égalité au sein de notre language, il faut nous tourner vers la logique. 
 La théorie des types implémente une définition de l'égalité proche de la conception de Leibniz : deux éléments sont identiques si ils ont les memes propriétés.
 Pour que deux éléments soient égaux, il faut nécéssairements qu'ils soient de même type. Ce n'est pas une
-conditions suffisante mais elle est nécéssaire. On notera \todo{définir une macro}  $a =_A b$ l'égalité de deux élements de type $A$.
+conditions suffisante mais elle est nécéssaire. On notera \equal{a}{A}{b} l'égalité de deux élements de type $A$.
 \begin{example}
-  L'égalité sur les entiers s'écrit donc $1 + 1 =_{N} 2$
+  L'égalité sur les entiers s'écrit donc \equal{2 + 2}{N}{4}
 \end{example}
 
-Si l'on souhaite exprimer la même idée en logique nous écrirons : \todo{je propose que l'on utilise la notation mathématique plutôt : plus facile à lire.}  $Id(A,a,b)$.
-Passons donc maintenant à la règle d'introduction de ce nouveau \todo{finir la phra}
-
-\todo{mettre les règles qui sont dans le livre de thompson puis mettre les règles suivantes entre les différentes
-  implémentation du type checker sinon trop de redondance.}
+Si l'on souhaite exprimer la même idée en logique nous écrirons : $Id(A,a,b)$.
+Nous allons donc introduire les règles de typage du terme id ainsi que celle de son introducteur \emph{refl} 
+et de son élimnateur \emph{Trans}.
 
 
+\begin{itemize}
+   
+\item[$\bullet$] \boxed{\inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
+  {\Gamma\vdash * \ni Id\:A\:a\:b}}\\
+  Pour le terme $Id\:A\:a\:b$ il nous faut tout d'abord évaluer $A$ afin de pouvoir 
+  vérifier les termes $a$ et $b$
+  \codefrom{dependent}{lambda}{check_head} 
+  \codefrom{dependent}{lambda}{check_id}
 
-Nous allons donc maintenant énoncer les règles équivalentes dans notre système de type:
-\[\begin{array}{c}
+\item[$\bullet$] \boxed{\inferrule[(Refl)]{\Gamma\vdash A \ni a}
+            {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}}\\
 
-
-  \inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
-            {\Gamma\vdash * \ni Id\:A\:a\:b}
-
-  \qquad
- 
-
-  \inferrule[(Refl)]{\Gamma\vdash A \ni a}
-            {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}
-
-  \medskip\\            
-
-\inferrule[(Trans)]{
-  \Gamma\vdash * \ni A \\
-  \Gamma\vdash A\ni a  \\
-  \Gamma\vdash A \ni b \\
-  \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *) \\
-  \Gamma\vdash Id\:A\:a\:b \ni q \\
-  \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
-          {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}
-          
-\end{array}\]
+  La spécification nous indique implicitement qu'il faut tester l'égalité entre les deux termes $a$. 
+  Cependant c'est le point central de cette règle.
+  Deux termes sont donc éqaux si leur évaluation est la meme et que l'on peut les vérifier 
+  avec le type $A$.
+  \codefrom{dependent}{lambda}{check_refl}
+  
+\item[$\bullet$] \boxed{\inferrule[(Trans)]{
+    \Gamma\vdash * \ni A \\
+    \Gamma\vdash A\ni a  \\
+    \Gamma\vdash A \ni b \\
+    \Gamma\vdash \forall a:A.\forall b:A.(Id\:A\:a\:b\rightarrow *) \\
+    \Gamma\vdash Id\:A\:a\:b \ni q \\
+    \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
+  {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}}\\
+  
+  La relation de transitivité nous indique que si les éléments $a$ et $b$ sont égaux et que l'on peut vérifier
+  que l'élément $x$ est vérifier alors celui est égale à $a$ et $b$.
+  \codefrom{dependent}{lambda}{synth_head}
+  \codefrom{dependent}{lambda}{synth_trans}
+  
+\end{itemize}
 
 
 \subsection{Exemples de preuves}
@@ -2263,7 +2270,7 @@ Nous aurons aussi besoin des fonctions suivantes:
 \item \fun{res_debug} : retourne le booléens présent dans le rapport.    
 \item \fun{create_report} : créé un rapport en prenant un argument pour chaque champs du \fun{report}
 \end{itemize}
-L'équivalent de ces fonctions pour le type \todo{c'est quoi ce emph ? c'est quoi debug synth ?} \emph{debug synth} sont suivis de \fun{_synth}.
+L'équivalent de ces fonctions pour le type \fun{debug synth} sont suivis de \fun{_synth}.
 Cette assistance est nécéssaire pour aider les programmeurs à connaitre la source de l'erreur,
 tout comme le font les compilateurs modernes. Cela nous aide aussi pour tester la validité de celui 
 ci car on peut maintenant tester si la vérification d'un terme est fausse.
@@ -2276,7 +2283,12 @@ Cette implémentation est un début, il existe de nombreuses autre extensions po
 pour assister les démonstrations.
 
 Le but de ce constructeur est d'interrompre la vérification de type et de demander au vérificateur de type de
-retourner le type que l'on souhaite vérifier. \todo{il faudrait être plus prcís ou donner un exemple. C'est confus là.} %a changer 
+retourner le type que l'on souhaite vérifier.
+\begin{example}
+  Soit le terme \fun{(lambda x ?)} que l'on veut vérifier avec le type \fun{(pi x nat bool)},
+  le type checker enoncera le fait que à la place du terme $\Hole$ nous souhaitons un terme de type 
+  booléens.
+\end{example}
 
 Nous allons donc rajouter ce terme parmis les termes vérifiables :
 \codefrom{dependent}{lambda}{inTm_head} \lstinline!(...)!
@@ -2288,8 +2300,7 @@ Dans notre type checker nous allons implémenter le code suivant:
 
 \codefrom{dependent}{lambda}{check_what}
 
-Nous refusons \todo{encore mieux : il faudrait l'accepter, comme ça on peut vérifier plusieurs trous en même temps.} donc le terme et retournons le type que l'on essaye de vérifier au moment
-où l'on rencontre le $?$.
+Nous acceptons quand meme le terme pour laisser la possibilité au programmeur de placer différents $\Hole$ dans son programme.
 
 \subsubsection{2 + 2 = 4}
 
