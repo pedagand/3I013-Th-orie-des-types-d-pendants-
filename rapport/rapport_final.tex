@@ -1818,46 +1818,55 @@ manière générale les types seront des termes vériable.  Le caractère
 bidirectionnel du langage du langage est utilisé ici de façon cruciale
 pour obtenir une présentation algorithmique du test de conversion : il
 est tout simplement traité par le changement de phase (règle
-\textsc{Ann}).
+\textsc{Inv}).
 
 Pour le moment, mis à part la dépendance introduite par l'abstraction, notre language ne comporte pas de termes exploitant 
 l'expressivité des types dépendants. Nous découvrirons leur richesse au fur et à mesure des extensions.
 
-En général le connecteur $\forall$ est appelé \emph{Pi} nous garderons cette convention.
+En général le connecteur $\forall$ est \todo{définir une macro pour Pi. Je préfèrerais que cela apparaisse comme $\Pi x : S. T$.} appelé \emph{Pi} nous garderons cette convention.
 Les deux notations suivantes sont équivalentes: 
 \begin{align*}  
   \forall x:S.T \Leftrightarrow Pi\: x\: S\: T
 \end{align*}
-Afin d'alléger la syntaxe si l'on veut crée un \emph{Pi} anonyme on peut utiliser la notation suivante:
+
+Afin d'alléger la syntaxe, un \emph{Pi} anonyme sera noté comme une simple implication :
 \begin{align*}
   & \forall x:Nat.Nat \Leftrightarrow Pi\: x\: Nat\: Nat \Leftrightarrow (Nat \rightarrow Nat) \\
 \end{align*}
 
-Avant de poursuivre il est important de nous convaincre que l'ensemble des termes exprimables avec un système 
-de typage simple est inclus dans l'ensemble des termes des types dépendants.
+Avant de poursuivre, il est important de se convaincre que l'ensemble des termes exprimables avec un système 
+de type simple est inclus dans l'ensemble des termes exprimable dans un système de type dépendant.
 \begin{example}
   On peut toujours exprimé une fonction identité applicable uniquement aux entiers de la manière suivante:
   \begin{align*}
-    &\Lam{x}{x}\:\forall x:Int\:Int \\
+    &\Lam{x}{x} : \forall x:Int.\: Int \\
   \end{align*}
 \end{example}
 
 \paragraph{Implémentation :} 
-La représentation de nos termes vérifiables et synthétisables dans le programme:
+
+\todo{il manque un verbe que ceci soit une phrase }La représentation de nos termes vérifiables et synthétisables dans le programme:
 \codefrom{dependent}{lambda}{inTm_head}
 \codefrom{dependent}{lambda}{inTm}
 \codefrom{dependent}{lambda}{exTm}
 
-Nous n'avons rajouter que deux nouveaux termes dans le noyeau de notre language mais 
+Nous n'avons rajouter que deux nouveaux termes dans le noyau de notre language mais 
 le fait de ne plus faire la distinction entre les termes et les types change beaucoup de
 choses dans l'architecture du programme. 
 
-Nous avons désormais une forme normale pour les types, il est donc intérressant de 
-fournire cette forme normale directement au type-checker. La fonction \fun{check} prend donc maintenat
-un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
+
+\todo{mort au cfracs}
 
 \begin{itemize}
-  
+\item[$\bullet$]
+  \boxed{\boxed{\Gamma\vdash T \ni t}}
+
+Nous avons désormais une forme normale pour les types, il est donc intérressant de 
+fournir cette forme normale directement au type-checker. La fonction \fun{check} prend donc maintenat
+un contexte, un terme vérifiable ainsi qu'un type en forme normale. \todo{expliquer pourquoi le type est en forme normale}
+
+  \codefrom{dependent}{lambda}{check_head}
+
 \item[$\bullet$] \boxed{\inferrule[Abs]{\Gamma,x:S\vdash T \ni t}
   {\Gamma \vdash \forall x:S.T \ni \lambda x. t}}\\
 
@@ -1865,21 +1874,19 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
   Etant donné que nous avons désormais des variables liées dans le type \emph{Pi} il nous faut
   effectuer la même opération que pour l'abstraction à savoir une substitution avec une variable
   fraiche. Notre type étant sous forme normale sont second membre est une fonction
-  anonyme comme vu en section \ref{maj_eval}. La substitution s'effectue donc à l'aide d'une
-  application de fonction d'Ocaml.
+  anonyme comme vu en Section~\ref{maj_eval}. La substitution s'effectue donc au travers de l'application de fonction en Ocaml.
 
-  \codefrom{dependent}{lambda}{check_head}
   \codefrom{dependent}{lambda}{check_abs}
   
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
   {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}}\\
   
   Le principal changement de cette implémentation est le changement d'égalité. 
-  En effet ici nos termes peuvent contenirs des fonctions anonymes dont on ne peut 
-  tester l'égalité avec la simple fonction d'ocaml. Il nous faut donc d'abord transformer 
-  nos \emph{value} en \emph{termes vérifiables}. Le second problème est que le nom associé 
-  aux différents binder tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
-  meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv}sur l'$\alpha$-équivalence 
+  En effet, ici les types sont des valeurs OCaml d'ordre supérieur (pouvant contenir des fonctions anonymes) dont on ne peut 
+  tester l'égalité. Il nous faut donc d'abord transformer 
+  ces valeurs en termes. Le second problème est que le nom associé 
+  aux différents lieurs tels que le $\lambda$ ou le $\forall$ n'auront pas nécéssairement le 
+  meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv},
   deux termes sont égaux meme si le nom de leur variables est différents. 
   La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
   du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les mêmes.
@@ -1898,20 +1905,24 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
     {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}}\\    
   
-  Désormais \emph{Pi} n'est pas sous forme normale étant donné qu'il est le terme
+  Ici,  \emph{Pi} n'est pas sous forme normale étant donné qu'il est le terme
   à vérifier. Nous somme donc obliger d'effectuer la substitution de $x$ dans $T$
   avec notre fonction \fun{substitution}:
   
 \codefrom{dependent}{lambda}{check_pi}
 
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash t \in T}}
+
+\todo{Expliquer les arguments de la fonction de synthèse.}
+
+    \codefrom{dependent}{lambda}{synth_head}
 
 \item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
     {\Gamma \vdash x \in T }\mbox{(Var)}}\\    
 
-  Tout comme dans l'implémentation précédente il n'est pas possible de rencontrer de variable 
-  liée lors de la vérification de type.
+  Tout comme dans l'implémentation précédente, il n'est pas possible de rencontrer de variable 
+  liée lors de la vérification de type. 
 
-    \codefrom{dependent}{lambda}{synth_head}
   \codefrom{dependent}{lambda}{synth_var}
 
 
@@ -1921,7 +1932,7 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
   Si la synthèse de $f$ nous donne bien un \emph{Pi} et que l'on vérifie $s$ de type
   $S$ alors il nous faut retourner $T$ en substitutant les occurences de variables liées.  
   Etant donné que \emph{Pi} est sous forme normale cette subsitution s'effectue
-  comme dans la règle de l'abstraction, par application de fonction Ocaml.
+  comme dans la règle de l'abstraction, par application de fonction dans Ocaml.
   
   \codefrom{dependent}{lambda}{synth_app}
 
@@ -1929,8 +1940,11 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
     {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}}\\
 
-Etant donné que nos termes et nos types sont équivalents il faut maintenant vérifier que 
-$T$ est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
+Etant donné que termes et types sont équivalents, il faut vérifier que
+le type $T$ proposé par l'annotation est bien un type (donc de type
+$\star$), sans quoi l'utilisateur pourrait introduire un type mal
+formé et donc, potentiellement, une contradiction logique. Il faut
+aussi évaluer celui ci afin de le mettre en forme normale.
   
 \codefrom{dependent}{lambda}{synth_ann}
 
