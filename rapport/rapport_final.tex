@@ -1555,46 +1555,41 @@ nous allons découvrir les types dépendants.
  
 \subsection{Automatisation de démonstration de preuve}
 Durant les deux premières parties du rapport nous avons présenté le $\lambda$-calcul
-qui nous à permis d'introduire un système de type. Cependant nous avions une vision 
-calculatoire des type. En effet notre seul but était de vérifier que nos $\lambda$-termes
-pouvaient se réduire. 
+qui nous à permis de nous initier à la conception et à l'implémentation d'un système de type. Cependant nous avions une vision 
+calculatoire des types. En effet notre seul but était de nous assurer que nos $\lambda$-termes
+étaient fortement normalisants. 
 Un des aspects primordiale des système de type est la correspondance de Curry-Howard.
 Celle ci permet de d'établire des relations entre la logique propositionnelle et les systèmes 
-de type. Nous verrons que ``t est une preuve de P'' est équivalent à \emph{t:P} c'est à dire
-t est de type P.
+de type. Nous verrons que ``t est une preuve de P'' est équivalent à \attention{je vais t'étrangler avec tes emph} \emph{t:P} c'est à dire
+\attention{pareil avec les variables mathématiques dans le texte} t est de type P.
 Tout d'abord intéressons nous aux bases de la logique propositionnelle.
 \subsubsection{La logique propositionnelle}
 
-Les règles de la logique propositionnelle associes à chaque constructeur 
-une règle d'introduction qui à partire des hypothèses de formuler une conclusion.
-Chaque constructeur possède aussi une règle d'éliminiation qui permet d'éliminer le constructeurs dans les hypothèses afin de
-formuler une nouvelle conclusion, ainsi qu'une règle de calcul.
-
-Tout comme les règles de typage on lire les règles suivantes de cette façon:''Si l'on suppose le numérateur
-alors le dénominateur est vrai'' ou encore ``Pour prouver le dénominateur il nous faut prouver le numérateur''
-
-Commençons par le connecteur $\Rightarrow$, représentant l'implication, sa règle d'introduction est la suivante:
-
-La règle d'introduction:
+Les règles de la logique propositionnelle associent à chaque
+connecteur logique une \emph{règle d'introduction} qui permet de
+formuler une conclusion à partir de certaines hypothèses. Par exemple,
+la règle d'introduction de l'implication est
+%
+\todo{MORT AU CFRACS. UTILISER LES MACROS.}
 \begin{align*}
-  \cfrac{[x:A] \: t:B}
-        {\lambda x:A.t\: :\: A\Rightarrow B}
+  \cfrac{\Gamma, A \vdash B}
+        {\Gamma \vdash A \Rightarrow B}
 \end{align*}
-Ici la notation [x:A] signifie ``Supposons x:A montrons t:B''.
-Voici maintenant la règle d'élimination:
-\begin{align*}
-  \cfrac{q\: :A\Rightarrow B\:\: a:A}
-        {q\:a\: : B}
-\end{align*}
+
+Les connecteurs logiques sont éliminés à travers une \emph{règle
+  d'élimination}, qui se traduit calculatoirement par des règles de
+réduction. Par exemple, la règle d'élimination de l'implication est 
+%
+\[
+  \inferrule{\Gamma \vdash A\Rightarrow B \\
+             \Gamma \vdash A}
+            {\Gamma \vdash B}
+\]
 
 On constate que la règle d'introduction de l'implication est presque identique à celle 
 du typage de l'abstraction. De meme pour l'élination vis à vis de la règle de l'application.
-La règle de calcul va nous permettre de confirmer notre intuition:
-\begin{align*}
-  \App{(\Lam{x:A}{t})}{a}\rightarrow \subst{t}{x}{a}
-\end{align*}
-On reconnait clairement l'évaluation d'une application. C'est cette intuition 
-qu'on eu Haskell Curry et Alvin Howard ce qui à permis de prouver la correspondance
+C'est cette intuition 
+qu'ont eu Haskell Curry et Alvin Howard ce qui à permis d'établir la correspondance
 entre les systèmes de type et la logique propositionnelle.
 
 Regardons maintenant un second exemple, le constructeur $\land$ signifiant le \emph{et} logique, dont voici la règle de 
