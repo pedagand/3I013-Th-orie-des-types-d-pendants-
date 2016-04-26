@@ -1964,7 +1964,7 @@ Nous commencerons par mettre à jour les types de données courants. Nous prése
 
 
 
-Passons maintenant aux règles de typages:
+Passons maintenant aux règles de typages: \todo{Utiliser les macros}
 
 \[\begin{array}{c}
   \inferrule[(Nat)]{}
@@ -1976,35 +1976,34 @@ Passons maintenant aux règles de typages:
   \inferrule[(Succ)]{\Gamma\vdash Nat \ni n}
             {\Gamma\vdash Nat \ni Succ\:n}
   \medskip\\
-  \inferrule[(Iter)]{\Gamma\vdash Nat\rightarrow *\ni P\:\: \Gamma\vdash Nat\ni n\\ \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\:
-  \\\Gamma\vdash P\:Zero\ni a}
+  \inferrule[(Iter)]
+            {\Gamma\vdash Nat\rightarrow *\ni P \\
+              \Gamma\vdash Nat\ni n\\
+              \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\\
+              \Gamma\vdash P\:Zero\ni a}
             {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}
 
 \end{array}\]
 Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
 
-Dans le $\lambda$-calcul simplement typé \ref{entier_type} nous avions besoin que l'argument \emph{a} soit un \emph{terme synthétisable}
-afin de déterminer le type de retour de cette construction.
-Maintenant l'ensemble des arguments de iter sont des termes vériables car l'introduction d'un prédicat
-\emph{P} nous permet de connaitre le type de retour de iter et donc de vérifier les autres termes. 
-Ce prédicat nous permet d'une part de crée de la dépendance et d'autre part de rajouter de l'information.
-
-Pour continuer l'analogie avec la logique propositionnelle, on constate que la règle de typage de iter correspond à un raisonnement par
+Pour continuer l'analogie avec la logique propositionnelle, on constate que la règle de typage de $\iter$ correspond à un raisonnement par
 \emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de zero. 
 Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
 
-Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide de notre syntaxe
-lispienne présentée en Section~\ref{parsing}:
-\begin{align*}
-  plus\:=\: (lambda\:n\:(lambda\:a\:(iter\:(lambda\:x\:N)\:n\:(lambda\:ni\:(lambda\:x\:(succ\:x)))\:a)))
-\end{align*}
+Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide dans une syntaxe
+Lispienne (parsée par notre prototype) :
+\begin{lstlisting}
+  plus = (lambda n (lambda a 
+           (iter (lambda x N) n 
+                 (lambda ni (lambda x (succ x))) a)))
+\end{lstlisting}
 Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à iterer \emph{n} fois la fonction successeur sur \emph{m}.
-Afin d'aléger la syntaxe nous utiliserons dorénavant ``(+ n m'' correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
+Afin d'aléger la syntaxe nous utiliserons dorénavant \lstinline!(+ n m)! correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
 \emph{m}.
 
 \paragraph{Implémentation :} 
 
-Commençons par les règles de vérifications:
+Commençons par les règles de vérifications: \todo{Simplifier le code : c'est souvent \lstinline!ty = VStar! ou  \lstinline!ty = VNat!}
 \codefrom{dependent}{lambda}{check_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{check_nat}
 
@@ -2013,7 +2012,7 @@ du prédicat $P$ sur $n$.
 \codefrom{dependent}{lambda}{synth_iter}
 
 
-Les règles d'évaluations n'ont pas changées depuis la dernière implémentation mis à part le fait que  
+Les règles d'évaluations n'ont pas changées depuis la dernière implémentation \todo{faire une ref au lieu de dire ``dernière''} mis à part le fait que  
 nous n'avons pas besoin d'évaluer le prédicat d'iter.
 
 
