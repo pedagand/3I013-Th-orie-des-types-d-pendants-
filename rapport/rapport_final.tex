@@ -1772,30 +1772,42 @@ Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons ma
 voici les nouvelles règles de typage en Figure~\ref{fig:typage dependant}.
 
 \begin{figure}
-  \center\boxed{\Gamma\vdash T \ni t}
+  \[
+  \begin{array}{cc}
+  \boxed{\Gamma\vdash T \ni t}
+  &
+  \boxed{\Gamma\vdash t \in T}
+  \bigskip
+  \\ 
+  &
+  \cfrac{x:T \in \Gamma}
+        {\Gamma \vdash x \in T }\mbox{(Var)}
+  \medskip
+  \\
+  \cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+        {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}
+  &
+  \cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
+        {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}
+  \medskip
+  \\
+  \cfrac{}
+        {\Gamma \vdash * \ni *}\mbox{(Star)} 
+  \medskip
+  \\
+  \cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
+        {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}
+  \medskip
+  \\
+  \cfrac{\Gamma,x:S\vdash T \ni t}
+        {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)} 
+  & 
+  \cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
+        {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)} 
+  \end{array}
+  \]
   
-  \begin{align*}
-    &\cfrac{\Gamma,x:S\vdash T \ni t}
-    {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)} \\
-    &\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-    {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)} \\
-    &\cfrac{}
-    {\Gamma \vdash * \ni *}\mbox{(Star)} \\
-    &\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
-    {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}
-  \end{align*}
-  
-  \center\boxed{\Gamma\vdash t \in T}
-  
-  \begin{align*}
-    &\cfrac{x:T \in \Gamma}
-    {\Gamma \vdash x \in T }\mbox{(Var)} \\
-    &\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
-    {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)} \\
-    &\cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
-    {\Gamma\vdash (t:T) \in T}\mbox{(Ann)} \\
-  \end{align*}
-  \caption{Typage Dépendant}
+  \caption{Typage dépendant}
   \label{fig:typage dependant} 
 \end{figure}
 
