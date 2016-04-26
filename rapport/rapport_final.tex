@@ -1565,6 +1565,11 @@ de type. Nous verrons que ``t est une preuve de P'' est équivalent à \attentio
 Tout d'abord intéressons nous aux bases de la logique propositionnelle.
 \subsubsection{La logique propositionnelle}
 
+\attention{Pour être exact, la \emph{logique} propositionnelle ne
+  parle jamais de ``termes'' (elle s'en fout). Son contenu
+  calculatoire (surtout en déduction naturelle) n'est pas simple à
+  aller pêcher. J'ai corrigé cette histoire de termes du coup}
+
 Les règles de la logique propositionnelle associent à chaque
 connecteur logique une \emph{règle d'introduction} qui permet de
 formuler une conclusion à partir de certaines hypothèses. Par exemple,
@@ -1592,34 +1597,37 @@ C'est cette intuition
 qu'ont eu Haskell Curry et Alvin Howard ce qui à permis d'établir la correspondance
 entre les systèmes de type et la logique propositionnelle.
 
-Regardons maintenant un second exemple, le constructeur $\land$ signifiant le \emph{et} logique, dont voici la règle de 
-formation:
+Regardons maintenant un second exemple, le constructeur $\land$
+signifiant le \emph{et} logique. La règle d'introduction énonce que
+pour prouver $A\land B$, il nous faut prouver d'une part $A$ et d'autre
+part $B$ :
+%
 \begin{align*}
-\cfrac{A \:est\: un\: terme \:\: B\:est\:un\:terme}
-{A\land B} 
-\end{align*}
-La règle d'introduction:
-\begin{align*}
-\cfrac{p:A\:\:q:B}
-{p,q\: : A\land B}
-\end{align*}
-Si l'on veut prouver $A\land B$ il nous faut prouver d'une part A et d'autre part B
-La règle d'élimination 
-\begin{align*}
-\cfrac{r\: : A\land B}
-      {fst\:r:\:A} \:\:
-      \cfrac{r\: : A\land B}
-            {snd\:r:\:B}
+\inferrule{\Gamma \vdash A\\
+           \Gamma \vdash B}
+          {\Gamma A \land B}
 \end{align*}
 
-On reconnait ici le produit cartésien que l'on avait introduit dans notre $\lambda$-calcul simplement typé avec \emph{fst}
-et \emph{snd} les projections.
+La règle d'élimination \todo{décrire ces règles} 
+\begin{align*}
+\inferrule{\Gamma \vdash A \land B}
+          {\Gamma \vdash A}
+\medskip\\
+\inferrule{\Gamma \vdash A \land B}
+          {\Gamma \vdash B}
+\end{align*}
+
+On reconnait ici le produit cartésien que l'on avait introduit dans
+notre $\lambda$-calcul simplement typé : la règle d'introduction
+correspond au constructeur de paires tandis que les éliminateurs
+correspondent aux projections \todo{on a défini des macros pour \Fst{} et \Snd{}} \emph{fst} et \emph{snd} les
+projections.
 
 
-Pour l'instant nous n'avons pas établie de lien réel entre ces connecteurs et nos termes, c'est l'enjeu de la
+Pour l'instant, nous n'avons pas établi de lien réel entre ces connecteurs et nos termes, c'est l'enjeu de la
 section suivante.
 
-\subsubsection{correspondance de Curry Howard}
+\subsubsection{Correspondance de Curry Howard}
 \label{corres_curry_howard}
 
 Dans la section précédente nous avons regarder quelques intuitions permettant de voir le lien entre la logique
