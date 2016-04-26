@@ -471,7 +471,8 @@ let rec lcheck contexte ty inT =
 		    (substitution_inTm t (FVar(Global(freshVar))) 0)
        | _ -> false
      end 
-(*=End *)
+  (*=End *)
+  (*=check_nat *)
   | Nat -> 
      begin 
        match ty with
@@ -489,7 +490,8 @@ let rec lcheck contexte ty inT =
        match ty with 
 	 | VNat -> lcheck contexte VNat x 
 	 | _ -> false
-     end 
+     end
+  (*=End *)
 (*=check_vec *)
   | Vec(alpha,n) -> 
      begin        
@@ -563,7 +565,8 @@ and lsynth contexte exT =
 		     else failwith "fail synth Appl"
        | _ -> failwith "fail synth Appl"
      end
-(*=End *) 
+  (*=End *)
+  (*=synth_iter *)
   | Iter(p,n,f,a) ->
      let big_p = big_step_eval_inTm p [] in
      let big_n = big_step_eval_inTm n [] in 
@@ -572,10 +575,12 @@ and lsynth contexte exT =
        lcheck contexte (big_step_eval_inTm
 			  (Pi(Global("n"),Nat,
 			      Pi(Global("NO"),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),n))),
-				 (Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])  f &&
+				 (Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])
+       f &&
        lcheck contexte (vapp(big_p,VZero)) a 
      then (vapp(big_p,big_n))
      else failwith "Iter synth fail"
+  (*=End *)
   | DFold(alpha,p,n,xs,f,a) ->
      let type_p = (Pi(Global"n",Nat,(Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
      if lcheck contexte VStar alpha &&

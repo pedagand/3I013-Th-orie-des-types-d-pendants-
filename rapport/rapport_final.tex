@@ -1939,18 +1939,21 @@ Maintenant iter possède un argument de plus que précédement nous verrons sont
 
 Passons maintenant aux règles de typages:
 
-\todo{roman:mieux présenter iter dans la spec} 
-\begin{align*}
-  &\cfrac{}
-  {\Gamma\vdash * \ni Nat}&\mbox{(Nat)} \\
-  &\cfrac{}
-  {\Gamma\vdash Nat \ni Zero}&\mbox{(Zero)} \\
-  &\cfrac{\Gamma\vdash Nat \ni n}
-  {\Gamma\vdash Nat \ni Succ\:n}&\mbox{(Succ)} \\
-  &\cfrac{\Gamma\vdash Nat\rightarrow *\ni P\: \Gamma\vdash Nat\ni n\: \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\:
-  \Gamma\vdash P\:Zero\ni a}
-  {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}&\mbox{(Iter)}\\
-\end{align*}
+\[\begin{array}{c}
+  \inferrule[(Nat)]{}
+            {\Gamma\vdash * \ni Nat}
+  \qquad
+  \inferrule[(Zero)]{}
+            {\Gamma\vdash Nat \ni Zero}
+  \qquad
+  \inferrule[(Succ)]{\Gamma\vdash Nat \ni n}
+            {\Gamma\vdash Nat \ni Succ\:n}
+  \medskip\\
+  \inferrule[(Iter)]{\Gamma\vdash Nat\rightarrow *\ni P\:\: \Gamma\vdash Nat\ni n\\ \Gamma\vdash \forall n:Nat.(P\:n\rightarrow P\:(succ\:n))\ni f\:
+  \\\Gamma\vdash P\:Zero\ni a}
+            {\Gamma\vdash iter \: P\: n\:f\:a\in P\:n}
+
+\end{array}\]
 Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
 
 Dans le $\lambda$-calcul simplement typé \ref{entier_type} nous avions besoin que l'argument \emph{a} soit un \emph{terme synthétisable}
@@ -1972,13 +1975,19 @@ Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à iterer \emph{
 Afin d'aléger la syntaxe nous utiliserons dorénavant ``(+ n m'' correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
 \emph{m}.
 
-Les règles de typages correspondantes dans notre algorithme:
+\paragraph{Implémentation :} 
 
-\todo{mettre le code quand celui ci sera mis au propre car pas présentable pour le moment}
+Commençons par les règles de vérifications:
+\codefrom{dependent}{lambda}{check_head}\lstinline!(...)!
+\codefrom{dependent}{lambda}{check_nat}
+
+Pour \emph{iter} si l'ensemble des des hypothèses sont vérifiées il nous faut retourner l'application
+du prédicat $P$ sur $n$.
+\codefrom{dependent}{lambda}{synth_iter}
 
 
-Pour l'évaluation nous n'avons pas besoin d'évaluer le prédicat, celle ci s'effectue de la meme façon que 
-dans le $\lambda$-calcul simplement typé.
+Les règles d'évaluations n'ont pas changées depuis la dernière implémentation mis à part le fait que  
+nous n'avons pas besoin d'évaluer le prédicat d'iter.
 
 
 \subsubsection{Les vecteurs}
