@@ -1447,7 +1447,7 @@ L'algorithme de typage suit litéralement sa spécification bidirectionnelle :
 
 
 \subsection{Réduction forte à grands pas}
-
+\label{red_forte_grand_pas}
 
 Dans cette section, nous décrivons une implémentation alternative de
 la réduction forte qui exploite le fait que nous implémentons notre évaluateur dans un language fonctionnel.
@@ -1719,6 +1719,43 @@ Meme si les termes sont maintenant des types et inversement il nous faut quand m
 \end{example}
 Nous allons donc dorénavant noté \emph{*} le type des types.
 
+
+
+
+\subsubsection{Mise à jour de l'évaluation}
+\label{maj_eval}
+
+Etant donné que nos types sont désormais des termes et que l'on peut les normaliser il nous faut
+d'abord parler de l'évaluation.
+
+\[\begin{array}{c}
+  \inferrule{{}}
+            {*\Downarrow *}
+  \medskip\\
+  \inferrule{{p\Downarrow t\:\:\:p'\Downarrow t'}}
+            {\forall x:p.p'\Downarrow \forall x:t.t'}
+\end{array}\]
+La spécification de ces évaluations est très classique cependant pour leur implémentation
+nous allons utilisé une stratégie plus similaire à l'implémentation précédente \ref{red_forte_grand_pas}. 
+Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont:
+\codefrom{dependent}{lambda}{value_pi_star}
+
+En suivant le meme raisonnement que pour l'évaluation d'une abstraction avec la
+fonction \fun{big_step_eval}, nous allons transformer le second membre de $\forall$
+en fonction anonyme. 
+
+\codefrom{dependent}{lambda}{big_step_new}
+Le premier membre est évalué simplement tandisque le second est bien évalué en fonction anonyme,
+car comme pour l'abstraction, cela nous permet de pouvoir substituer dans notre type 
+directement.
+
+Pour terminer voici la fonction permettant de remettre nos \emph{values} dans le monde
+des termes vérifiables:
+
+\codefrom{dependent}{lambda}{value_to_inTm_new}
+
+
+
 \subsubsection{Formalisation}
 
 Maintenant que nous avons l'intuition des nouveaux constructeurs nous pouvons maintenant enrichire notre language,
@@ -1803,9 +1840,11 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
   {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)}}\\
 
   Pour l'abstraction il nous faut désormais libérer les occurences de $x$ dans $T$.
-  Etant donné que nous avons désormais des variables liées dans les types il nous faut
+  Etant donné que nous avons désormais des variables liées dans le type \emph{Pi} il nous faut
   effectuer la même opération que pour l'abstraction à savoir une substitution avec une variable
-  fraiche. Comme nous 
+  fraiche. Notre type étant sous forme normale sont second membre est une fonction
+  anonyme comme vu en section \ref{maj_eval}. La substitution s'effectue donc à l'aide d'une
+  application de fonction d'Ocaml.
 
   \codefrom{dependent}{lambda}{check_head}
   \codefrom{dependent}{lambda}{check_abs}
@@ -1821,29 +1860,37 @@ un contexte, un \emph{terme inférable} ainsi qu'une \emph{value}.
   meme nom. Comme nous l'avons vu dans la Section~\ref{alpha_equiv}sur l'$\alpha$-équivalence 
   deux termes sont égaux meme si le nom de leur variables est différents. 
   La fonction \fun{equal_inTm} parcour simplement les deux termes passé en arguments sans tenir compte
-  du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les memes.
+  du nom de variable associé au binder. Par contre les variables libres doivent nécéssairement etre les mêmes.
 
   \codefrom{dependent}{lambda}{check_inv}
 
          
-    
-    
-\codefrom{dependent}{lambda}{check_star}
-$\cfrac{}
-    {\Gamma \vdash * \ni *}$
+\item[$\bullet$] \boxed{\cfrac{}
+    {\Gamma \vdash * \ni *}\mbox{(Star)}}\\    
+
+  L'implémentation de la règle \emph{Star} est triviale:
+  
+  \codefrom{dependent}{lambda}{check_star}
 
     
-
+\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
+    {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}}\\    
+  
+  Désormais \emph{Pi} n'est pas sous forme normale étant donné qu'il est le terme
+  à vérifier. Nous somme donc obliger d'effectuer la substitution de $x$ dans $T$
+  avec notre fonction \fun{substitution}:
+  
 \codefrom{dependent}{lambda}{check_pi}
-$\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
-    {\Gamma\vdash * \ni \forall x:S.T}$
 
 
+\item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
+    {\Gamma \vdash x \in T }\mbox{(Var)}}\\    
+
+  Tout comme dans l'implémentation précédente il n'est pas possible de rencontrer de variable 
+  liée lors de la vérification de type.
+  
 \codefrom{dependent}{lambda}{synth_var}
-$\cfrac{x:T \in \Gamma}
-    {\Gamma \vdash x \in T }$
-Tout comme dans l'implémentation précédente il n'est pas possible de rencontrer de variable 
-liée lors de la vérification de type.
+
 
 \codefrom{dependent}{lambda}{synth_app}
 
@@ -1861,37 +1908,6 @@ Etant donné que nos termes et nos types sont équivalents il faut maintenant v�
 $T$ est bien un type. Il faut aussi évaluer celui ci afin de le mettre en forme normale.
 
 \end{itemize}
-
-\subsubsection{Mise à jour de l'évaluation}
-
-Nous savons maitenant comment vérifier les termes \emph{pi} et \emph{Star}, passons donc 
-à leur évaluation:
-
-\[\begin{array}{c}
-  \inferrule{{}}
-            {*\Downarrow *}
-  \medskip\\
-  \inferrule{{p\Downarrow t\:\:\:p'\Downarrow t'}}
-            {\forall x:p.p'\Downarrow \forall x:t.t'}
-\end{array}\]
-
-Les deux \emph{value} nécéssaires à l'implémentation de cette évaluation sont:
-\codefrom{dependent}{lambda}{value_pi_star}
-
-En suivant le meme raisonnement que pour l'évaluation d'une abstraction avec la
-fonction \fun{big_step_eval}, nous allons transformer le second membre de $\forall$
-en fonction anonyme. 
-
-\codefrom{dependent}{lambda}{big_step_new}
-Le premier membre est évalué simplement tandisque le second est bien évalué en fonction anonyme,
-car comme pour l'abstraction cela nous permet de pouvoir substituer dans notre type 
-directement.
-
-Pour terminer voici la fonction permettant de remettre nos \emph{values} dans le monde
-des termes vérifiables:
-
-\codefrom{dependent}{lambda}{value_to_inTm_new}
-
 
 
 \subsection{Extensions}
