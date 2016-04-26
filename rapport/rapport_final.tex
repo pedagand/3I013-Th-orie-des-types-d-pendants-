@@ -2012,6 +2012,7 @@ Commençons par enrichire notre grammaire:
   &|& \dfold\:t\:t\:t\:t\:t\:t & \mbox{(dfold)}
 \end{bnf}
 
+Ce qui se traduit dans notre programme par le code suivant:
 \codefrom{dependent}{lambda}{terme_vector}
 \codefrom{dependent}{lambda}{terme_dfold}
 
@@ -2036,9 +2037,9 @@ Certains tris étant beaucoup plus efficaces sur de grands vecteurs et inverseme
 Voici maintenant deux constructeurs pour les vecteurs:
 \begin{align*}
   &\cfrac{}
-  {\Gamma\vdash Vec\:\alpha\:n\ni dnil\:\alpha}&\mbox{(dnil)} \\
-  &\cfrac{\Gamma\vdash Vec\:\alpha\:\zero\ni v \:\:\Gamma\vdash \alpha\ni a}
-  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
+  {\Gamma\vdash Vec\:\alpha\:\zero \ni dnil\:\alpha}&\mbox{(dnil)} \\
+  &\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
+  {\Gamma\vdash Vec\:\alpha\:(\succs\:n)\ni dcons\:a\:v}&\mbox{(dcons)} \\
 \end{align*}
 
 Le terme \emph{dnil} correspond au vecteur de taille zero, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
@@ -2053,15 +2054,15 @@ Nous pouvons maintenant crée des vecteurs mais nous ne possédons pas encore d'
 implémenter une fonction bien connue des programmeurs fonctionnels, \emph{dfold} dont voici une définition intuitive:
 \fun{fold f vec b} $\rightarrow$ \fun{f a1 (f a2(...(f an b)...))}.
 Définissons maintenant l'éliminateur \emph{dfold} comme un \emph{terme synthétisable}:
-\todo{modifier la présentation aussi}
-\begin{align*}
-  &\cfrac{\Gamma\vdash *\ni\alpha\:
-    \Gamma\vdash Nat \ni n \: 
-    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P\:
-    \Gamma\vdash Vec\:\alpha\:n\ni v\:
+
+\[\begin{array}{c}
+  \inferrule[(Dfold)]{\Gamma\vdash *\ni\alpha\:
+    \Gamma\vdash Nat \ni n \\ 
+    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P \\
+    \Gamma\vdash Vec\:\alpha\:n\ni v \\
     \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
-  {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}&\mbox{(dfold)}
-\end{align*}
+            {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}
+\end{array}\]
 
 De la meme manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
 de rendre le type de retour dépendant des différents arguments.
@@ -2073,19 +2074,34 @@ Voici le terme correspondant à cette utilisation:
 \end{align*}
 
 Voici donc le code du type-checker correpondant:
+\begin{itemize}
+  
+\item[$\bullet$] \boxed{\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
+  {\Gamma\vdash * \ni Vec\: \alpha\:n }\mbox{(Vec)}}\\
+  
+  %texte pour vec  
+  \codefrom{dependent}{lambda}{check_vec}
 
-\codefrom{dependent}{lambda}{check_vec}
-$\cfrac{\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}
-  {\Gamma\vdash * \ni Vec\: \alpha\:n }$
-\codefrom{dependent}{lambda}{check_dnil}
-$\cfrac{}
-  {\Gamma\vdash Vec\:\alpha\:\zero\ni dnil\:\alpha}$
+  
+\item[$\bullet$] \boxed{\cfrac{}
+  {\Gamma\vdash Vec\:\alpha\:\zero\ni dnil\:\alpha}\mbox{(Dnill)}}\\
+  %texte pour dnill
+  \codefrom{dependent}{lambda}{check_dnil}
 
-\codefrom{dependent}{lambda}{check_dcons}
-  $\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
-  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}$
+\item[$\bullet$] \boxed{\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
+  {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}\mbox{(Dcons)}}\\
+  %texte pour dcons
+  \codefrom{dependent}{lambda}{check_dcons}
 
-\todo{rajouter dfold mais plus tard, la c'est vraiment pas présentable}
+  
+  \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
+    {\Gamma\vdash Vec\:\alpha\:(succ\:n)\ni dcons\:a\:v}\mbox{(Dcons)}}\\
+
+    
+\end{itemize}
+
+
+
 
 \paragraph{Evaluation :} 
 Avant d'implémenter l'évaluation dans notre programme il nous faut tout d'abord
