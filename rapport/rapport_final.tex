@@ -1664,14 +1664,14 @@ nous allons introduire un nouveau lien entre logique et typage : le quantificate
 \subsubsection{Equivalence entre les types et les termes}
 \label{presentation_type_dependants}
 
-Jusqu'a présent nous avions d'une part l'ensemble des types et l'ensemble des termes. Cette séparation 
-avait un sens car les termes et les types ne se comportaient pas de la meme façon. La plus grande différence 
-était au niveau de l'évaluation, en effet nos types étant statiques il n'était pas nécéssaire de les réduires
+Jusqu'à présent, nous avions d'une part l'ensemble des types et l'ensemble des termes. Cette séparation 
+avait un sens car les termes et les types ne se comportaient pas de la meme façon. \todo{Qu'est-ce que tu veux dire ?} La plus grande différence 
+était au niveau de l'évaluation, en effet nos types étant statiques il n'était pas nécéssaire de les réduire
 ou d'effectuer des calculs sur eux %nul.
 Cependant certains termes ne peuvent pas s'exprimer dans un système de type statique, prenons par exemple
 la fonction identité. 
 \begin{example}
-  Dans notre système précédent il existait une fonction identité pour chaque type. 
+  Dans notre système précédent, il existait une fonction identité pour chaque type :
   \begin{align*}
     &\Lam{x}{x}\: :Bool\rightarrow Bool \\
     &\Lam{x}{x}\: :Int\rightarrow Int \\
@@ -1681,39 +1681,55 @@ On souhaiterais écrire une fonction polymorphe dont le type de retour est influ
 \end{example}
 
 Il existe différentes façon de permettre l'écriture de fonctions comme celles ci. Inspirons nous de la
-logique, le quatifieur $\forall$ pourrait nous permettre d'écrire ce type de termes.
+logique, le quantificateur $\forall$ nous permet d'écrire ce type de termes.
+\attention{Ce n'est surtout pas $\forall x : A \rightarrow A$ qui ne veut pas dire grand chose.}
 \begin{example}
-  On souhaiterais pouvoir écrire une fonction identité de la manière suivante:
+  On souhaiterais pouvoir écrire une fonction identité de la manière suivante :
   \begin{align*}
-    \Lam{x}{x}\::(\forall x:A \rightarrow A)
+    \Lam{A}{\Lam{x}{x}}\::(\forall A, A \rightarrow A)
   \end{align*}
+  %
+%  où $\star$ est le type des types.
 \end{example}
 
-Avec des variables au sein de nos types nous pouvons désormais introduire un ensemble de termes, 
+\newcommand{\nil}{\ensuremath{\mathsf{nil}}}
+\newcommand{\cons}{\ensuremath{\mathsf{cons}}}
+\newcommand{\Vect}{\ensuremath{\mathsf{vec}}}
+
+Avec des variables au sein de nos types nous pouvons désormais introduire des \emph{familles de type},
 comme par exemple les vecteurs de taille \emph{n}.
 \begin{example}  
   \label{example vecteur}
-  Voici des vecteurs d'éléments de type $\alpha$ et de taille \emph{n}:
+  Les vecteurs représentent des listes dont la taille est connue (et
+  vérifiée) lors de la compilation. Voici des vecteurs d'éléments de
+  type $\alpha$, pour certaines tailles \emph{n} fixées : \todo{Définir des macros}
   \begin{align*}
-    &[e] &: Vec\: 1\: \alpha \\
-    &[(e:\alpha),(e:\alpha)] &: Vec\: 1\: \alpha \\
-    &... \\
-    &[.....] &: \forall n:Int\: \forall \alpha : A . Vec\: \alpha \: n \\
+    &\nil &: \Vect\: 0\: \alpha \\
+    &\cons\: \true\: \nil &: \Vect\: 1\: \bool \\
+    &\cons\: \false\: (\cons\: \true\: \nil) &: \Vect\: 2\: \bool \\
   \end{align*}
 \end{example}
-On ressent de plus en plus l'intuition que en introduisant une dépendance dans nos types, ceux ci se comportent de la meme façon que 
-les termes.
-Il serait intérressant de considérés à la fois les termes et les types comme un unique ensemble régit par les meme propriétés.
-C'est ce que certains systèmes comme \emph{Système F} et les types dépendants on formalisé. 
-Meme si les termes sont maintenant des types et inversement il nous faut quand meme introduire un type pour les types.
+En introduisant une dépendance des types sur les types, ceux ci se
+comportent de la meme façon que les termes. En particulier, la notion
+de réduction s'élève au niveau des types : on s'attend à ce que le
+type \(\Vect\: (2 + 2)\: \bool\) soit ``équivalent'' au type \(\Vect\:
+4\: \bool\).  Poussant cette logique à l'extrême, on est amené à
+considérer les types et les termes comme appartenant à une unique
+famille syntaxique régie par les meme propriétés.
+
+Afin de distinguer statiquement types et termes, on introduit le type
+$\star$, le type des types.
 \begin{example}
-  Reprenons notre fonction identité, dire que:
+  Pour être tout à fait explicite, notre fonction identité est de type
   \begin{align*}
-    \Lam{x}{x} : \forall x:A \rightarrow A
+    \forall A : \star, A \rightarrow A
   \end{align*}
-  Si l'on considère que A est le terme $\Lam{x}{x}$ cela n'a pas de sens.
+  
+  Quand le quantificateur porte sur une variable de type, on aura
+  tendance à garder son type (nécessairement $\star$) implicite.
+
 \end{example}
-Nous allons donc dorénavant noté \emph{*} le type des types.
+Nous allons donc dorénavant noté \attention{Ha non, tu recommences ! C'est $\star$.} \emph{*} le type des types.
 
 
 
