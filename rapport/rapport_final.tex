@@ -2148,9 +2148,19 @@ qui nous permet d'éffectuer l'évaluation:
 
 Pour implémenter l'égalité au sein de notre language il faut nous tourner vers la logique. 
 Leibniz philosophe du XVII siècle énonça que deux éléments sont identiques si elles ont les memes propriétés.
-C'est ce que nous allons essayer de traduire dans notre système.
+Pour que deux éléments soient égaux il faut nécéssairements qu'ils soient de même type. Ce n'est pas une
+conditions suffisante mais elle est nécéssaire. Une notation assez classique serait celle ci : $a =_A b$
+\begin{example}
+  L'égalité sur les entiers s'écrit donc $1 + 1 =N 2$
+\end{example}
 
-\todo{mettre une introduction de règles issues de la logique}
+La notation précédente est adapté à la notation mathématique, c'est un opérateur binaire assez classique.
+Si l'on souhaite exprimer la même idée en logique nous écrirons: $Id(A,a,b)$.
+Passons donc maintenant à la règle d'introduction de ce nouveau 
+
+\todo{mettre les règles qui sont dans le livre de thompson puis mettre les règles suivantes entre les différentes
+  implémentation du type checker sinon trop de redondance.}
+
 
 
 Nous allons donc maintenant énoncer les règles équivalentes dans notre système de type:
