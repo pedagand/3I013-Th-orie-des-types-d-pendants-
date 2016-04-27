@@ -102,7 +102,6 @@
 
 \section{Introduction}
 
-\todo{a relire}
 
 
 Dans ce rapport, il sera question de comprendre le typage, une  étape clée de la chaîne de compilation.
@@ -254,17 +253,19 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
 
 \begin{example} 
   
-  Soit \Var{x} une variable libre. \todo{Cela manque d'explication : je ne comprends pas cet exemple, qu'est-ce que tu veux montrer ?}
-  En théorie : 
-  \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}})} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
+  Soit le terme \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}})}\) voici la reduction de celui-ci 
+  avec les différentes représentations:
 
-  En pratique avec les indices de De Bruijn : $\Lam{}{\App{((\Lam{}{\Lam{}{1}})}{0})} \leadsto \Lam{}{\Lam{}{0}}$
+  -avec la représentation classique:
+\(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}})} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
+
+  -avec les indices de De Bruijn : $\Lam{}{\App{((\Lam{}{\Lam{}{1}})}{0})} \leadsto \Lam{}{\Lam{}{0}}$
 
   Ici on constate bien que le terme obtenu n'est pas correct. Il nous faut introduire une opération
   intermédiaire afin de remédier à ce problème.
   Cette opération est appelée par Pierce les ``shifts''
   
-  En pratique avec du locally nameless : $\Lam{}{\App{((\Lam{}{\Lam{}{1}})}{x})}\leadsto \Lam{}{\Lam{}{\Var{x}}}$
+  -avec du locally nameless : $\Lam{}{\App{((\Lam{}{\Lam{}{1}})}{x})}\leadsto \Lam{}{\Lam{}{\Var{x}}}$
 
   Il n'est plus nécessaire d'effectuer des ``shifts'', cette représentation
   possède les avantages de la représentation avec les indices de De Bruijn et
@@ -278,7 +279,7 @@ Voici le code Ocaml traduisant cette définition inductive des termes :
 
 Cette représentation se rapproche au plus de la spécification formelle
 : seule la distinction entre les variables liées (\lstinline!BoundVar!)
-et les variables libres (\lstinline!FreeVar!) diffère. \todo{On voulais mettre les \fun{name} dans \fun{FreeVar}}
+et les variables libres (\lstinline!FreeVar!) diffère.
 
 
 
@@ -293,8 +294,7 @@ entre eux. Mais il nous faut tout d'abord définir le mécanisme de substitution
 
 \newcommand{\subst}[3]{#1[#2 := #3]}
 
-\todo{Sérieusement, il reste des ``lambda''?! Il est temps de rencontrer query-search-and-replace.}
-La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
+La substitution est un mécanisme central dans le $\lambda$-calcul. Cela consiste 
 à remplacer l'occurrence d'une variable liée par un \(\lambda\)-terme.
 On note \(\subst{t}{x}{u}\) la substitution de la variable $\Var{x}$ dans le terme $\Var{t}$ par le 
 terme u.
@@ -431,8 +431,8 @@ de la forme
 \(\Lam{\Var{x_0}}\ldots\Lam{\Var{x_k}}\App{\App{\App{x_i}{t_0}}{\ldots}}{t_l}\)
 où les \(t_j\) sont eux-mêmes des termes normaux.
 
-\begin{example}[Terme en forme normale] \todo{Il faut écrire un petit quelque chose ici, sinon cela tombe à plat.}
-  \(\Lam{\Var{x}}{\Var{x}}\)
+\begin{example}[Terme en forme normale]
+  Ce terme ne peut plus se réduire peut importe la stratégie \(\Lam{\Var{x}}{\Var{x}}\) 
 \end{example}
 
 On dira qu'un terme \(t\) est \emph{normalisable} s'il existe un terme
@@ -454,13 +454,11 @@ réduction à partir de \(t\). Un terme fortement normalisable est,
 \end{example}
 
 \begin{example}[Terme normalisable mais pas fortement normalisable]
-  \label{ex:divergence}
+  \label{ex:divergence} 
   \(\App{(\Lam{\Var{x}}{0})}{\omega}\)
+  Si l'on réduit $\omega$ en premier cela diverge, on réduit donc le 
+  redex le plus à gauche.
 
-\todo{Il faut écrire un petit quelque chose ici, sinon cela tombe à
-  plat. En particulier, il faut dire que si l'on commence par réduire
-  $\omega$, cela diverge. Si l'on commence par le redex le plus à
-  gauche, cela normalise.}
 
 \end{example}
 
@@ -551,7 +549,7 @@ les systèmes de type que l'on peut statiquement garantir que les
 termes acceptés par l'analyse de type sont fortement normalisants.
 
 \begin{remark}
-  Le fait d'obtenir \todo{pas français :} la garantie que l'ensemble de nos termes sont fortement normalisants signifie que
+  Le fait d'obtenir la garantie que l'ensemble que nos termes sont fortement normalisants signifie que
   notre langage n'est plus Turing complet. En effet, nous ne pourrons plus exprimer les programmes
   qui ne terminent pas. Cependant, ce n'est pas gênant car nous ne cherchons pas à écrire ce genre de
   programmes dans notre système.
@@ -1814,9 +1812,8 @@ Les règles de typage sont présentées en style bidirectionnel en Figure~\ref{f
   \label{fig:typage dependant} 
 \end{figure}
 
-\todo{Des fois tu utilises un $\Pi$, des fois un $\forall$. La lecture serait plus simple s'il n'y avait qu'un $\forall$}
 
-Les deux nouvelles constructions \todo{c'est quoi ça ? utiliser la macro} $Pi$ et
+Les deux nouvelles constructions $\forall$ et
 $\star$ sont des termes vérifiables étant donné que l'on possède
 toute l'information nécessaire pour les vérifier efficacement. De
 manière générale les types seront des termes vérifiables.  Le caractère
@@ -1865,7 +1862,7 @@ nos termes ne sont plus statiques.
   {\Gamma \vdash \forall x:S.T \ni \lambda x. t}}\\
 
   Pour l'abstraction il nous faut libérer les occurences de $x$ dans $T$.
-  Etant donné que nous avons désormais des variables liées dans le type $\Pi$ il nous faut
+  Etant donné que nous avons désormais des variables liées dans le type $\forall$ il nous faut
   effectuer la même opération que pour l'abstraction à savoir une substitution avec une variable
   fraîche. Notre type étant sous forme normale son second membre est une fonction
   anonyme comme vu en Section~\ref{maj_eval}. La substitution s'effectue donc au travers de l'application de fonction en Ocaml.
@@ -1899,7 +1896,7 @@ nos termes ne sont plus statiques.
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
     {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}}\\    
   
-  Ici,  $\Pi$ n'est pas sous forme normale étant donné qu'il est le terme
+  Ici,  $\forall$ n'est pas sous forme normale étant donné qu'il est le terme
   à vérifier. Nous sommes donc obligés d'effectuer la substitution de $x$ dans $T$
   avec notre fonction \fun{substitution}:
   
@@ -1924,9 +1921,9 @@ Notre fonction de synthèse nécessite un contexte \fun{ctxt} qui est de même t
 \item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
     {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)}}\\    
 
-  Si la synthèse de $f$ nous donne bien un $\Pi$ et que l'on vérifie $s$ de type
+  Si la synthèse de $f$ nous donne bien un $\forall$ et que l'on vérifie $s$ de type
   $S$ alors il nous faut retourner $T$ en substituant les occurences de variables liées.  
-  Etant donné que $\Pi$ est sous forme normale cette substitution s'effectue
+  Etant donné que $\forall$ est sous forme normale cette substitution s'effectue
   comme dans la règle de l'abstraction, par application de fonction dans Ocaml.
   
   \codefrom{dependent}{lambda}{synth_app}
@@ -2050,23 +2047,23 @@ Ce qui se traduit dans notre programme par le code suivant:
 
 
 Les arguments des différents constructeurs seront expliqués une fois que nous aurons vu les 
-règles de typage présentes en figure \ref{fig:typage_vec}. \todo{Utilise les macros dans la figure (et dans le texte) !}
+règles de typage présentes en figure \ref{fig:typage_vec}.
 \begin{figure}
 \[
 \begin{array}{c}
   
   \inferrule[(Vec)]%
              {\Gamma\vdash * \ni \alpha\:\:\Gamma\vdash Nat \ni n}%
-             {\Gamma\vdash * \ni Vec\: \alpha\:n }  
+             {\Gamma\vdash * \ni \vect\: \alpha\:n }  
   \medskip\\
 
   \inferrule[(dnil)]%
             {\:}%
-            {\Gamma\vdash Vec\:\alpha\:\zero \ni dnil\:\alpha}  
+            {\Gamma\vdash Vec\:\alpha\:\zero \ni \dnil\:\alpha}  
   \medskip\\
   \inferrule[(dcons)]%
             {\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}%
-            {\Gamma\vdash Vec\:\alpha\:(\succs\:n)\ni dcons\:a\:v}  
+            {\Gamma\vdash Vec\:\alpha\:(\succs\:n)\ni \dcons\:a\:v}  
 
 \end{array}
 \]
@@ -2077,13 +2074,13 @@ règles de typage présentes en figure \ref{fig:typage_vec}. \todo{Utilise les m
 
 
 
-Dans la règle \emph{vec}, $\alpha$ sera le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
+Dans la règle $\vect$, $\alpha$ sera le type des éléments contenus dans le vecteur et $n$ sa taille. 
 Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
 de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants qui
 permettent d'assister les programmeurs dans la vérification de leurs programmes.
 
 
-Le terme \emph{dnil} correspond au vecteur vide, et \emph{dcons} qui nous permet d'ajouter un élément dans un vecteur.
+Le terme $\dnil$ correspond au vecteur vide, et $\dcons$ qui nous permet d'ajouter un élément dans un vecteur.
 \begin{example}
   Voici un vecteur de taille trois dont les éléments sont des entiers:
   \begin{align*}
@@ -2106,10 +2103,10 @@ Définissons maintenant l'éliminateur dfold comme un terme synthétisable:
             {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}
 \end{array}\]
 
-De la même manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
+De la même manière que pour l'éliminateur des entiers naturels \iter, le prédicat $p$ nous permet 
 de rendre le type de retour dépendant des différents arguments.
 
-Il existe de nombreuses façons d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
+Il existe de nombreuses façons d'utiliser $\dfold$, une application assez simple consiste à faire la somme des éléments d'une liste.
 Voici le terme correspondant à cette utilisation:
 \begin{lstlisting} 
 somme_liste = 
@@ -2291,30 +2288,39 @@ Dans notre vérificateur de type nous allons implémenter le code suivant:
 
 Nous acceptons quand même le terme pour laisser la possibilité au programmeur de placer différents $\Hole$ dans son programme.
 
+
+
+
+
 \subsubsection{2 + 2 = 4}
+
+\newcommand{\refl}{\ensuremath{\mathsf{refl}}}
+\newcommand{\refls}[1]{\ensuremath{\mathsf{refl(#1)}}}
 
 Attelons-nous maintenant à notre première preuve. Nous avons désormais tout le bagage nécessaire, 
 les entiers et l'égalité.
 La construction de cette preuve est assez simple. Comme nous l'avons vu dans la section
 sur l'égalité \ref{egalite} la contruction \equal{2+2}{N}{4} est équivalente  au type  $(id\: Nat\: (2\: +\: 2)\:\: 4)$.
 Il nous faut maintenant déterminer un terme correspondant à ce type. La règle d'introduction
-du type $id$ est le terme \todo{Macro !} $refl$. Le seul terme permettant de vérifier ce type
-est le terme $refl{4}$
+du type $id$ est le terme \refl . Le seul terme permettant de vérifier ce type
+est le terme \refls{4}
 
 
-Afin de vérifier cette preuve dans notre type checker il nous faut exécuter la fonction suivante: \todo{retour à la ligne dans le listing}
+Afin de vérifier cette preuve dans notre type checker il nous faut exécuter la fonction suivante: 
 
-\fun{lcheck [] (read ``(succ (succ (succ (succ zero))))'')}
-
-\fun{(read ``(id (+ (succ (succ zero)) (succ (succ zero))) (succ (succ (succ (succ zero)))))'')}
+\begin{lstlisting} 
+lcheck [] (read ``(succ (succ (succ (succ zero))))'') 
+           read ``(id (+ (succ (succ zero)) (succ (succ zero))) 
+                         (succ (succ (succ (succ zero)))))''
+\end{lstlisting} 
 
 La fonction \fun{read} permet de parser une chaine de caractères pour obtenir le terme correspondant.
 On appelle la fonction \fun{lcheck} avec comme premier argument \fun{[]} qui correspond à la liste vide en Ocaml
 car nous débutons avec un contexte vide.
 
 Pour vérifier que l'implémentation de notre vérificateur de type se comporte correctement tentons 
-d'exécuter \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléen \fun{false} comme
-attendu. \todo{il faut expliquer le booléen false en question n'est pas le résultat de l'égalité mais du type checker !}
+d'exécuter \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléen \fun{false} ce qui signifie que 
+ce terme n'est pas correctement typé. Il n'existe pas de preuve pour cette proposition, elle est donc fausse.
 
 \subsubsection{Preuve sur les vecteurs}
 
@@ -2364,7 +2370,7 @@ Voici notre prédicat $P$: \\
 
 Trouvons maintenant la fonction $f$ nous permettant de concatener nos vecteurs: \\
 \fun{(lambda f (lambda vec1 (lambda a (lambda vec2 (dcons a vec2)))))}
-Ce qui nous donne comme terme final: \todo{saut à la ligne dans le listing}
+Ce qui nous donne comme terme final: 
 
 \begin{lstlisting} 
   (lambda A
