@@ -1364,7 +1364,7 @@ Les règles d'évaluations restent inchangées.
 
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
-En suivant la meme demarche que  pour les entiers les 
+En suivant la même démarche que  pour les entiers, les 
 constructeurs \emph{True} et \emph{False} sont désormais des \emph{termes vérifiables}
 et le constructeur \emph{Ifte} un \emph{terme synthétisable}
 
@@ -1427,7 +1427,7 @@ Concernant l'évaluation, les règles sont les mêmes qu'en Section~\ref{paires}
 
 \paragraph{Implémentation :}
 Nous allons maintenant implémenter le produit cartésien afin d'enrichir
-notre language. 
+notre langage. 
 
 %% En l'état, cette liste de code sans commentaire nous est inutile.
 %% \emph{Type}
@@ -1450,15 +1450,15 @@ L'algorithme de typage suit litéralement sa spécification bidirectionnelle :
 \label{red_forte_grand_pas}
 
 Dans cette section, nous décrivons une implémentation alternative de
-la réduction forte qui exploite le fait que nous implémentons notre évaluateur dans un language fonctionnel.
-Il est intéressant d'exploiter les méchanismes d'Ocaml. Nous allons crée un interpréteur pour nos termes
-en utilisant les termes Ocaml ce qui nous permettra de ne pas à
-gérer les méchanismes de définition de fonction et d'application.
+la réduction forte qui exploite le fait que nous implémentons notre évaluateur dans un langage fonctionnel.
+Il est intéressant d'exploiter les mécanismes d'Ocaml. Nous allons créer un interpréteur pour nos termes
+en utilisant les termes Ocaml ce qui nous permettra de ne pas avoir à 
+gérer les mécanismes de définition de fonction et d'application.
 
 Comme nous l'avons vu dans la Section~\ref{reduction_forte} \if 0 peut
 etre dans la partie safety je ne me souviens plus a voir \fi la
-réduction forte aboutie forcément à une forme normale, les termes que
-nous obtenons par la réduction à grand pas, seront donc les mêmes que
+réduction forte aboutit forcément à une forme normale, les termes que
+nous obtenons par la réduction à grands pas, seront donc les mêmes que
 ceux obtenus avec la réduction à petits pas
 (Section~\ref{reduction_petits_pas}).
 
@@ -1489,8 +1489,8 @@ variable.
 \end{example}
 
 
-Comme nous l'avons vu précédement le type contenue dans une annotation n'est pas utile lors de l'évaluation.
-Il nous faut simplement évalué le terme \fun{x} contenue dans celle ci.
+Comme nous l'avons vu précédement le type contenu dans une annotation n'est pas utile lors de l'évaluation.
+Il nous faut simplement évaluer le terme \fun{x} contenu dans celle ci.
 %
 \codefrom{typed}{lambda}{big_step_eval_exTm_ann}
 
@@ -1498,14 +1498,14 @@ Il en est de même pour l'inversion :
 \codefrom{typed}{lambda}{big_step_eval_inTm_inv}
 
 
-Pour les variables liées il faut retrouvé dans le contexte la variable à laquel elle est associé.
-Cela nous permettra de définire cette variable comme un argument de la fonction anonyme que nous avons
-crée avec l'évaluation de l'abstraction.
+Pour les variables liées il faut retrouver dans le contexte la variable à laquelle elle est associée.
+Cela nous permettra de définir cette variable comme un argument de la fonction anonyme que nous avons
+créée avec l'évaluation de l'abstraction.
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_var}
 
-Nous avons besoins de crée des \fun{neutral} pour
-tous les termes dont l'évaluation est terminé. C'est le rôle de la fonction
+Nous avons besoin de créer des \fun{neutral} pour
+tous les termes dont l'évaluation est terminée. C'est le rôle de la fonction
 \fun{vfree} dont voici le code:
 \codefrom{typed}{lambda}{vfree}
 
@@ -1515,7 +1515,7 @@ Pour évaluer l'application d'un coup, définissons une fonction
 par l'évaluation de la fonction et son argument.  Si la fonction est une abstraction, il nous suffit d'appliquer celle-ci
 \emph{dans Ocaml}, étant donné qu'elle est encodée par une fonction
 anonyme OCaml. Sinon l'évaluation est bloquée sur un terme neutre, il faut donc
-crée un nouveau terme neutre contenant la fonction suspendue.
+créer un nouveau terme neutre contenant la fonction suspendue.
 Voici le cas de l'application dans notre fonction d'évaluation:
 
 \codefrom{typed}{lambda}{big_step_eval_exTm_app}
@@ -1529,7 +1529,7 @@ L'évaluation de l'abstraction consiste donc à transformer celle-ci en une fonc
 
 Une fois nos termes évalués dans OCaml, il s'agit de les
 \emph{réifier} sous forme de termes de notre
-$\lambda$-calcul. Cette fonction doit nécéssairement prendre un argument de
+$\lambda$-calcul. Cette fonction doit nécessairement prendre un argument de
 type{value} afin de nous retourner un \emph{terme synthétisable}.
 
 \codefrom{typed}{lambda}{value_to_inTm}
@@ -1541,7 +1541,7 @@ Le type \fun{name} nous permet de faire la distinction entre les
 variables réellement libres et celles que nous souhaitons lier pendant la réification.
 Afin de transformer une valeur \lstinline!VLam f! en
 \emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
-de reification, que l'on distinguera des autres variables libres grace au type \fun{name}.
+de réification, que l'on distinguera des autres variables libres grâce au type \fun{name}.
 On s'assure que les variables ainsi introduites sont fraîches en utilisant la fonction \fun{gensym}.
 La fonction \fun{boundfree} va nous permettre de relier les \fun{NFree} dont la variable est un \fun{Quote}.
 \codefrom{typed}{lambda}{boundfree}
