@@ -1191,8 +1191,6 @@ présenté en Figure~\ref{fig:typage-simple}.
   que ce nom n'a jamais été utilisé. On substitue l'ensemble
   des variables liées à l'abstraction en cours avec une variable libre dont le nom est celui généré précédement.
   On insère ensuite dans le contexte l'association variable type.
-  La fonction de synthèse \lstinline!synth! prend en argument un contexte et un
-  \emph{terme synthéthisable} et renvoie le type de celui-ci.
   
 %
  \codefrom{typed}{lambda}{check_abs}
@@ -1218,7 +1216,7 @@ terme synthétisable et renvoie le type de celui-ci.
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash T \ni t}
                               {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}} \\
 
-  Nous somme ici en synthèse c'est à dire que nous devons retourner un type.
+  Nous sommes ici en synthèse c'est à dire que nous devons retourner un type.
   Si $t$ est effectivement de type $T$, alors il suffit de retourner $T$.
   %
 \codefrom{typed}{lambda}{synth_ann}
@@ -1230,7 +1228,7 @@ terme synthétisable et renvoie le type de celui-ci.
 
 Dans la spécification formelle, on ne fait pas de distinction entre
 les variables libres et liées.  Comme nous l'avons vu dans la règle de
-typage de l'abstraction, l'ensemble des variables liées à chaqu'un des
+typage de l'abstraction, l'ensemble des variables liées à chacun des
 lieurs sont libérées. La spécification parle donc bien des variables
 libres, que l'on synthétise à partir  du type qui leur a été assigné dans le contexte.
 %
@@ -1240,9 +1238,9 @@ libres, que l'on synthétise à partir  du type qui leur a été assigné dans l
          {\Gamma\vdash f\:s\in B}\mbox{(App)}}\\
 
   
-  Comme la spécification nous l'indique, il est d'abord nécéssaire de synthétiser le type de $f$.
+  Comme la spécification nous l'indique, il est d'abord nécessaire de synthétiser le type de $f$.
   Il faut ensuite s'assurer que le type retourné par la synthèse est bien de la forme $A\rightarrow B$
-  puis en extraire le type $A$ pour pouvoir cette fois-ci vérifier $s$. Si cette vérification réussi,
+  puis en extraire le type $A$ pour pouvoir cette fois-ci vérifier $s$. Si cette vérification réussit,
   on retourne le type $B$.
  
 \codefrom{typed}{lambda}{synth_appl}
@@ -1253,15 +1251,13 @@ Pour cette implémentation nous avons choisi de générer des exceptions
 lorsque le terme n'était pas correctement typé. Cela permet de
 terminer le programme directement car de toute façon le terme serait
 refusé. Nous reviendrons cependant sur certains points négatifs de
-cette méthode dans l'implémentation des types dépendants. \todo{Est-ce
-  que l'on y revient effectivement ? Faire une référence ref/label
-  explicite.}
+cette méthode dans la section \ref{upgrade_type_check}.
 
 
 
 \subsection{Normalisation} 
 
-Dans cette section nous verrons certaines propriétés offertent par les
+Dans cette section nous verrons certaines propriétés offertes par les
 systèmes de type, et nous parlerons de l'évaluation. Nous ne
 reviendrons pas sur la substitution ni la $\beta$-réduction, qui
 restent identique aux définitions introduites en
@@ -1270,8 +1266,8 @@ Section~\ref{calculer_dans_le_lambda_calcul}.
 \subsubsection{Méta-théorie}
 \label{meta_theorie}
 
-Le typage permet d'obtenir, à la compilation, des garanties quant à la
-bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés complementaires d'un système de type :
+Le typage permet d'obtenir, lors de la compilation, des garanties quant à la
+bonne exécution des programmes.  Formellement, ces garanties se traduisent en deux propriétés complémentaires d'un système de type :
 \begin{description}
 \item[Progrès :] si un terme \(t\) est correctement typé alors soit \(t\) est une valeur, soit il
  existe une réduction telle que \(t \leadsto t'\)
@@ -1290,7 +1286,7 @@ bien typé réduit vers une valeur de ce type.
 \end{example}
 
 
-\subsubsection{Reduction forte}
+\subsubsection{Réduction forte}
 
 \label{reduction_forte}
 Dans le \(\lambda\)-calcul non typé, nous avions utilisé une stratégie
@@ -1310,7 +1306,9 @@ nos termes bidirectionnels vers les termes non typés est transparente
 : il suffit d'effacer les annotations de type.
 
 \begin{example}
-  \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport}
+  
+  \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport C'est l'exemple où cela ne réduit pas}
+   
 \end{example}
 
 \paragraph{Implémentation :}
@@ -1323,7 +1321,7 @@ d'évaluation précédente
 %
 Avec les garanties offertes par notre
 système de type nous pouvons à présent contracter \emph{tous} les
-redexes d'un terme sans risque de divergence.
+redexes d'un terme sans risque de divergence. 
 
 
 
@@ -1335,7 +1333,7 @@ nous verrons ici la façon de les représenter ainsi que leurs règles de typage
 \subsubsection{Les entiers}
 \label{entier_type}
 
-Les constructeurs sont les memes que dans le \(\lambda\)-calcul non typé 
+Les constructeurs sont les mêmes que dans le \(\lambda\)-calcul non typé 
 cependant, maintenant que nous disposons de termes bidirectionnels, il est important
 de préciser leur phase.
 
@@ -1360,7 +1358,7 @@ Les règles de typage bidirectionnel sont donc :
 \]
 
 %
-Les règles d'évaluations restent inchangés. 
+Les règles d'évaluations restent inchangées. 
 
 \subsubsection{Les booléens}
 
@@ -2254,6 +2252,7 @@ Nous verrons ensuite un exemple de démonstration de la proposition
 
 
 \subsubsection{Amélioration du vérificateur}
+\label{upgrade_type_check}
 
 Dans les sections précédentes, afin que le code soit présentable, nous
 avons présenté une version ``allégée'' de la fonction de
