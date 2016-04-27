@@ -454,6 +454,7 @@ réduction à partir de \(t\). Un terme fortement normalisable est,
 \end{example}
 
 \begin{example}[Terme normalisable mais pas fortement normalisable]
+  \label{ex:divergence}
   \(\App{(\Lam{\Var{x}}{0})}{\omega}\)
 
 \todo{Il faut écrire un petit quelque chose ici, sinon cela tombe à
@@ -521,7 +522,7 @@ Crucialement, nous avons la propriété suivante~\citep[th.3,
 
 Il existe d'autres stratégies de réduction comme par exemple
 \emph{l'appel par valeur}, qu'implémente OCaml. Bien que plus
-efficace, l'appel par valeur diverge pour certains termes normalisant.
+efficace, l'appel par valeur diverge pour certains termes normalisant (Exemple~\ref{ex:divergence}).
 Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
 pas tous fortement normalisables, on privilégiera la réduction en appel
 par nom.
