@@ -669,7 +669,7 @@ argument \Var{x}. On définira donc
 \end{align*}
 
 Afin de construire tous les entiers naturels, on s'inspire alors de la
-définition des entiers de Peano et définit le successeur d'un nombre \(n\)
+définition des entiers de Peano et on définit le successeur d'un nombre \(n\)
 comme
 %
 \[
@@ -699,10 +699,10 @@ sera question d'analyser certaines parties du code et non sa totalité.
 \newcommand{\NFalse}{\lstinline!False!}
 \newcommand{\NIfte}{\lstinline!IfThenElse!}
 
-Afin d'implémenter les boléens dans notre language, une possibilité
+Afin d'implémenter les boléens dans notre langage, une possibilité
 consiste à exporter l'encodage à la Church des termes \True{},
 \False{} et \Ifte{} définis en Section~\ref{church-bool}. Cependant
-nous avons choisi d'enrichir le noyau de notre language afin de
+nous avons choisi d'enrichir le noyau de notre langage afin de
 supporter, de façon primitive, les booléens. Cela permet d'alléger
 l'écriture des termes mais surtout de faciliter la représentation et,
 par la suite, la compilation des programmes manipulant des expressions
@@ -728,7 +728,7 @@ type lambda_term = (...)
 Pour la substitution des constructeurs \NTrue{} et \NFalse{}, les règles
 sont triviales. Pour le terme \NIfte{}, il faut rappeler la fonction de
 substitution sur l'ensemble des arguments du constructeur.  En
-particulier, il n'est pas nécéssaire d'incrémenter la valeur de
+particulier, il n'est pas nécessaire d'incrémenter la valeur de
 \lstinline!var! étant donné que ce constructeur ne lie aucune
 variables.
 
@@ -763,7 +763,7 @@ particulière :
 \newcommand{\NSucc}{\lstinline!Succ!}
 \newcommand{\NIter}{\lstinline!Iter!}
 
-Tout comme pour les booléens, il nous faut enrichire la grammaire
+Tout comme pour les booléens, il nous faut enrichir la grammaire
 formelle du $\lambda$-calcul
 %
 \begin{bnf}
@@ -804,8 +804,8 @@ L'implémentation de l'évaluation suit cette spécification :
 \codefrom{untyped}{lambda}{nat_evaluation}
 Nous rappelons donc la fonction avec cette fois-ci \fun{(f a)} et le prédécesseur de \fun{n}.
 
-Ici la iota-réduction n'éffectue que les étapes de calcul d'iter sans effectuer l'évaluation
-des applications. En effet cela n'est pas le role de la iota-réduction mais de la $\beta$-réduction
+Ici la \(\iota\)-réduction n'effectue que les étapes de calcul d'\fun{iter} sans effectuer l'évaluation
+des applications. En effet cela n'est pas le rôle de la \(\iota\)-réduction mais de la $\beta$-réduction
 de réduire les applications.
 
 
@@ -813,10 +813,10 @@ de réduire les applications.
 \label{paires}
 
 
-La paire est une construction très répandue dans les languages fonctionnelles, 
-cela nous permet de crée un ensemble de deux éléments. Afin d'extraire les éléments d'une paire,
-nous utiliserons les projections $\pi_0$ et $\pi_1$. Celles ci nous permettent 
-d'obtenir respectivement le premier élément ou le second de la paire.
+La paire est une construction très répandue dans les langages fonctionnels, 
+cela nous permet de créer un ensemble de deux éléments. Afin d'en extraire les éléments,
+nous utiliserons les projections $\pi_0$ et $\pi_1$. Celles-ci nous permettent 
+d'obtenir respectivement le premier ou le second élément de la paire.
 
 \begin{bnf}
   t &::= & (\ldots) &\mbox{(lambda terme)} \\
@@ -863,11 +863,11 @@ L'évaluation des membres de la paire s'effectue dans la fonction \fun{eval}:
 
 \section{Le $\lambda$-calcul simplement typé}
 
-Nous allons maintenant enrichire notre $\lambda$-calcul avec des
-types. Cela va nous donner des propriétés quand à l'évaluation de nos
+Nous allons maintenant enrichir notre $\lambda$-calcul avec des
+types. Cela va nous donner des propriétés quant à l'évaluation de nos
 termes et leur utilisation. Nous verrons que dans le $\lambda$-calcul
-simplement typé il est impossible d'écrire des termes qui ne soit pas
-fortement normalisant, comme dans l'Exemple~\ref{paradoxe}. Dans un
+simplement typé il est impossible d'écrire des termes qui ne soient pas
+fortement normalisants, comme dans l'Exemple~\ref{paradoxe}. Dans un
 premier temps nous introduirons les types, puis nous verrons comment
 les utiliser en définissant des règles de typage pour nos termes.
 
@@ -899,7 +899,7 @@ suivante :
   \end{eqnarray}
   Le type (\ref{eq_1}) est celui d'une fonction prenant un argument de type entier et 
   retournant un résultat de type booléen.
-  Le second type (\ref{eq_2}) correspond a une paire donc le membre de gauche est un booléen
+  Le second type (\ref{eq_2}) correspond à une paire donc le membre de gauche est un booléen
   et le membre de droite un entier.
 \end{example}
 
@@ -912,16 +912,16 @@ La spécification des types se traduit naturellement en OCaml :
 
 \subsection{Système de type}
 
-Un système de type est un système formelle permettant de vérifier que l'ensemble de nos termes sont
-correctement typés. Il sera question de définir un ensemble de règles pour chacuns des termes de notre language.
+Un système de type est un système formel permettant de vérifier que l'ensemble de nos termes sont
+correctement typés. Il sera question de définir un ensemble de règles pour chacun des termes de notre langage.
 Le typage nous apportera certaines propriétés quant à la normalisation de nos termes comme nous le verrons
 dans la section \ref{meta_theorie}. 
 
 \subsubsection{Spécification}
 
 Afin de faciliter la lecture et la compréhension, nous allons dans 
-un premier temps donner les règles de typage pour les termes appartenants au noyau 
-du language. Nous donnerons les autres règles dans les sections suivantes.
+un premier temps donner les règles de typage pour les termes appartenant au noyau 
+du langage. Nous donnerons les autres règles dans les sections suivantes.
 
 La vérification de type s'effectue dans un \emph{contexte} qui assigne
 à chaque variable d'un programme son type. Le contexte est donc une
@@ -961,18 +961,18 @@ liste ordonnée de paires variable/type :
 Les règles de typage sont définies en
 Figure~\ref{fig:typage-simple}. La règle (\textsc{Var}) spécifie le
 typage des variables. Cette expression se lit en partant du numérateur
-pour déduire le dénumérateur : supposons que la variable \Var{x} de
+pour déduire le dénominateur : supposons que la variable \Var{x} de
 type \Var{T} soit présente dans le contexte, alors on conclut que le
 type de la variable \Var{x} est \Var{T}.  La règle (\textsc{Abs})
-spécifie le typage des lambda abstractions. L'abstraction construit un
+spécifie le typage des $\lambda$-abstractions. L'abstraction construit un
 type fonction de la forme \(A \Rightarrow B\) : il faut donc que la
 variable associée au lambda terme soit de type \(A\) et le résultat de
 type \(B\).  La règle (\textsc{App}) spécifie le typage de
-l'application.  Dans un language de programmation, appliquer un terme
+l'application.  Dans un langage de programmation, appliquer un terme
 n'étant pas une fonction n'a pas de sens. On s'assure donc que le
 membre gauche de notre application est bien de type $A\rightarrow B$,
-pour $A$ et $B$ quelconque.  De plus on vérifie que l'argument de la
-fonction est bien de type $A$, correspondant au domaine de la
+pour $A$ et $B$ quelconque. De plus on vérifie que l'argument de la
+fonction est bien de type $A$, correspondant au domaine défintition de la
 fonction.
 
 
