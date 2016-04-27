@@ -972,7 +972,7 @@ l'application.  Dans un langage de programmation, appliquer un terme
 n'étant pas une fonction n'a pas de sens. On s'assure donc que le
 membre gauche de notre application est bien de type $A\rightarrow B$,
 pour $A$ et $B$ quelconque. De plus on vérifie que l'argument de la
-fonction est bien de type $A$, correspondant au domaine défintition de la
+fonction est bien de type $A$, correspondant au domaine définition de la
 fonction.
 
 
@@ -1030,25 +1030,25 @@ par la spécification. Par exemple, la dérivation
   \end{array}  
   \]  
 %
- admet une infinité de choix possible pour le type
+ admet une infinité de choix possibles pour le type
 \(?_A\) : on pourra choisir $?_A = \intg$ ou encore $?_A = \bool \times (\intg \to \intg)$.
 
 Afin d'obtenir un algorithme, la règle typant l'application introduit
 donc une difficulté : il faut vérifier que le membre de gauche est de
 type $A \rightarrow B$ alors que l'on ne connait que $B$. Nous allons
 donc introduire une nouvelle représentation des termes afin de
-déterminiser la spécification et obtenir un algorithme.
+déterminer la spécification et obtenir un algorithme.
 
 \subsubsection{Syntaxe bidirectionnelle}
 
 
-Les applications dont le membre de gauche est une abstractions posent
+Les applications dont le membre de gauche est une abstraction, posent
 problème car il faut leur calculer un type sans nécessairement avoir cette information à disposition immédiate.  Nous
 allons donc partitionner les \(\lambda\)-termes en deux catégories :
 d'une part, les termes dont on peut automatiquement synthétiser le
 type (que l'on peut donc placer à gauche d'une application) et ceux
 pour lesquels il faudra fournir une annotation de type (annotation que l'on saura vérifier efficacement).
-Nous nomerons les premiers
+Nous nommerons les premiers
 les termes \emph{synthétisables} et les seconds les  termes
 \emph{vérifiables}. 
 
@@ -1069,7 +1069,7 @@ Voici donc notre représentation des termes:
 
 
 On a ainsi introduit l'inversion \Inv{ex}, qui permet d'inclure les
-termes synhtétisables dans le monde des termes vérifiables, et l'annotation \Ann{in}{T}, qui inclut les termes
+termes synthétisables dans le monde des termes vérifiables, et l'annotation \Ann{in}{T}, qui inclut les termes
 vérifiables dans le monde des termes synthétisables en fournissant
 l'information de typage manquante.
 
@@ -1086,7 +1086,7 @@ La représentation des termes bidirectionnels est sans surprise :
 \codefrom{typed}{lambda}{inTm}
 \codefrom{typed}{lambda}{exTm}
 
-Le type \lstinline!name! permet ci-dessous nous permettra de mettre des entiers à la place 
+Le type \lstinline!name! ci-dessous nous permettra de mettre des entiers à la place 
 d'une chaîne de caractère\todo{description trop opérationnelle/peu motivée : ne pas en parler maintenant. On pourrait introduire name pour gérer les DefVars dans le non typé : cela simplifierai les choses.}, nous en reparlerons dans l'implémentation de l'évaluation.
 \codefrom{typed}{lambda}{name}
 
@@ -1140,7 +1140,7 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 
 Les règles de la forme \(\Gamma\vdash T \ni t\) sont des règles de
 vérification, celles de la forme \(\Gamma\vdash t \in T\) des règles
-de synthèse.  Lors de la vérification, on connait le type $T$ et
+de synthèse.  Lors de la vérification, on connaît le type $T$ et
 l'on souhaite déterminer si le terme $t$ est bien de ce
 type. Lors de la synthèse, on est en mesure, à partir d'un terme
 $t$ quelconque, de déterminer son type \(T\) sans ambiguïté.  On vérifie
@@ -1149,7 +1149,6 @@ présenté en Figure~\ref{fig:typage-simple}.
 
 \begin{example}
   Voici maintenant la même dérivation mais avec notre système de type bidirectionnel:
-  problème précédement.
   \[
   \begin{array}{c}
     \inferrule[]
@@ -1170,10 +1169,10 @@ présenté en Figure~\ref{fig:typage-simple}.
 \item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni t}}\\
   
   Nous disposons d'une fonction de vérification \lstinline!check!
-  permettant d'éffectuer de vérifier que le terme \fun{inT} est bien de type
+  permettant de vérifier que le terme \fun{inT} est bien de type
   \fun{ty}.
   Le \fun{contexte} est une liste qui nous permet de stocker
-  des paires associants une variable à son type. Il nous faut aussi
+  des paires associant une variable à son type. Il nous faut aussi
   donner le type d'entrée \fun{ty}.
     
   
@@ -1184,18 +1183,17 @@ présenté en Figure~\ref{fig:typage-simple}.
   {T = A \rightarrow B\\ \Gamma, x:A \vdash B \ni t}
   {\Gamma \vdash T \ni \lambda x. t}} \\
   
-  \todo{relire}
 
-  Lorsque que l'on veut vérifier le terme contenus dans une abstraction il nous faut libérer l'ensemble des variables
-  qui lui sont associées. Avec notre représentation ``locally nameless'' nous somme obliger d'effectuer une substitution
-  contrairement à une représentation composé uniquement des indices de de Bruijn.
+  Lorsque que l'on veut vérifier le terme contenu dans une abstraction il faut libérer l'ensemble des variables
+  qui lui sont associées. Avec notre représentation ``locally nameless'' nous somme obligé d'effectuer une substitution.
   
-  C'est pour cette raison que l'on génère une nouvelle variable libre et que l'on substitue les variables liées 
-  au $\lambda$ par celle ci. On insère donc dans le contexte l'association variable type.
-  La fonction de synthèse \lstinline!synth! prend un contexte et un
+  C'est pour cette raison que l'on génère un nouveau nom à l'aide de la fonction \fun{gensym} qui nous garantie
+  que ce nom n'a jamais été utilisé. On substitue l'ensemble
+  des variables liées à l'abstraction en cours avec une variable libre dont le nom est celui généré précédement.
+  On insère ensuite dans le contexte l'association variable type.
+  La fonction de synthèse \lstinline!synth! prend en argument un contexte et un
   \emph{terme synthéthisable} et renvoie le type de celui-ci.
-  La fonction gensym utilisée ici permet de crée un nom de variable frais, garantissant que celui n'a encore jamais
-été utilisé. 
+  
 %
  \codefrom{typed}{lambda}{check_abs}
 
