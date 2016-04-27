@@ -91,11 +91,6 @@
 
 %% ** Abstract 
 
-\todo{Mettre un coup de ispell}
-
-\begin{abstract} 
-  Ce document représente l'ensemble du travail effectué durant l'unité d'enseignement 3I013 de l'\textsc{upmc}. \todo{Cet abstract n'apporte pas grand chose : le supprimer ?}
-\end{abstract}
 
 \setcounter{tocdepth}{2}
 \tableofcontents
@@ -108,29 +103,27 @@
 
 \todo{a relire}
 
-Un langage de compilation est entièrement défini par son compilateur. En effet ce logiciel permet de traduire
+Un langage de programmation est entièrement défini par son compilateur. En effet ce logiciel permet de traduire
 des programmes écrits dans un langage de haut niveau en instructions pour le processeur.
 
-Il sera donc question dans ce rapport de comprendre le typage, une des étapes de la chaîne de compilation.
-Pour résumer brièvement le compilateur 
-traduit d'abord le texte écrit par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite utilisable
-dans un algorithme.
+Dans ce rapport il sera question de comprendre le typage, une des étapes de la chaîne de compilation.
+Résumons brièvement la composition d'un compilateur:
+Celui-ci traduit d'abord le texte écrit par le programmeur en un arbre de syntaxe abstraite. Cette représentation lui permet
+de manipuler les différents éléments du programme.
 Si le compilateur ne génère pas d'erreur durant cette étape, on dit que le programme est syntaxiquement correct. Cependant 
 le programmeur à pu écrire des instructions telles que \lstinline!x = 2 + true!. Même si cette instruction est syntaxiquement correcte, celle-ci 
 n'a aucun sens. Il lui faut maintenant à partir de l'arbre de syntaxe abstraite générer du code assembleur, un code compréhensible 
 par les microprocesseurs. Le compilateur peut très bien générer une suite d'instructions assembleur correspondant à l'expression 
-précédente. C'est durant l'exécution du programme que le processeur va interrompre le programme. Lorsque ces erreurs surviennent, il est 
-très compliqué de trouver la source de celles-ci car l'instruction fautive ne correspond pas au code écrit par le programmeur. 
+précédente. C'est durant l'exécution du programme que le processeur va interrompre celui-ci. Lorsque ces erreurs surviennent, il est 
+très compliqué de trouver leur source car l'instruction fautive ne correspond pas exactement à celle écrite par le programmeur.
 Pour éviter ce genre d'erreurs qui peuvent survenir très longtemps après le lancement du programme (les serveurs par exemple), 
-il nous faut donc vérifier la validité de celui-ci. Il faut donc rajouter une étape dans la chaîne de compilation grâce au typage 
-assuré par l'analyseur de type.
+il nous faut donc vérifier la validité du programme. Afin d'effectuer cette vérification, nous allons implémenter un vérificateur
+de type dans la chaîne de compilation.
 L'intérêt du typage est donc de vérifier que le programme s'exécutera correctement, sans avoir besoin d'exécuter celui-ci. 
 Il permet aussi d'obtenir des informations très précises sur la source des erreurs.
 
 \section{$\lambda$-calcul non typé}
 \label{sec:untyped}
-
-\todo{Il reste des ``lambda'' qui devraient être des $\lambda$.}
 
 En 1936, Alonzo Church introduit le $\lambda$-calcul non typé
 ~\citep{church:lambda-calcul}. Le $\lambda$-calcul est
@@ -1087,7 +1080,7 @@ La représentation des termes bidirectionnels est sans surprise :
 \codefrom{typed}{lambda}{exTm}
 
 Le type \lstinline!name! ci-dessous nous permettra de mettre des entiers à la place 
-d'une chaîne de caractère\todo{description trop opérationnelle/peu motivée : ne pas en parler maintenant. On pourrait introduire name pour gérer les DefVars dans le non typé : cela simplifierai les choses.}, nous en reparlerons dans l'implémentation de l'évaluation.
+d'une chaîne de caractère, nous en reparlerons dans l'implémentation de l'évaluation.
 \codefrom{typed}{lambda}{name}
 
 
@@ -1692,7 +1685,7 @@ comme par exemple les vecteurs de taille \emph{n}.
   \label{example vecteur}
   Les vecteurs représentent des listes dont la taille est connue (et
   vérifiée) lors de la compilation. Voici des vecteurs d'éléments de
-  type $\alpha$, pour certaines tailles \emph{n} fixées : \todo{Définir des macros}
+  type $\alpha$, pour certaines tailles \emph{n} fixées : 
   \begin{align*}
     &\nil &: \Vect\: 0\: \alpha \\
     &\cons\: \true\: \nil &: \Vect\: 1\: \bool \\
@@ -2148,10 +2141,11 @@ Voici donc le code du type-checker correpondant:
     \Gamma\vdash Nat \ni n \\ 
     \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P \\
     \Gamma\vdash Vec\:\alpha\:n\ni v \\
+    \Gamma\vdash P\: \zero \:(dnil\: \alpha)\ni a \\
     \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
             {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}\mbox{(Dfold)}}\\
   Il nous faut tout d'abord vérifier l'ensemble des hypothèses puis retourner l'application du terme $P$
-  aux termes $n$ et $v$
+  aux termes $n$ et $v$ 
   \codefrom{dependent}{lambda}{synth_dfold}
 
     
@@ -2298,22 +2292,24 @@ Attelons-nous maintenant à notre première preuve. Nous avons désormais tout l
 les entiers et l'égalité.
 La construction de cette preuve est assez simple. Comme nous l'avons vu dans la section
 sur l'égalité \ref{egalite} la contruction \equal{2+2}{N}{4} est équivalente  au type  $(id\: Nat\: (2\: +\: 2)\:\: 4)$.
-Il nous faut maintenant determiné un terme correspondant à ce type. La règle d'introduction
-du type $id$ est le terme $refl$. Le seul terme
+Il nous faut maintenant déterminer un terme correspondant à ce type. La règle d'introduction
+du type $id$ est le terme $refl$. Le seul terme permettant de vérifier ce type
+est le terme $refl{4}$
 
-Afin de vérifier cette preuve dans notre type checker il nous faut exectuer la fonction suivante:
+
+Afin de vérifier cette preuve dans notre type checker il nous faut exécuter la fonction suivante:
 
 \fun{lcheck [] (read ``(succ (succ (succ (succ zero))))'')}
 
 \fun{(read ``(id (+ (succ (succ zero)) (succ (succ zero))) (succ (succ (succ (succ zero)))))'')}
 
-La fonction \fun{read} permet de parser une chaine de charactère pour obtenir le terme correspondant.
+La fonction \fun{read} permet de parser une chaine de caractères pour obtenir le terme correspondant.
 On appelle la fonction \fun{lcheck} avec comme premier argument \fun{[]} qui correspond à la liste vide en Ocaml
 car nous débutons avec un contexte vide.
 
-Pour vérifier que l'implémentation de notre type checker se comporte correctement tentons
-executer \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléens \fun{false} comme
-attendue.
+Pour vérifier que l'implémentation de notre vérificateur de type se comporte correctement tentons 
+d'exécuter \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléen \fun{false} comme
+attendu.
 
 \subsubsection{Preuve sur les vecteurs}
 
