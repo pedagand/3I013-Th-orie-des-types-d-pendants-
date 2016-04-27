@@ -1950,7 +1950,7 @@ aussi évaluer celui-ci afin de le mettre en forme normale.
 
 \subsection{Extensions}
 
-Comme nous l'avons vu dans l'Exemple~\ref{example vecteur} nous pouvons typé de nouveaux termes inexistants auparavant.
+Comme nous l'avons vu dans l'Exemple~\ref{example vecteur} nous pouvons typer de nouveaux termes inexistants auparavant.
 Nous commencerons par mettre à jour les types de données courants. Nous présenterons ensuite les vecteurs ainsi que l'égalité.
 
 \subsubsection{Les entiers}
@@ -1985,35 +1985,36 @@ Passons maintenant aux règles de typages:
 Comme nous l'énoncions précédement les types sont maintenant des termes, il nous faut donc ajouter une règle \emph{Nat}.
 
 Pour continuer l'analogie avec la logique propositionnelle, on constate que la règle de typage de $\iter$ correspond à un raisonnement par
-\emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de zero. 
+\emph{induction}. En effet on vérifie d'abord que l'argument \emph{a} est bien du type du prédicat dans le cas de $\zero$. 
 Puis l'on vérifie que la fonction \emph{f} est définie pour tout \emph{n} vers \emph{n + 1}.
 
-Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide dans une syntaxe
+Nous allons maintenant définir un $\lambda$-terme permettant d'effectuer l'addition de deux nombres avec l'aide d'une syntaxe
 Lispienne (parsée par notre prototype) :
 \begin{lstlisting}
   plus = (lambda n (lambda a 
            (iter (lambda x N) n 
                  (lambda ni (lambda x (succ x))) a)))
 \end{lstlisting}
-Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à iterer \emph{n} fois la fonction successeur sur \emph{m}.
-Afin d'aléger la syntaxe nous utiliserons dorénavant \lstinline!(+ n m)! correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
+Pour effectuer l'addition \emph{n\:+\:m} la stratégie consiste à itérer \emph{n} fois la fonction successeur sur \emph{m}.
+Afin d'alléger la syntaxe nous utiliserons dorénavant \lstinline!(+ n m)! correspondant au terme \emph{plus} appliqué aux entiers \emph{n} et
 \emph{m}.
 
 \paragraph{Implémentation :} 
 
-Commençons par les règles de vérifications:
+Commençons par les règles de vérification:
 \codefrom{dependent}{lambda}{check_head}\lstinline!(...)!
 \codefrom{dependent}{lambda}{check_nat}
 
-Pour \emph{iter} si l'ensemble des des hypothèses sont vérifiées il nous faut retourner l'application
+Pour \emph{iter} si l'ensemble des hypothèses sont vérifiées il nous faut retourner l'application
 du prédicat $P$ sur $n$.
 \codefrom{dependent}{lambda}{synth_iter}
 
-Dans l'implémentation ~\ref{entier_type} nous n'avons pas présenté l'évaluation à grand pas des entiers naturels, 
+Dans l'implémentation ~\ref{entier_type} nous n'avons pas présenté l'évaluation à grands pas des entiers naturels, 
 voici donc le code correspondant:
 \codefrom{dependent}{lambda}{big_step_nat}
 
-Pour l'évaluation de \fun{iter} nous utilisons la meme techniques que pour 
+
+Pour l'évaluation de \fun{iter} nous utilisons la même technique que pour 
 l'application. On évalue l'ensemble des arguments puis on appelle la fonction \fun{vitter}
 \codefrom{dependent}{lambda}{big_step_iter}
 
@@ -2026,9 +2027,9 @@ fonction.
 
 Les vecteurs permettent d'introduire réellement de la dépendance de type. Nous avons vu une 
 présentation assez informelle
-des vecteurs afin de présenter les types dépendants, il sera donc question ici formaliser l'intuition de la
+des vecteurs afin de présenter les types dépendants, il sera donc question ici de formaliser l'intuition de
 la Section~\ref{presentation_type_dependants}. 
-Commençons par enrichire notre grammaire:
+Commençons par enrichir notre grammaire:
 
 \newcommand{\vect}{\mathit{vec}} 
 \newcommand{\dnil}{\mathit{dnil}}
@@ -2050,8 +2051,8 @@ Ce qui se traduit dans notre programme par le code suivant:
 
 
 
-Les arguments des différents constructeurs seront expliqué une fois que nous aurrons vu les 
-règles de typage présente en figure \ref{fig:typage_vec}.
+Les arguments des différents constructeurs seront expliqués une fois que nous aurons vu les 
+règles de typage présentes en figure \ref{fig:typage_vec}.
 \begin{figure}
 \[
 \begin{array}{c}
@@ -2078,15 +2079,15 @@ règles de typage présente en figure \ref{fig:typage_vec}.
 
 
 
-Dans la règle \emph{vec} $\alpha$ sera donc le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
+Dans la règle \emph{vec}, $\alpha$ sera le type des éléments contenus dans le vecteur et \emph{n} sa taille. 
 Cette représentation des vecteurs n'est pas familière aux programmeurs, en général si l'on veut appliquer une fonction sur des vecteurs 
 de taille précise il faut effectuer un test à l'entrée de la fonction. C'est un des aspects très intéressant des types dépendants qui
 permettent d'assister les programmeurs dans la vérification de leurs programmes.
 
 
-Le terme \emph{dnil} correspond au vecteur vide, et \emph{dcons} qui nous permet avec d'ajouter un élément dans un vecteur.
+Le terme \emph{dnil} correspond au vecteur vide, et \emph{dcons} qui nous permet d'ajouter un élément dans un vecteur.
 \begin{example}
-  Voici un vecteur de taille trois et dont les éléments sont des entiers:
+  Voici un vecteur de taille trois dont les éléments sont des entiers:
   \begin{align*}
     dcons\:zero\:(dcons\:(succ\:zero)\:(dcons\:zero\:(dnil\:Nat)))
   \end{align*}  
@@ -2106,10 +2107,10 @@ Définissons maintenant l'éliminateur dfold comme un terme synthétisable:
             {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}
 \end{array}\]
 
-De la meme manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
+De la même manière que pour l'éliminateur des entiers naturels \emph{iter}, le prédicat \emph{p} nous permet 
 de rendre le type de retour dépendant des différents arguments.
 
-Il existe de nombreuses façon d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
+Il existe de nombreuses façons d'utiliser \emph{dfold}, une application assez simple consiste à faire la somme des éléments d'une liste.
 Voici le terme correspondant à cette utilisation:
 \begin{lstlisting} 
 somme_liste = 
@@ -2132,8 +2133,8 @@ Voici donc le code du type-checker correpondant:
   
 \item[$\bullet$] \boxed{\cfrac{}
   {\Gamma\vdash Vec\:\alpha\:\zero\ni dnil\:\alpha}\mbox{(Dnill)}}\\
-  Afin de vérifier le terme \emph{Dnill} il nous faut simplement vérifier que les terme $\alpha$
-  sont égaux.  \todo{Le code match sur \fun{DNil(alpha)} mais c'est un entier n en fait}
+  Afin de vérifier le terme \emph{Dnill} il nous faut simplement vérifier que les termes $\alpha$
+  sont égaux.
   \codefrom{dependent}{lambda}{check_dnil}
 
 \item[$\bullet$] \boxed{\cfrac{\Gamma\vdash Vec\:\alpha\:n\ni v \:\:\Gamma\vdash \alpha\ni a}
@@ -2160,7 +2161,7 @@ Voici donc le code du type-checker correpondant:
 
 \paragraph{Evaluation :} 
 Avant d'implémenter l'évaluation dans notre programme il nous faut tout d'abord
-rajouter les \emph{valeurs} suivantes à notre language.
+rajouter les \emph{valeurs} suivantes à notre langage.
 \codefrom{dependent}{lambda}{Value_Vector}
 
 Passons maintenant à l'évaluation des vecteurs, nos trois constructeurs 
@@ -2172,7 +2173,7 @@ Si $dfold$ contient des variables libres il nous faut un élément neutre à ret
 \codefrom{dependent}{lambda}{neutral_fold}
 
 Pour l'implémentation, comme pour \iter, nous avons crée une fonction \fun{vfold}
-qui nous permet d'éffectuer l'évaluation:
+qui nous permet d'effectuer l'évaluation:
 
 \codefrom{dependent}{lambda}{vfold}
 
@@ -2181,7 +2182,7 @@ qui nous permet d'éffectuer l'évaluation:
 
 \newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
 
-Pour implémenter l'égalité au sein de notre language, il faut nous tourner vers la logique. 
+Pour implémenter l'égalité au sein de notre langage, il faut nous tourner vers la logique. 
 La théorie des types implémente une définition de l'égalité proche de la conception de Leibniz : deux éléments sont identiques si ils ont les memes propriétés.
 Pour que deux éléments soient égaux, il faut nécéssairements qu'ils soient de même type. Ce n'est pas une
 conditions suffisante mais elle est nécéssaire. On notera \equal{a}{A}{b} l'égalité de deux élements de type $A$.
