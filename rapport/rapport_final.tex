@@ -555,10 +555,9 @@ termes acceptés par l'analyse de type sont fortement normalisants.
 
 \begin{remark}
   Le fait d'obtenir la garantie que l'ensemble de nos termes sont fortement normalisants signifie que
-  notre langage n'est plus \emph{Turing complet}. En effet nous ne pourrons plus exprimé les programmes
-  qui ne terminent pas. Cependant ce n'est pas génant car nous ne cherchons pas à écrire ce genre de
-  programmes dans notre système. Nous verrons dans les sections suivantes pourquoi il est important
-  de ne pas être Turing complet.
+  notre langage n'est plus \emph{Turing complet}. En effet nous ne pourrons plus exprimer les programmes
+  qui ne terminent pas. Cependant ce n'est pas gênant car nous ne cherchons pas à écrire ce genre de
+  programmes dans notre système.
 \end{remark}
 
 
@@ -573,20 +572,20 @@ par l'argument dans le corps de la fonction :
 %
 \codefrom{untyped}{lambda}{reduction}
 
-Les seuls termes pouvant se réduire étant les redex, nous effectuons la substitution sur celle ci,
-sinon le terme est retourné sans modifications.
+Les seuls termes pouvant se réduire étant les redex, nous effectuons la substitution sur celle-ci,
+sinon le terme est retourné sans modification.
 Passons maintenant à l'évaluation:
 
 \codefrom{untyped}{lambda}{evaluation}
 \codefrom{untyped}{lambda}{evaluation_bis}
 
-La fonction \fun{eval} à pour but de détecter les applications et d'en évaluer le memebre de gauche.
-Une fois le membre de gauche évaluer nous pouvons tenter de réduire l'ensemble de l'application.
+La fonction \fun{eval} à pour but de détecter les applications et d'en évaluer le membre de gauche.
+Une fois le membre de gauche évalué, nous pouvons tenter de réduire l'ensemble de l'application.
 
 \subsection{Encodages à la Church}
 
-Bien que le $\lambda$-calcul soit un language minimaliste, Church~\citet{church:lambda-calcul} a montré que l'on peut
-y \emph{encoder} de nombreux types de donnés familiers aux développeurs, tels que
+Bien que le $\lambda$-calcul soit un langage minimaliste, ~\citet{church:lambda-calcul} a montré que l'on peut
+y \emph{encoder} de nombreux types de données familiers aux développeurs, tels que
 les entiers et les booléens.
 
 
@@ -597,7 +596,7 @@ les entiers et les booléens.
 \newcommand{\False}{\ensuremath{\mathit{false}}}
 \newcommand{\Ifte}{\ensuremath{\mathit{ifte}}}
 
-Nous allons ici voir une représentation des booléens accompagnée de la 
+Nous allons voir une représentation des booléens accompagnée de la 
 structure de contrôle \texttt{if ... then ... else ...}.
 Voici les termes correspondants aux constructeurs \True{}, \False{} et 
 \Ifte{} :
@@ -624,11 +623,11 @@ de l'application d'un \Ifte{} reproduit le comportement attendu.
 
 Ici nous n'avons aucun moyen de vérifier avant normalisation que le
 premier argument de \Ifte{} est effectivement un booléen : nous ne
-pouvons donc pas garantire la bonne évaluation de notre terme.
+pouvons donc pas garantir la bonne évaluation de notre terme.
 
 \begin{remark}
-  Les languages orientés objets permettent de représenter ce type d'encodage d'une manière particulière.
-  Voici la représentation avec le language Java:
+  Les langages orientés objets permettent de représenter ce type d'encodage d'une manière particulière.
+  Voici la représentation avec le langage Java:
   \begin{lstlisting}[language=java]
     Interface Bool<A>{
       A ifte(A x,A y);
