@@ -2314,7 +2314,7 @@ car nous débutons avec un contexte vide.
 
 Pour vérifier que l'implémentation de notre vérificateur de type se comporte correctement tentons 
 d'exécuter \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléen \fun{false} comme
-attendu.
+attendu. \todo{il faut expliquer le booléen false en question n'est pas le résultat de l'égalité mais du type checker !}
 
 \subsubsection{Preuve sur les vecteurs}
 
@@ -2327,13 +2327,15 @@ Voici donc le type dont nous souhaitons trouver un terme:
 
 $\forall A:* \:\forall\: m:Nat\: \forall\: xs:Vec\: A\: m\: \forall\: n:Nat\: \forall\: ys:Vec\: A\: n\: \rightarrow\: Vec\: A\: (n\: +\: m)$
 
-Cette spécification nous demande donc de créer un terme prenant quatre arguments: \\
--$A$ qui correspond au type des deux vecteurs \\
--$m$ la taille du premier vecteur \\
--$xs$ un vecteur de type $A$ et de taille $m$ \\
--$n$ la taille du second vecteur \\
--$ys$ un vecteur de type $A$ et de taille $n$ \\
-On doit ensuite retourner un élément de type $Vec\:A\:(n\: +\: m)$. \\
+Cette spécification nous demande donc de créer un terme prenant quatre arguments: 
+\begin{itemize}
+\item $A$ qui correspond au type des deux vecteurs 
+\item $m$ la taille du premier vecteur 
+\item $xs$ un vecteur de type $A$ et de taille $m$ 
+\item $n$ la taille du second vecteur 
+\item $ys$ un vecteur de type $A$ et de taille $n$ 
+\end{itemize}
+On doit ensuite retourner un élément de type $Vec\:A\:(n\: +\: m)$.
 
 Le seul terme dont nous disposons pour construire un vecteur avec ce genre de dépendance est $dfold$.
 Construisons ce terme dans notre langage: \\
@@ -2362,7 +2364,7 @@ Voici notre prédicat $P$: \\
 
 Trouvons maintenant la fonction $f$ nous permettant de concatener nos vecteurs: \\
 \fun{(lambda f (lambda vec1 (lambda a (lambda vec2 (dcons a vec2)))))}
-Ce qui nous donne comme terme final:
+Ce qui nous donne comme terme final: \todo{saut à la ligne dans le listing}
 
 \begin{lstlisting} 
   (lambda A
@@ -2374,10 +2376,10 @@ Ce qui nous donne comme terme final:
          m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) ys))))))  
 \end{lstlisting}
 
-Voici la preuve rédigée à l'aide de AGDA un langage implémentant les types dépendants:
+Voici la preuve rédigée à l'aide de Agda, un langage implémentant les types dépendants:
 \begin{lstlisting}
   concat : (A : Set)(m : N)(xs : Vec A m) -> (n : N)(ys : Vec A n) -> CONCAT A m xs n ys
-  concat A m xs n ys = dfold A (lambda m xs -> CONCAT A m xs n ys)
+  concat A m xs n ys = dfold A (lambda m xs -> Vec A (m + n))
                              m xs (lambda m a xs xs++ys -> cons a xs++ys) ys 
 \end{lstlisting}
 
