@@ -268,13 +268,12 @@ let reduction env t =
     end
   | mt -> mt
 
-(*=evaluation *)
-let evaluation env t 
-    =
-  (*=evaluation_sig *)
+(*=evaluation_sig *)
+let evaluation env t  =
   let rec eval t =
     match t with
     (*=End *)
+  (*=evaluation *)
     | Appl(f, v) -> 
       let vf = eval f in
       try_reduction (Appl(vf, v))

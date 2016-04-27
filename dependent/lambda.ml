@@ -327,9 +327,11 @@ let rec big_step_eval_inTm t envi =
   | Succ(n) -> VSucc(big_step_eval_inTm n envi)
 (*=End *)
 (*=big_step_vec *) 
-  | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),(big_step_eval_inTm n envi))
+  | Vec(alpha,n) -> VVec((big_step_eval_inTm alpha envi),
+			 (big_step_eval_inTm n envi))
   | DNil(alpha) -> VDNil(big_step_eval_inTm alpha envi)
-  | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),(big_step_eval_inTm xs envi))
+  | DCons(a,xs) -> VDCons((big_step_eval_inTm a envi),
+			  (big_step_eval_inTm xs envi))
 (*=End *)
   | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
   | Refl(a) -> VRefl(big_step_eval_inTm a envi)
@@ -351,7 +353,8 @@ and vitter (p,n,f,a) =
 and vfold(alpha,p,n,xs,f,a) = 
   match xs,f,n with
   | (VDNil(alphi),VLam fu,VZero) -> a
-  | (VDCons(elem,y),VLam fu,VSucc(ni)) -> vapp(vapp(vapp(fu n,xs),elem),vfold(alpha,p,ni,y,f,a))
+  | (VDCons(elem,y),VLam fu,VSucc(ni)) -> 
+     vapp(vapp(vapp(fu n,xs),elem),vfold(alpha,p,ni,y,f,a))
   | _ -> VNeutral(NDFold(alpha,p,n,xs,f,a))
 (*=End *)
 and big_step_eval_exTm t envi = 
@@ -582,18 +585,21 @@ and lsynth ctxt exT =
      let big_n = big_step_eval_inTm n [] in 
      if lcheck ctxt (big_step_eval_inTm (read "(-> N *)") []) p &&
        lcheck ctxt (big_step_eval_inTm (read "N") []) n &&
-       lcheck ctxt (big_step_eval_inTm
-			  (Pi(Global("n"),Nat,
-			      Pi(Global("NO"),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),n))),
-				 (Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])
-       f &&
+       lcheck 
+	 ctxt (big_step_eval_inTm
+		 (Pi(Global("n"),Nat,
+		     Pi(Global("NO"),(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),n))),
+			(Inv(Appl(Ann(p,Pi(Global"NO",Nat,Star)),Succ(n))))))) [])
+	 f &&
        lcheck ctxt (vapp(big_p,VZero)) a 
      then (vapp(big_p,big_n))
      else failwith "Iter synth fail"
   (*=End *)
   (*=synth_dfold *)
   | DFold(alpha,p,n,xs,f,a) ->
-     let type_p = (Pi(Global"n",Nat,(Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
+     let type_p = 
+       (Pi(Global"n",Nat,
+	   (Pi(Global"xs",Vec(alpha,Inv(BVar 0)),Star)))) in 
      if lcheck ctxt VStar alpha &&
        lcheck ctxt (big_step_eval_inTm type_p []) p &&
        lcheck ctxt VNat n &&
@@ -611,14 +617,20 @@ and lsynth ctxt exT =
   (*=End *)
   (*=synth_trans *)
   | Trans(gA,p,a,b,q,x) ->
-     let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
+     let type_p = Pi(Global"a",gA,
+		     Pi(Global"b",gA,
+			Pi(Global"NO",Id(gA,Inv(BVar 1),
+					 Inv(BVar 0)),Star))) in 
      if lcheck ctxt VStar gA &&
        lcheck ctxt (big_step_eval_inTm gA []) a &&
        lcheck ctxt (big_step_eval_inTm gA []) b &&
        lcheck ctxt  (big_step_eval_inTm (Id(gA,a,b)) []) q &&  
        lcheck ctxt (big_step_eval_inTm type_p []) p && 
-       lcheck ctxt (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) x
-     then (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
+       lcheck ctxt 
+	      (big_step_eval_inTm 
+		 (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) x
+     then (big_step_eval_inTm 
+	     (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
      else failwith "Trans synth fail"           			       
   (*=End *)
   | _ -> failwith "HAHAHAHAHAHAHA"

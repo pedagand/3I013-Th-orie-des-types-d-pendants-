@@ -569,8 +569,9 @@ par l'argument dans le corps de la fonction :
 
 Les seuls termes pouvant se réduire étant les redex, nous effectuons la substitution sur celle-ci,
 sinon le terme est retourné sans modification.
-Passons maintenant à l'évaluation:\todo{il y a un problème dans le code ci-dessous}
+Passons maintenant à l'évaluation:
 
+\codefrom{untyped}{lambda}{evaluation_sig}
 \codefrom{untyped}{lambda}{evaluation}
 \codefrom{untyped}{lambda}{evaluation_bis}
 
@@ -1159,7 +1160,6 @@ présenté en Figure~\ref{fig:typage-simple}.
 
 \paragraph{Implémentation :}
 
-\todo{Encore des cfracs pourris ? Sérieusement ?!}
 \begin{itemize}
   
 \item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni in}}\\
@@ -1175,7 +1175,7 @@ présenté en Figure~\ref{fig:typage-simple}.
   
   \codefrom{typed}{lambda}{check_def} 
   
-\item[$\bullet$] \boxed{\inferrule[Abs]
+\item[$\bullet$] \boxed{\inferrule[(Abs)]
   {T = A \rightarrow B\\ \Gamma, x:A \vdash B \ni t}
   {\Gamma \vdash T \ni \lambda x. t}} \\
   
@@ -1191,8 +1191,8 @@ présenté en Figure~\ref{fig:typage-simple}.
 %
  \codefrom{typed}{lambda}{check_abs}
 
-\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-                              {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}} \\
+\item[$\bullet$] \boxed{\inferrule[(Inv)]{\Gamma \vdash t \in T' \:\: T=T'}
+                              {\Gamma\vdash T \ni inv(t)}} \\
 
 
 Afin de tester l'égalité de type, l'égalité structurelle de OCaml est
@@ -1209,8 +1209,8 @@ terme synthétisable et renvoie le type de celui-ci.
 
  \codefrom{typed}{lambda}{synth_def}
 
-\item[$\bullet$] \boxed{\cfrac{\Gamma\vdash T \ni t}
-                              {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}} \\
+\item[$\bullet$] \boxed{\inferrule[(Ann)]{\Gamma\vdash T \ni t}
+                              {\Gamma\vdash (t:T) \in T}} \\
 
   Nous sommes ici en synthèse c'est à dire que nous devons retourner un type.
   Si $t$ est effectivement de type $T$, alors il suffit de retourner $T$.
@@ -1219,19 +1219,19 @@ terme synthétisable et renvoie le type de celui-ci.
 
 
 
-\item[$\bullet$] \boxed{\cfrac{x:T \in \Gamma}
-                               {\Gamma \vdash x \in T }\mbox{(Var)}}\\
+\item[$\bullet$] \boxed{\inferrule[(Var)]{x:T \in \Gamma} 
+                               {\Gamma \vdash x \in T }}\\
 
 Dans la spécification formelle, on ne fait pas de distinction entre
 les variables libres et liées.  Comme nous l'avons vu dans la règle de
 typage de l'abstraction, l'ensemble des variables liées à chacun des
 lieurs sont libérées. La spécification parle donc bien des variables
-libres, que l'on synthétise à partir  du type qui leur a été assigné dans le contexte. \todo{le code contient un TODO}
+libres, que l'on synthétise à partir  du type qui leur a été assigné dans le contexte. 
 %
 \codefrom{typed}{lambda}{synth_var}
 
-\item[$\bullet$] \boxed{\cfrac{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
-         {\Gamma\vdash f\:s\in B}\mbox{(App)}}\\
+\item[$\bullet$] \boxed{\inferrule[(App)]{\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s }
+         {\Gamma\vdash f\:s\in B}}\\
 
   
   Comme la spécification nous l'indique, il est d'abord nécessaire de synthétiser le type de $f$.
@@ -1301,10 +1301,6 @@ fortement normalisant du \(\lambda\)-calcul non typé. La traduction de
 nos termes bidirectionnels vers les termes non typés est transparente
 : il suffit d'effacer les annotations de type.
 
-\begin{example}  
-  \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport C'est l'exemple où cela ne réduit pas}   
-\end{example}
-
 \paragraph{Implémentation :}
 \label{reduction_petits_pas}
 
@@ -1359,8 +1355,8 @@ Les règles d'évaluations restent inchangées.
 
 Afin de pouvoir typer nos termes, il nous faut introduire le type \bool{}.
 En suivant la même démarche que  pour les entiers, les 
-constructeurs \todo{ces constructeurs n'existent pas, utilise les macros\ldots} \emph{True} et \emph{False} sont désormais des \emph{termes vérifiables}
-et le constructeur \todo{ces constructeurs n'existent pas, utilise les macros\ldots} \emph{Ifte} un \emph{terme synthétisable}
+constructeurs \True\: et \False\: sont désormais des \emph{termes vérifiables}
+et le constructeur \Ifte\: un \emph{terme synthétisable}
 
 Nous pouvons désormais typer nos booléens de la manière suivante:
 
@@ -1457,7 +1453,7 @@ ceux obtenus avec la réduction à petits pas
 (Section~\ref{reduction_petits_pas}).
 
 \newcommand{\VLam}{\lstinline!VLam!}
-Voici donc le code correspondant à la nouvelle représentation de nos termes en \todo{c'est OCaml} Ocaml:
+Voici donc le code correspondant à la nouvelle représentation de nos termes en OCaml:
 
 \codefrom{typed}{lambda}{value}
 \codefrom{typed}{lambda}{neutral}
@@ -1534,7 +1530,7 @@ type{value} afin de nous retourner un \emph{terme synthétisable}.
 Le type \fun{name} nous permet de faire la distinction entre les
 variables réellement libres et celles que nous souhaitons lier pendant la réification.
 Afin de transformer une valeur \lstinline!VLam f! en
-\todo{c'est quoi ce truc ?} \emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
+ \fun{Abs} il nous faut appliquer la fonction \emph{f} à une variable
 de réification, que l'on distinguera des autres variables libres grâce au type \fun{name}.
 On s'assure que les variables ainsi introduites sont fraîches en utilisant la fonction \fun{gensym}.
 La fonction \fun{boundfree} va nous permettre de relier les \fun{NFree} dont la variable est un \fun{Quote}.
@@ -1681,7 +1677,7 @@ logique, le quantificateur $\forall$ nous permet d'écrire ce type de termes.
 \newcommand{\Vect}{\ensuremath{\mathsf{vec}}}
 
 Avec des variables au sein de nos types nous pouvons désormais introduire des \emph{familles de type},
-comme par exemple les vecteurs de taille \todo{Ce emph n'en est pas un, comme tant d'autres} \emph{n}.
+comme par exemple les vecteurs de taille $n$.
 \begin{example}  
   \label{example vecteur}
   Les vecteurs représentent des listes dont la taille est connue (et
@@ -2379,7 +2375,8 @@ Ce qui nous donne comme terme final:
      (lambda n
       (lambda ys
        (dfold A (lambda mp (lambda vp (Vec A (+ mp n))))
-         m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) ys))))))  
+         m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) 
+           ys))))))  
 \end{lstlisting}
 
 Voici la preuve rédigée à l'aide de Agda, un langage implémentant les types dépendants:

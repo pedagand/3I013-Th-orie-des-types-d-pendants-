@@ -456,7 +456,6 @@ let rec check contexte ty inT
        begin
          match ty with
          | Fleche(s, t) -> 
-            (* XXX: open the de Bruijn binder *)
             let freshVar = gensym () in
             check ((Global(freshVar), s) :: contexte) t
 	      (substitution_inTm b (FVar (Global(freshVar))) 0) 
