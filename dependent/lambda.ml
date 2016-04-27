@@ -610,8 +610,10 @@ and lsynth ctxt exT =
 	      Pi(Global"xs",Vec(alpha,Inv(BVar 0)),
 		 Pi(Global"a",alpha,
 		    Pi(Global"NO",Inv(Appl(Appl(Ann(p,type_p),n),xs)),
-		       Inv(Appl(Appl(Ann(p,type_p),Succ(n)),DCons(a,xs)))))))) []) f &&
-       lcheck ctxt (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) []) a				 
+		       Inv(Appl(Appl(Ann(p,type_p),Succ(n)),
+				DCons(a,xs)))))))) []) f &&
+       lcheck ctxt (big_step_eval_inTm 
+		      (Inv(Appl(Appl(Ann(p,type_p),Zero),DNil(alpha)))) []) a				 
      then (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
      else failwith "DFOld synth something goes wrong"
   (*=End *)
