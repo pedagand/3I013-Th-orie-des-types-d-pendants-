@@ -150,7 +150,7 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 
 
 \begin{bnf}
-  t &::= & &\mbox{(lambda terme)} \\
+  t &::= & &\mbox{($\lambda$-terme)} \\
   &|& \Var{x} & \mbox{(variable)} \\
   &|& \Lam{x}{t} & \mbox{(abstraction)} \\
   &|& \App{t}{t}          & \mbox{(application)}
@@ -158,9 +158,9 @@ Le $\lambda$-calcul est composé uniquement de \(\lambda\)-termes dont voici la 
 
 Pour faire une analogie avec les mathématiques, une abstraction peut
 être vue comme une définition de fonction anonyme.
- 
+
 \begin{example}
- La fonction identité est définie par le $lambda$-terme suivant : $\Lam{x}{\Var{x}}$
+ La fonction identité est définie par le $\lambda$-terme suivant : $\Lam{x}{\Var{x}}$
 \end{example}
 
 On peut constater avec cette syntaxe que les abstractions ne prennent
@@ -180,8 +180,7 @@ succession de fonctions à un seul argument.
 \newcommand{\IsFree}{\mathrm{isFree}}
 
 
-Une variable est \emph{liée} lorsque celle-ci est déclarée dans le corps d'un
-lambda. Dans l'Exemple~\ref{example:id}, $x$ était ainsi une variable liée.
+Une variable est \emph{liée} lorsque celle-ci est déclarée dans le corps d'une abstraction. Dans l'Exemple~\ref{example:id}, $x$ était ainsi une variable liée.
 Si la variable n'a pas été déclarée, elle est dite
 \emph{libre}. Formellement, l'ensemble des variables libres d'un terme est
 défini récursivement de la façon suivante:
@@ -284,17 +283,17 @@ et les variables libres (\lstinline!FreeVar!) diffère.
 
 
   
-\subsection{Calculer dans le lambda calcul}
+\subsection{Calculer dans le $\lambda$-calcul}
 \label{calculer_dans_le_lambda_calcul}
 
-Dans le lambda calcul pur, il n'existe pas d'opérations primitives, comme l'addition ou la multiplication d'entiers par exemple. Le seul moyen de calculer de nouveaux termes est de les appliquer 
+Dans le $\lambda$-calcul pur, il n'existe pas d'opérations primitives, comme l'addition ou la multiplication d'entiers par exemple. Le seul moyen de calculer de nouveaux termes est de les appliquer 
 entre eux. Mais il nous faut tout d'abord définir le mécanisme de substitution par lequel se réalise la notion de calcul.
 
 \subsubsection{Substitution}
 
 \newcommand{\subst}[3]{#1[#2 := #3]}
 
-
+\todo{Sérieusement, il reste des ``lambda''?! Il est temps de rencontrer query-search-and-replace.}
 La substitution est un mécanisme central dans le lambda calcul. Cela consiste 
 à remplacer l'occurrence d'une variable liée par un \(\lambda\)-terme.
 On note \(\subst{t}{x}{u}\) la substitution de la variable $\Var{x}$ dans le terme $\Var{t}$ par le 
