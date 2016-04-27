@@ -1447,8 +1447,8 @@ L'algorithme de typage suit litéralement sa spécification bidirectionnelle :
 
 Dans cette section, nous décrivons une implémentation alternative de
 la réduction forte qui exploite le fait que nous implémentons notre évaluateur dans un langage fonctionnel.
-Il est intéressant d'exploiter les mécanismes d'Ocaml. Nous allons créer un interpréteur pour nos termes
-en utilisant les termes Ocaml ce qui nous permettra de ne pas avoir à 
+Il est intéressant d'exploiter les mécanismes d'OCaml. Nous allons créer un interpréteur pour nos termes
+en utilisant les termes OCaml ce qui nous permettra de ne pas avoir à 
 gérer les mécanismes de définition de fonction et d'application.
 
 Comme nous l'avons vu dans la Section~\ref{reduction_forte} \if 0 peut
@@ -1459,7 +1459,7 @@ ceux obtenus avec la réduction à petits pas
 (Section~\ref{reduction_petits_pas}).
 
 \newcommand{\VLam}{\lstinline!VLam!}
-Voici donc le code correspondant à la nouvelle représentation de nos termes en Ocaml:
+Voici donc le code correspondant à la nouvelle représentation de nos termes en \todo{c'est OCaml} Ocaml:
 
 \codefrom{typed}{lambda}{value}
 \codefrom{typed}{lambda}{neutral}
