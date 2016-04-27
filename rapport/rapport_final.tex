@@ -2179,6 +2179,7 @@ qui nous permet d'effectuer l'évaluation:
 
 
 \subsubsection{L'égalite} 
+\label{egalite}
 
 \newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
 
@@ -2294,9 +2295,24 @@ Nous acceptons quand même le terme pour laisser la possibilité au programmeur 
 
 Attelons-nous maintenant à notre première preuve. Nous avons désormais tout le bagage nécessaire, 
 les entiers et l'égalité.
+La construction de cette preuve est assez simple. Comme nous l'avons vu dans la section
+sur l'égalité \ref{egalite} la contruction \equal{2+2}{N}{4} est équivalente  au type  $(id\: Nat\: (2\: +\: 2)\:\: 4)$.
+Il nous faut maintenant determiné un terme correspondant à ce type. La règle d'introduction
+du type $id$ est le terme $refl$. Le seul terme
 
+Afin de vérifier cette preuve dans notre type checker il nous faut exectuer la fonction suivante:
 
+\fun{lcheck [] (read ``(succ (succ (succ (succ zero))))'')}
 
+\fun{(read ``(id (+ (succ (succ zero)) (succ (succ zero))) (succ (succ (succ (succ zero)))))'')}
+
+La fonction \fun{read} permet de parser une chaine de charactère pour obtenir le terme correspondant.
+On appelle la fonction \fun{lcheck} avec comme premier argument \fun{[]} qui correspond à la liste vide en Ocaml
+car nous débutons avec un contexte vide.
+
+Pour vérifier que l'implémentation de notre type checker se comporte correctement tentons
+executer \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléens \fun{false} comme
+attendue.
 
 
 \section*{Remerciements}
