@@ -2183,16 +2183,16 @@ qui nous permet d'effectuer l'évaluation:
 \newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
 
 Pour implémenter l'égalité au sein de notre langage, il faut nous tourner vers la logique. 
-La théorie des types implémente une définition de l'égalité proche de la conception de Leibniz : deux éléments sont identiques si ils ont les memes propriétés.
-Pour que deux éléments soient égaux, il faut nécéssairements qu'ils soient de même type. Ce n'est pas une
-conditions suffisante mais elle est nécéssaire. On notera \equal{a}{A}{b} l'égalité de deux élements de type $A$.
+La théorie des types implémente une définition de l'égalité proche de la conception de Leibniz : deux éléments sont identiques s'ils ont les mêmes propriétés.
+Pour que deux éléments soient égaux, il faut nécessairement qu'ils soient de même type. Ce n'est pas une
+condition suffisante mais elle est nécessaire. On notera \equal{a}{A}{b} l'égalité de deux élements de type $A$.
 \begin{example}
   L'égalité sur les entiers s'écrit donc \equal{2 + 2}{N}{4}
 \end{example}
 
 Si l'on souhaite exprimer la même idée en logique nous écrirons : $Id(A,a,b)$.
-Nous allons donc introduire les règles de typage du terme id ainsi que celle de son introducteur \emph{refl} 
-et de son élimnateur \emph{Trans}.
+Nous allons donc introduire les règles de typage du terme \emph{id} ainsi que celle de son introducteur \emph{refl} 
+et de son éliminateur \emph{Trans}.
 
 
 \begin{itemize}
@@ -2208,8 +2208,8 @@ et de son élimnateur \emph{Trans}.
             {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}}\\
 
   La spécification nous indique implicitement qu'il faut tester l'égalité entre les deux termes $a$. 
-  Cependant c'est le point central de cette règle.
-  Deux termes sont donc éqaux si leur évaluation est la meme et que l'on peut les vérifier 
+  C'est le point central de cette règle.
+  Deux termes sont donc éqaux si leur évaluation est la même et que l'on peut les vérifier 
   avec le type $A$.
   \codefrom{dependent}{lambda}{check_refl}
   
@@ -2222,8 +2222,8 @@ et de son élimnateur \emph{Trans}.
     \Gamma\vdash P\:a\:a\:(refl\:a)\ni x}
   {\Gamma\vdash trans\:A\:P\:a\:b\:q\:x\in P\:a\:b\:q}}\\
   
-  La relation de transitivité nous indique que si les éléments $a$ et $b$ sont égaux et que l'on peut vérifier
-  que l'élément $x$ est vérifier alors celui est égale à $a$ et $b$.
+  La relation de transitivité nous indique que si les éléments $a$ et $b$ sont égaux et que l'on vérifie $x$
+  alors celui-ci est égal à $a$ et $b$.
   \codefrom{dependent}{lambda}{synth_head}
   \codefrom{dependent}{lambda}{synth_trans}
   
@@ -2237,7 +2237,7 @@ Dans la section \ref{corres_curry_howard} nous avons parlé de l'utilisation du 
 pour assister la démonstration de propositions logiques. Nous allons étendre notre implémentation afin
 de faciliter cette tâche.
 Nous verrons ensuite un exemple de démonstration de la proposition 
-``2 + 2 = 4'', qui était l'objectif initiale de ce projet.
+``2 + 2 = 4'', qui était l'objectif initial de ce projet.
 
 
 \subsubsection{Amélioration du vérificateur}
@@ -2248,53 +2248,51 @@ avons présenté une version ``allégée'' de la fonction de
 vérification. Cependant, nous avons également implémenté une
 version plus complète comportant des messages d'erreurs précis.
 
-Dans l'implémentation du \fun{type_checker} du $\lambda$-calcul simplement typé lorsqu'un terme n'était pas
+Dans l'implémentation du vérificateur de type du $\lambda$-calcul simplement typé lorsqu'un terme n'était pas
 correctement typé la fonction stoppait son éxecution par le moyen d'une exception.
-Nos programmes devenant de plus en plus complexe, il peut etre intérressant de renvoyer un rapport detaillé
-de l'echec. Voici la structure que nous allons utilisé:
+Nos programmes devenant de plus en plus complexes, il peut être intéressant de renvoyer un rapport détaillé
+de l'échec. Voici la structure que nous allons utiliser:
 
 \codefrom{dependent}{lambda}{debug}
 
 Nous aurons aussi besoin des fonctions suivantes:
 \begin{itemize} 
-\item \fun{res_debug} : retourne le booléens présent dans le rapport.    
+\item \fun{res_debug} : retourne le booléen présent dans le rapport.    
 \item \fun{create_report} : créé un rapport en prenant un argument pour chaque champs du \fun{report}
 \end{itemize}
-L'équivalent de ces fonctions pour le type \fun{debug synth} sont suivis de \fun{_synth}.
-Cette assistance est nécéssaire pour aider les programmeurs à connaitre la source de l'erreur,
-tout comme le font les compilateurs modernes. Cela nous aide aussi pour tester la validité de celui 
-ci car on peut maintenant tester si la vérification d'un terme est fausse.
+Les équivalents de ces fonctions pour le type \fun{debug synth} sont suivis du suffixe \fun{_synth}.
+Cette assistance est nécessaire pour aider les programmeurs à connaître la source de l'erreur,
+tout comme le font les compilateurs modernes. Cela nous aide aussi à tester la validité de celui-ci
+car on peut maintenant tester si la vérification d'un terme est fausse.
 
 \newcommand{\Hole}{\text{?\!?`\!?}}
 
 Afin que notre vérificateur de type permette d'assister dans la recherche de preuves
 nous allons implémenter un nouveau constructeur: $\Hole$.
-Cette implémentation est un début, il existe de nombreuses autre extensions possibles
-pour assister les démonstrations.
 
-Le but de ce constructeur est d'interrompre la vérification de type et de demander au vérificateur de type de
+Le but de ce constructeur est d'interrompre la vérification et de demander au vérificateur de type de
 retourner le type que l'on souhaite vérifier.
 \begin{example}
   Soit le terme \fun{(lambda x ?)} que l'on veut vérifier avec le type \fun{(pi x nat bool)},
-  le type checker enoncera le fait que à la place du terme $\Hole$ nous souhaitons un terme de type 
-  booléens.
+  le type checker énoncera le fait que à la place du terme $\Hole$ nous souhaitons un terme de type 
+  booléen.
 \end{example}
 
-Nous allons donc rajouter ce terme parmis les termes vérifiables :
+Nous allons donc rajouter ce terme parmi les termes vérifiables :
 \codefrom{dependent}{lambda}{inTm_head} \lstinline!(...)!
 \codefrom{dependent}{lambda}{what}
 
 Etant donné que ce terme est simplement là pour améliorer l'utilisation de notre programme,
-il ne possède pas de règles d'évaluation ou tout autre règles de calculs.
-Dans notre type checker nous allons implémenter le code suivant:
+il ne possède pas de règle d'évaluation ou tout autre règle de calcul.
+Dans notre vérificateur de type nous allons implémenter le code suivant:
 
 \codefrom{dependent}{lambda}{check_what}
 
-Nous acceptons quand meme le terme pour laisser la possibilité au programmeur de placer différents $\Hole$ dans son programme.
+Nous acceptons quand même le terme pour laisser la possibilité au programmeur de placer différents $\Hole$ dans son programme.
 
 \subsubsection{2 + 2 = 4}
 
-Atelons nous maintenant à notre première preuve. Nous avons désormais tout le bagage nécéssaire, 
+Attelons-nous maintenant à notre première preuve. Nous avons désormais tout le bagage nécessaire, 
 les entiers et l'égalité.
 
 
@@ -2303,9 +2301,7 @@ les entiers et l'égalité.
 
 \section*{Remerciements}
 
-Merci à Pierre-Evariste Dagand d'avoir perdu quelques cheveux pour m'aider à mener à bien ce projet 
-et à Frédéric Peschanski pour sa pédagogie.
-
+Merci 
 
 
 
