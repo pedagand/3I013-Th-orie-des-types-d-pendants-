@@ -261,15 +261,18 @@ représentées par un (unique) nom de variable, comme dans la
 présentation formelle. Une telle représentation est traditionnellement
 appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
 
-\begin{example}
-  \todo{Donner l'exemple de réduction sous un binder}
+\begin{example} 
+  
   Soit \Var{x} une variable libre. 
   En théorie : 
-  \(\App{(\Lam{\Var{y}}{\Var{y}})}{\Var{x}} \leadsto \Var{x}\)
+  \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}}} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
 
-  En pratique avec des de Bruijn : \todo{montrer le problème et parler des shifts}
+  En pratique avec des de Bruijn : $\Lam{}{\App{(\Lam{}{\Lam{}{1}})}{0}} \leadsto \Lam{}{\Lam{}{0}}$
+  Ici on constate bien que le terme obtenu n'est pas correct. Il nous faut introduire une opération
+  intermédiaire afin de remédier à ce problème.
   Cette opération est appelée par Pierce les ``shifts''
-
+  
+  \todo{Mettre à jour cet exemple}
   En pratique avec du locally nameless : $\App{(\Lam{}{0})}{\Var{x}}\leadsto \Var{x}$
 
   Il n'est plus nécéssaires d'éffectuer des ``shifts'', cette représentation
