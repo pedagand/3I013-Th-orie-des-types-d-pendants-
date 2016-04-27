@@ -1550,32 +1550,26 @@ La fonction \fun{boundfree} va nous permettre de relier les \fun{NFree} dont la 
 
 \section{Les types dépendants}
 
-Maintenant que les bases du $\lambda$-calcul et du typage a été présenté,
+Maintenant que les bases du $\lambda$-calcul et du typage on été présentés,
 nous allons découvrir les types dépendants. 
  
 \subsection{Automatisation de démonstration de preuve}
 Durant les deux premières parties du rapport nous avons présenté le $\lambda$-calcul
-qui nous à permis de nous initier à la conception et à l'implémentation d'un système de type. Cependant nous avions une vision 
+qui nous a permis de nous initier à la conception et à l'implémentation d'un système de type. Cependant nous avions une vision 
 calculatoire des types. En effet notre seul but était de nous assurer que nos $\lambda$-termes
 étaient fortement normalisants. 
-Un des aspects primordiale des système de type est la correspondance de Curry-Howard.
-Celle ci permet de d'établire des relations entre la logique propositionnelle et les systèmes 
-de type. Nous verrons que ``t est une preuve de P'' est équivalent à  $t:P$ c'est à dire
-\attention{pareil avec les variables mathématiques dans le texte} $t$ est de type $P$.
+Un des aspects primordial des systèmes de types est la correspondance de Curry-Howard.
+Celle-ci permet de d'établir des relations entre la logique propositionnelle et les systèmes 
+de type. Nous verrons que ``t est une preuve de P'' est équivalent à  $t:P$ c'est à dire  $t$ est de type $P$.
 Tout d'abord intéressons nous aux bases de la logique propositionnelle.
-\subsubsection{La logique propositionnelle}
 
-\attention{Pour être exact, la \emph{logique} propositionnelle ne
-  parle jamais de ``termes'' (elle s'en fout). Son contenu
-  calculatoire (surtout en déduction naturelle) n'est pas simple à
-  aller pêcher. J'ai corrigé cette histoire de termes du coup}
+\subsubsection{La logique propositionnelle}
 
 Les règles de la logique propositionnelle associent à chaque
 connecteur logique une \emph{règle d'introduction} qui permet de
 formuler une conclusion à partir de certaines hypothèses. Par exemple,
 la règle d'introduction de l'implication est
 %
-\todo{MORT AU CFRACS. UTILISER LES MACROS.}
 \begin{align*}
   \inferrule[]{\Gamma, A \vdash B}
         {\Gamma \vdash A \Rightarrow B}
@@ -1592,7 +1586,7 @@ réduction. Par exemple, la règle d'élimination de l'implication est
 \]
 
 On constate que la règle d'introduction de l'implication est presque identique à celle 
-du typage de l'abstraction. De meme pour l'élination vis à vis de la règle de l'application.
+du typage de l'abstraction. De même pour l'élimination vis à vis de la règle de l'application.
 C'est cette intuition 
 qu'ont eu Haskell Curry et Alvin Howard ce qui à permis d'établir la correspondance
 entre les systèmes de type et la logique propositionnelle.
@@ -1618,11 +1612,10 @@ est vraie. Ce raisonnement est aussi valable pour une propriété $B$.
           {\Gamma \vdash B}
 \end{align*}
 
-On reconnait ici le produit cartésien que l'on avait introduit dans
+On reconnaît ici le produit cartésien que l'on avait introduit dans
 notre $\lambda$-calcul simplement typé : la règle d'introduction
 correspond au constructeur de paires tandis que les éliminateurs
-correspondent aux projections \Fst{} et \Snd{} les
-projections.
+correspondent aux projections \Fst{} et \Snd{}.
 
 
 Pour l'instant, nous n'avons pas établi de lien réel entre ces connecteurs et nos termes, c'est l'enjeu de la
@@ -1631,7 +1624,7 @@ section suivante.
 \subsubsection{Correspondance de Curry Howard}
 \label{corres_curry_howard}
 
-Dans la section précédente nous avons regarder quelques intuitions permettant de voir le lien entre la logique
+Dans la section précédente nous avons regardé quelques intuitions permettant de voir le lien entre la logique
 et l'informatique au travers des systèmes de type.
 Nous avons étudié le $\lambda$-calcul qui permet de faire le lien avec la déduction naturelle. 
 Voici un tableau montrant les différents liens entre la logique et le $\lambda$-calcul.
@@ -1646,7 +1639,7 @@ Voici un tableau montrant les différents liens entre la logique et le $\lambda$
 \\
 
 
-Le fait d'avoir séparé nos termes permet de rendre ces correspondances plus aisées. En effet les constructeur
+Le fait d'avoir séparé nos termes permet de rendre ces correspondances plus aisées. En effet les constructeurs
 correspondent aux \emph{termes vérifiables} tandis que les \emph{termes synthétisables} sont les destructeurs.
 Introduire de nouveaux termes dans notre $\lambda$-calcul nous a ainsi permis d'introduire de nouveaux connecteurs logiques dans notre système. Nous allons suivre la même motivation en introduisant les types dépendants.
 
