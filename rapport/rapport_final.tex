@@ -2316,13 +2316,13 @@ attendu.
 Nous allons effectuer la preuve que la concaténation d'un vecteur de taille $n$ et d'un vecteur
 de taille $m$ nous donne un vecteur de taille $n+m$.
 Commençons tout d'abord par essayer d'énoncer cette preuve de façon intuitive. Nous souhaitons introduire
-de la dépendance sur le type des vecteurs cependant celui ci doit être le même. Il nous faut aussi
+de la dépendance sur le type des vecteurs cependant celui-ci doit être le même. Il nous faut aussi
 de la dépendance sur la taille de nos vecteurs. 
-Voici donc le type que dont nous souhaitons trouver un terme:
+Voici donc le type dont nous souhaitons trouver un terme:
 
 $\forall A:* \:\forall\: m:Nat\: \forall\: xs:Vec\: A\: m\: \forall\: n:Nat\: \forall\: ys:Vec\: A\: n\: \rightarrow\: Vec\: A\: (n\: +\: m)$
 
-Cette spécification nous demande donc de crée un terme prenant quatre arguments: \\
+Cette spécification nous demande donc de créer un terme prenant quatre arguments: \\
 -$A$ qui correspond au type des deux vecteurs \\
 -$m$ la taille du premier vecteur \\
 -$xs$ un vecteur de type $A$ et de taille $m$ \\
@@ -2330,13 +2330,13 @@ Cette spécification nous demande donc de crée un terme prenant quatre argument
 -$ys$ un vecteur de type $A$ et de taille $n$ \\
 On doit ensuite retourner un élément de type $Vec\:A\:(n\: +\: m)$. \\
 
-Le seul terme dont nous disposons pour construire un vecteur avec ce genre de dépendance est dfold.
+Le seul terme dont nous disposons pour construire un vecteur avec ce genre de dépendance est $dfold$.
 Construisons ce terme dans notre langage: \\
-Tout d'abord nous avons quatre type $\forall$ ce qui nous force à commencer par un terme avec quatre abstractions
+Tout d'abord nous avons quatre types $\forall$ ce qui nous force à commencer par un terme avec quatre abstractions
 \fun{(lambda A (lambda m (lambda xs (lambda n (lambda ys (?))))))}
 
-A l'aide du constructeur $\Hole$ le type checker nous indique qu'il attend un terme de type $Vec\:A\:(n\: +\: m)$
-nous allons donc construire ce terme à l'aide de dfold car c'est le seul constructeur qui nous permet d'introduire
+A l'aide du constructeur $\Hole$ le vérificateur de type nous indique qu'il attend un terme de type $Vec\:A\:(n\: +\: m)$
+nous allons donc construire ce terme à l'aide de $dfold$ car c'est le seul constructeur qui nous permet d'introduire
 de la dépendance dans les vecteurs.
 
 Rappelons la règle de typage de Dfold:
@@ -2350,7 +2350,7 @@ Rappelons la règle de typage de Dfold:
             {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}
 \end{array}\]
 
-Il nous faut donc définir un prédicat permettant $P$ permettant de générée le type $Vec\:A\:(n\: +\: m)$
+Il nous faut donc définir un prédicat permettant $P$ permettant de générer le type $Vec\:A\:(n\: +\: m)$
 une fois appliqué.
 Voici notre prédicat $P$: \\
 \fun{(lambda m (lambda v (Vec A (+ m n))))}
@@ -2369,7 +2369,7 @@ Ce qui nous donne comme terme final:
          m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) ys))))))  
 \end{lstlisting}
 
-Voici la preuve rédiger à l'aide de AGDA un langage implémentant les types dépendants:
+Voici la preuve rédigée à l'aide de AGDA un langage implémentant les types dépendants:
 \begin{lstlisting}
   concat : (A : Set)(m : N)(xs : Vec A m) -> (n : N)(ys : Vec A n) -> CONCAT A m xs n ys
   concat A m xs n ys = dfold A (lambda m xs -> CONCAT A m xs n ys)
@@ -2383,7 +2383,7 @@ Voici la preuve rédiger à l'aide de AGDA un langage implémentant les types d�
 Je remercie les professeurs qui m'ont aidé dans la réalisation de ce mémoire.
 Pierre-Evariste Dagand pour m'avoir éclairé et soutenu tout au long de ce projet.
 Frédéric Peschanski pour sa pédagogie et 
-Jérémie Salvucci pour avoir accepté de répondre à mes questions.
+Jérémie Salvucci pour avoir répondu à certaines de mes interrogations.
 
 
 
