@@ -258,16 +258,15 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
   
   Soit \Var{x} une variable libre. 
   En théorie : 
-  \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}}} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
+  \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}})} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
 
-  En pratique avec les indices de De Bruijn : $\Lam{}{\App{(\Lam{}{\Lam{}{1}})}{0}} \leadsto \Lam{}{\Lam{}{0}}$
+  En pratique avec les indices de De Bruijn : $\Lam{}{\App{((\Lam{}{\Lam{}{1}})}{0})} \leadsto \Lam{}{\Lam{}{0}}$
 
   Ici on constate bien que le terme obtenu n'est pas correct. Il nous faut introduire une opération
   intermédiaire afin de remédier à ce problème.
   Cette opération est appelée par Pierce les ``shifts''
   
-  \todo{Mettre à jour cet exemple}
-  En pratique avec du locally nameless : $\App{(\Lam{}{0})}{\Var{x}}\leadsto \Var{x}$
+  En pratique avec du locally nameless : $\Lam{}{\App{((\Lam{}{\Lam{}{1}})}{x})}\leadsto \Lam{}{\Lam{}{\Var{x}}}$
 
   Il n'est plus nécessaire d'effectuer des ``shifts'', cette représentation
   possède les avantages de la représentation avec les indices de De Bruijn et
@@ -1298,10 +1297,8 @@ fortement normalisant du \(\lambda\)-calcul non typé. La traduction de
 nos termes bidirectionnels vers les termes non typés est transparente
 : il suffit d'effacer les annotations de type.
 
-\begin{example}
-  
-  \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport C'est l'exemple où cela ne réduit pas}
-   
+\begin{example}  
+  \todo{Roman: j'ai l'exemple sur papier faut juste que le mette dans le rapport C'est l'exemple où cela ne réduit pas}   
 \end{example}
 
 \paragraph{Implémentation :}
