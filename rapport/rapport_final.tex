@@ -106,25 +106,26 @@
 
 \section{Introduction}
 
+\todo{a relire}
 
-Un language de compilation est entièrement définis par son compilateur. En effet ce logiciel permet de traduire
-des programmes écris dans un language en instructions pour le compilateur.... \todo{à terminer}
+Un langage de compilation est entièrement défini par son compilateur. En effet ce logiciel permet de traduire
+des programmes écrits dans un langage de haut niveau en instructions pour le processeur.
 
-Il sera donc question dans ce rapport de comprendre le typage, une des étapes de la chaine de compilation.
-Pour résumé brievement le compilateur 
-traduit d'abord le texte écris par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite utilisable
+Il sera donc question dans ce rapport de comprendre le typage, une des étapes de la chaîne de compilation.
+Pour résumer brièvement le compilateur 
+traduit d'abord le texte écrit par le programmeur en un arbre de syntaxe abstraite. Cette représentation est ensuite utilisable
 dans un algorithme.
-Si le compilateur ne génère pas d'erreur durant cette étape on dit que le programme est syntaxiquement correcte. Cependant 
-le programmeur à pu écrire des instructions tels que \lstinline!x = 2 + true!. Meme si cette instruction est syntaxiquement correcte, celle ci 
+Si le compilateur ne génère pas d'erreur durant cette étape, on dit que le programme est syntaxiquement correct. Cependant 
+le programmeur à pu écrire des instructions telles que \lstinline!x = 2 + true!. Même si cette instruction est syntaxiquement correcte, celle-ci 
 n'a aucun sens. Il lui faut maintenant à partir de l'arbre de syntaxe abstraite générer du code assembleur, un code compréhensible 
-par les microprocesseurs. Le compilateur peut très bien générer une suite d'instructions assembleurs correspondant à l'expression 
-précédente, c'est durant l'execution du programme que le processeur va interompre le programme. Lorsque ces erreurs surviennent il est 
-très compliqué de trouver la source de celle ci car l'instruction fautive ne correspond pas au code écrit par le programmeur. 
-Pour évitez ce genre d'erreurs qui peuvent survenirs très longtemps après le lancement du programme (les serveurs par exemple), 
-il nous faut donc vérifier la validité de celui ci. Il faut donc rajouter une étape dans la chaine de compilation grace au typage 
+par les microprocesseurs. Le compilateur peut très bien générer une suite d'instructions assembleur correspondant à l'expression 
+précédente. C'est durant l'exécution du programme que le processeur va interrompre le programme. Lorsque ces erreurs surviennent, il est 
+très compliqué de trouver la source de celles-ci car l'instruction fautive ne correspond pas au code écrit par le programmeur. 
+Pour éviter ce genre d'erreurs qui peuvent survenir très longtemps après le lancement du programme (les serveurs par exemple), 
+il nous faut donc vérifier la validité de celui-ci. Il faut donc rajouter une étape dans la chaîne de compilation grâce au typage 
 assuré par l'analyseur de type.
-L'intéret du typage est donc de vérifier que le programme s'executera correctement, sans avoir besoins d'éxecuter celui ci. 
-Il permet aussi d'obtenir des informations très précises sur la sources des erreurs.
+L'intérêt du typage est donc de vérifier que le programme s'exécutera correctement, sans avoir besoin d'exécuter celui-ci. 
+Il permet aussi d'obtenir des informations très précises sur la source des erreurs.
 
 \section{$\lambda$-calcul non typé}
 \label{sec:untyped}
