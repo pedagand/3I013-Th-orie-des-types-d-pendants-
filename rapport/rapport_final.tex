@@ -2029,10 +2029,10 @@ des vecteurs afin de présenter les types dépendants, il sera donc question ici
 la Section~\ref{presentation_type_dependants}. 
 Commençons par enrichir notre grammaire:
 
-\newcommand{\vect}{\mathit{vec}} 
-\newcommand{\dnil}{\mathit{dnil}}
-\newcommand{\dcons}{\mathit{dcons}}
-\newcommand{\dfold}{\mathit{dfold}}
+\newcommand{\vect}{\mathsf{vec}} 
+\newcommand{\dnil}{\mathsf{dnil}}
+\newcommand{\dcons}{\mathsf{dcons}}
+\newcommand{\dfold}{\mathsf{dfold}}
 
 \begin{bnf}
   t &::= & (\ldots) &\mbox{(termes vérifiables)} \\
@@ -2050,7 +2050,7 @@ Ce qui se traduit dans notre programme par le code suivant:
 
 
 Les arguments des différents constructeurs seront expliqués une fois que nous aurons vu les 
-règles de typage présentes en figure \ref{fig:typage_vec}.
+règles de typage présentes en figure \ref{fig:typage_vec}. \todo{Utilise les macros dans la figure (et dans le texte) !}
 \begin{figure}
 \[
 \begin{array}{c}
@@ -2298,11 +2298,11 @@ les entiers et l'égalité.
 La construction de cette preuve est assez simple. Comme nous l'avons vu dans la section
 sur l'égalité \ref{egalite} la contruction \equal{2+2}{N}{4} est équivalente  au type  $(id\: Nat\: (2\: +\: 2)\:\: 4)$.
 Il nous faut maintenant déterminer un terme correspondant à ce type. La règle d'introduction
-du type $id$ est le terme $refl$. Le seul terme permettant de vérifier ce type
+du type $id$ est le terme \todo{Macro !} $refl$. Le seul terme permettant de vérifier ce type
 est le terme $refl{4}$
 
 
-Afin de vérifier cette preuve dans notre type checker il nous faut exécuter la fonction suivante:
+Afin de vérifier cette preuve dans notre type checker il nous faut exécuter la fonction suivante: \todo{retour à la ligne dans le listing}
 
 \fun{lcheck [] (read ``(succ (succ (succ (succ zero))))'')}
 
