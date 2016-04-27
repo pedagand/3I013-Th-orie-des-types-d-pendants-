@@ -254,7 +254,7 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
 
 \begin{example} 
   
-  Soit \Var{x} une variable libre. 
+  Soit \Var{x} une variable libre. \todo{Cela manque d'explication : je ne comprends pas cet exemple, qu'est-ce que tu veux montrer ?}
   En théorie : 
   \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}})} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
 
@@ -278,7 +278,7 @@ Voici le code Ocaml traduisant cette définition inductive des termes :
 
 Cette représentation se rapproche au plus de la spécification formelle
 : seule la distinction entre les variables liées (\lstinline!BoundVar!)
-et les variables libres (\lstinline!FreeVar!) diffère.
+et les variables libres (\lstinline!FreeVar!) diffère. \todo{On voulais mettre les \fun{name} dans \fun{FreeVar}}
 
 
 
@@ -319,9 +319,9 @@ La substitution de la variable liée \lstinline!var! par le terme
 %
 \codefrom{untyped}{lambda}{substitution}
 
-L'argument \fun{var} compte le nombre de \emph{lieurs} traversés.
+L'argument \fun{var} compte le nombre de lieurs traversés.
 Cette valeur correspond donc à la valeur de la variable liée à substituer. C'est pour cette
-raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} on teste l'égalité entre 
+raison que dans le cas où \fun{term} est une variable liée d'indice \fun{x} on teste l'égalité entre 
 \fun{var} et \fun{x}. Le cas échéant, on effectue la substitution.
 
 
@@ -431,7 +431,7 @@ de la forme
 \(\Lam{\Var{x_0}}\ldots\Lam{\Var{x_k}}\App{\App{\App{x_i}{t_0}}{\ldots}}{t_l}\)
 où les \(t_j\) sont eux-mêmes des termes normaux.
 
-\begin{example}[Terme en forme normale]
+\begin{example}[Terme en forme normale] \todo{Il faut écrire un petit quelque chose ici, sinon cela tombe à plat.}
   \(\Lam{\Var{x}}{\Var{x}}\)
 \end{example}
 
@@ -455,6 +455,12 @@ réduction à partir de \(t\). Un terme fortement normalisable est,
 
 \begin{example}[Terme normalisable mais pas fortement normalisable]
   \(\App{(\Lam{\Var{x}}{0})}{\omega}\)
+
+\todo{Il faut écrire un petit quelque chose ici, sinon cela tombe à
+  plat. En particulier, il faut dire que si l'on commence par réduire
+  $\omega$, cela diverge. Si l'on commence par le redex le plus à
+  gauche, cela normalise.}
+
 \end{example}
 
 Un terme normalisable (mais pas \emph{fortement} normalisable) pourra
