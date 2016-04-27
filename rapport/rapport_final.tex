@@ -267,7 +267,8 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
   En théorie : 
   \(\Lam{x}{\App{(\Lam{\Var{y}}{\Lam{z}{\Var{y}}})}{\Var{x}}} \leadsto \Lam{x}{\Lam{z}{\Var{x}}}\)
 
-  En pratique avec des de Bruijn : $\Lam{}{\App{(\Lam{}{\Lam{}{1}})}{0}} \leadsto \Lam{}{\Lam{}{0}}$
+  En pratique avec les indices de De Bruijn : $\Lam{}{\App{(\Lam{}{\Lam{}{1}})}{0}} \leadsto \Lam{}{\Lam{}{0}}$
+
   Ici on constate bien que le terme obtenu n'est pas correct. Il nous faut introduire une opération
   intermédiaire afin de remédier à ce problème.
   Cette opération est appelée par Pierce les ``shifts''
@@ -275,9 +276,9 @@ appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
   \todo{Mettre à jour cet exemple}
   En pratique avec du locally nameless : $\App{(\Lam{}{0})}{\Var{x}}\leadsto \Var{x}$
 
-  Il n'est plus nécéssaires d'éffectuer des ``shifts'', cette représentation
-  possède les avantages de la représentation avec les indices de de Bruijn et
-  s'afranchit du problème de la valeur des variables libres.
+  Il n'est plus nécessaire d'effectuer des ``shifts'', cette représentation
+  possède les avantages de la représentation avec les indices de De Bruijn et
+  s'affranchit du problème de la valeur des variables libres.
   
 \end{example}
 
@@ -330,8 +331,8 @@ La substitution de la variable liée \lstinline!var! par le terme
 
 L'argument \fun{var} compte le nombre de \emph{lieurs} traversés.
 Cette valeur correspond donc à la valeur de la variable liée à substituer. C'est pour cette
-raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} on test l'égalité entre 
-\fun{var} et \fun{x} et effectue la substitution le cas échéant.
+raison que dans le cas où \fun{terme} est une variable liée d'indice \fun{x} on teste l'égalité entre 
+\fun{var} et \fun{x}. Le cas échéant, on effectue la substitution.
 
 
 \begin{example}
@@ -394,7 +395,7 @@ termes :
             {\App{t}{u} \Red \App{t}{u'}}
 \end{array}\]
 
-On obtient la \(\beta\)-conversion en prenant la clôture reflexive et
+On obtient la \(\beta\)-conversion en prenant la clôture réflexive et
 transitive \(t \Conv t'\) de la \(\beta\)-réduction : on a \(t \Conv
 t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
 \ldots \Red t'\).
@@ -413,7 +414,7 @@ t'\) s'il existe une suite de \(\beta\)-réductions telles que \(t \Red
   \begin{align*}
     & \App{(\Lam{x}{\Lam{y}{y}})}{w} \leadsto \Lam{y}{y} \\
   \end{align*}
-  \Var{x} n'étant pas utilisé dans la fonction, l'argument \Var{w} disparaît complètement.
+  \Var{x} n'étant pas utilisée dans la fonction, l'argument \Var{w} disparaît complètement.
 \end{example}
 
 
@@ -448,7 +449,7 @@ On dira qu'un terme \(t\) est \emph{normalisable} s'il existe un terme
 normal \(t'\) tel que \(t \Conv t'\). Un terme \(t\) est
 \emph{fortement normalisable} s'il n'existe aucune suite infinie de
 réduction à partir de \(t\). Un terme fortement normalisable est,
-\textit{a fortiori}, un terme normalisable.
+\textit{à fortiori}, un terme normalisable.
 
 \begin{example}
  \label{paradoxe}
@@ -517,7 +518,7 @@ Crucialement, nous avons la propriété suivante~\citep[th.3,
 %
 \begin{proposition}
   Un terme \(t\) normalise vers une forme normale de tête si et
-  seulement la stratégie d'appel par nom termine (donnant un terme en
+  seulement si la stratégie d'appel par nom termine (donnant un terme en
   forme normale de tête).
 \end{proposition}
 
@@ -526,7 +527,7 @@ Il existe d'autres stratégies de réduction comme par exemple
 \emph{l'appel par valeur}, qu'implémente OCaml. Bien que plus
 efficace, l'appel par valeur diverge pour certains termes normalisant.
 Dans le contexte du \(\lambda\)-calcul non typé, où les termes ne sont
-pas tous fortement normalisable, on privilégiera la réduction en appel
+pas tous fortement normalisables, on privilégiera la réduction en appel
 par nom.
 
 \begin{example}
@@ -553,8 +554,8 @@ les systèmes de type que l'on peut statiquement garantir que les
 termes acceptés par l'analyse de type sont fortement normalisants.
 
 \begin{remark}
-  Le fait d'obtenir la garantie que l'ensemble de nos termes sont fortement normalisant signifie que
-  notre language n'est plus \emph{Turing complet}. En effet nous ne pourrons plus exprimé les programmes
+  Le fait d'obtenir la garantie que l'ensemble de nos termes sont fortement normalisants signifie que
+  notre langage n'est plus \emph{Turing complet}. En effet nous ne pourrons plus exprimé les programmes
   qui ne terminent pas. Cependant ce n'est pas génant car nous ne cherchons pas à écrire ce genre de
   programmes dans notre système. Nous verrons dans les sections suivantes pourquoi il est important
   de ne pas être Turing complet.
