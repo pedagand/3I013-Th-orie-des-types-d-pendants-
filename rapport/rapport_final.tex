@@ -1494,7 +1494,7 @@ Il en est de même pour l'inversion :
 \codefrom{typed}{lambda}{big_step_eval_inTm_inv}
 
 
-Pour les variables liées il faut retrouver dans le contexte la variable à laquelle elle est associée.
+Pour les variables liées, il faut retrouver dans le contexte la variable à laquelle celle-ci est associée.
 Cela nous permettra de définir cette variable comme un argument de la fonction anonyme que nous avons
 créée avec l'évaluation de l'abstraction.
 
@@ -1536,7 +1536,7 @@ type{value} afin de nous retourner un \emph{terme synthétisable}.
 Le type \fun{name} nous permet de faire la distinction entre les
 variables réellement libres et celles que nous souhaitons lier pendant la réification.
 Afin de transformer une valeur \lstinline!VLam f! en
-\emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
+\todo{c'est quoi ce truc ?} \emph{Abs} il nous faut appliquer la fonction \emph{f} à une variable
 de réification, que l'on distinguera des autres variables libres grâce au type \fun{name}.
 On s'assure que les variables ainsi introduites sont fraîches en utilisant la fonction \fun{gensym}.
 La fonction \fun{boundfree} va nous permettre de relier les \fun{NFree} dont la variable est un \fun{Quote}.
@@ -1636,7 +1636,7 @@ Voici un tableau montrant les différents liens entre la logique et le $\lambda$
 
 
 Le fait d'avoir séparé nos termes permet de rendre ces correspondances plus aisées. En effet les constructeurs
-correspondent aux \emph{termes vérifiables} tandis que les \emph{termes synthétisables} sont les destructeurs.
+correspondent aux termes vérifiables tandis que les termes synthétisables sont les destructeurs.
 Introduire de nouveaux termes dans notre $\lambda$-calcul nous a ainsi permis d'introduire de nouveaux connecteurs logiques dans notre système. Nous allons suivre la même motivation en introduisant les types dépendants.
 
 Si nous souhaitons prouver une proposition, c'est à dire un type, il nous faudra trouver
@@ -1683,7 +1683,7 @@ logique, le quantificateur $\forall$ nous permet d'écrire ce type de termes.
 \newcommand{\Vect}{\ensuremath{\mathsf{vec}}}
 
 Avec des variables au sein de nos types nous pouvons désormais introduire des \emph{familles de type},
-comme par exemple les vecteurs de taille \emph{n}.
+comme par exemple les vecteurs de taille \todo{Ce emph n'en est pas un, comme tant d'autres} \emph{n}.
 \begin{example}  
   \label{example vecteur}
   Les vecteurs représentent des listes dont la taille est connue (et
@@ -1698,7 +1698,7 @@ comme par exemple les vecteurs de taille \emph{n}.
 En introduisant une dépendance des types sur les types, ceux-ci se
 comportent de la même façon que les termes. En particulier, la notion
 de réduction s'élève au niveau des types : on s'attend à ce que le
-type \(\Vect\: (2 + 2)\: \bool\) soit ``équivalent'' au type \(\Vect\:
+type \(\Vect\: (2 + 2)\: \bool\) soit ``équivalent'' au type \(\Vect\:\:
 4\: \bool\).  Poussant cette logique à l'extrême, on est amené à
 considérer les types et les termes comme appartenant à une unique
 famille syntaxique régie par les même propriétés.
