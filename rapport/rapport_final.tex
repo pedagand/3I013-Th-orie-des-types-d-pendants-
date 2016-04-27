@@ -173,7 +173,7 @@ Pour faire une analogie avec les mathématiques, une abstraction peut
 
 On peut constater avec cette syntaxe que les abstractions ne prennent
 qu'un seul argument. Cependant, l'ensemble des fonctions à plusieurs
-arguments peut etre représenté, par curryfication, à l'aide une
+arguments peut être représenté, par curryfication, à l'aide d'une
 succession de fonctions à un seul argument.
 
 \begin{example}
@@ -192,7 +192,7 @@ Une variable est \emph{liée} lorsque celle-ci est déclarée dans le corps d'un
 lambda. Dans l'Exemple~\ref{example:id}, $x$ était ainsi une variable liée.
 Si la variable n'a pas été déclarée, elle est dite
 \emph{libre}. Formellement, l'ensemble des variables libres d'un terme est
-défini récursivement de la façon suivante
+défini récursivement de la façon suivante:
 %
 \begin{align*}
   \IsFree(x) &\triangleq \{x\} \\
@@ -200,11 +200,11 @@ défini récursivement de la façon suivante
   \IsFree(f s) &\triangleq \IsFree(f) \cup \IsFree(s) \\
 \end{align*}
 
-Comme les abstractions lient les variables, elles sont comunéments appelées des \emph{lieurs}
+Comme les abstractions lient les variables, elles sont communéments appelées \emph{lieurs}.
 
 \begin{example}
-  Dans le terme \(\Lam{x}{\Lam{y}{\App{\App{\Var{x}}{\Var{y}}}{\Var{z}}}}\), 
-  les variables $\Var{x}$ et $\Var{y}$ sont liées tandis que la variable $\Var{z}$ est libre 
+  Dans le terme \(\Lam{x}{\Lam{y}{\App{\App{\Var{x}}{\Var{y}}}{\Var{z}}}}\),
+  les variables $\Var{x}$ et $\Var{y}$ sont liées tandis que la variable $\Var{z}$ est libre .
 \end{example}
 
 
@@ -215,7 +215,7 @@ Un terme ne contenant aucune occurrence de variable \emph{libre} est dit \emph{c
   Dans le $\lambda$-terme
   \App{(\Lam{x}{\Lam{y}{\App{x}{y}}})}{\Var{y}}, la variable \Var{x}
   ainsi que la première occurence de la variable \Var{y} sont
-  liées. Cependant, la seconde occurence de variable \Var{y} est
+  liées. Cependant la seconde occurence de variable \Var{y} est
   libre.
 \end{example}
 
@@ -227,14 +227,14 @@ Un terme ne contenant aucune occurrence de variable \emph{libre} est dit \emph{c
 \newcommand{\equivAlpha}{\mathop{\equiv_\alpha}}
 
 Le problème avec cette représentation est que les termes
-\Lam{\Var{x}}{\Var{x}} et \Lam{\Var{y}}{\Var{y}} sont \textit{a
+\Lam{\Var{x}}{\Var{x}} et \Lam{\Var{y}}{\Var{y}} sont \textit{à
   priori} distincts du fait des noms de variable utilisés. Or cette
 distinction n'est pas souhaitable : ces deux termes représentent de
 façon équivalente la fonction identité, indépendamment du choix de nom
 de variable. Nous introduisons donc la notion d'$\alpha$-équivalence.
 
 On considère que deux termes sont \(\alpha\)-équivalents si et seulement si ils sont 
-égaux à renommage de leur variables liées près. 
+égaux au renommage de leurs variables liées près. 
 \begin{example}
   Voici deux termes \(\alpha\)-équivalents 
   \begin{align*}
@@ -244,11 +244,11 @@ On considère que deux termes sont \(\alpha\)-équivalents si et seulement si il
 
 \subsubsection{Représentation concrète}
  
-Pour pallier à la Remarque~\ref{problemelibreliee}, notre implémentation utilise une représentation
-particulière pour les variables liées: les indices de de Bruijn.  Nous
+Pour pallier à la remarque~\ref{problemelibreliee}, notre implémentation utilise une représentation
+particulière pour les variables liées: les indices de De Bruijn.  Nous
 allons ainsi représenter les variables liées non pas par un nom mais
-par un entier naturel. Cette valeur est determiné à partir du nombre
-d'abstractions entre la variable et l'abstraction qui l'introduit.
+par un entier naturel. Cette valeur est déterminée à partir du nombre
+d'abstractions entre la variable et le lieur qui l'introduit.
 
 \begin{example}
   Le $\lambda$-terme représentant l'identité, que l'on écrivait \(\lambda x.x\), est représenté par \(\lambda.0\)
@@ -256,7 +256,7 @@ d'abstractions entre la variable et l'abstraction qui l'introduit.
 \end{example}
 
 Tandis que les variables liées seront representées par des
-indices de de Bruijn, les variables libres quant à elle seront
+indices de De Bruijn, les variables libres quant à elle seront
 représentées par un (unique) nom de variable, comme dans la
 présentation formelle. Une telle représentation est traditionnellement
 appelée ``locally nameless''~\citep{chargueraud:locally-nameless}
