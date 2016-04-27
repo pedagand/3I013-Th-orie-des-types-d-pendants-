@@ -104,21 +104,19 @@
 
 \todo{a relire}
 
-Un langage de programmation est entièrement défini par son compilateur. En effet ce logiciel permet de traduire
-des programmes écrits dans un langage de haut niveau en instructions pour le processeur.
 
-Dans ce rapport il sera question de comprendre le typage, une des étapes de la chaîne de compilation.
-Résumons brièvement la composition d'un compilateur:
+Dans ce rapport, il sera question de comprendre le typage, une  étape clée de la chaîne de compilation.
+Résumons brièvement la composition d'un compilateur.
 Celui-ci traduit d'abord le texte écrit par le programmeur en un arbre de syntaxe abstraite. Cette représentation lui permet
 de manipuler les différents éléments du programme.
 Si le compilateur ne génère pas d'erreur durant cette étape, on dit que le programme est syntaxiquement correct. Cependant 
 le programmeur à pu écrire des instructions telles que \lstinline!x = 2 + true!. Même si cette instruction est syntaxiquement correcte, celle-ci 
-n'a aucun sens. Il lui faut maintenant à partir de l'arbre de syntaxe abstraite générer du code assembleur, un code compréhensible 
+n'a aucun sens. Il lui faut maintenant, à partir de l'arbre de syntaxe abstraite, générer du code assembleur, un code compréhensible 
 par les microprocesseurs. Le compilateur peut très bien générer une suite d'instructions assembleur correspondant à l'expression 
 précédente. C'est durant l'exécution du programme que le processeur va interrompre celui-ci. Lorsque ces erreurs surviennent, il est 
-très compliqué de trouver leur source car l'instruction fautive ne correspond pas exactement à celle écrite par le programmeur.
-Pour éviter ce genre d'erreurs qui peuvent survenir très longtemps après le lancement du programme (les serveurs par exemple), 
-il nous faut donc vérifier la validité du programme. Afin d'effectuer cette vérification, nous allons implémenter un vérificateur
+très compliqué de trouver leur source car le programme compilé est très différent de celui écrit par le programmeur.
+Pour éviter ce genre d'erreurs, qui peuvent survenir très longtemps après le lancement du programme, 
+il nous faut donc vérifier la validité du programme. Afin d'effectuer cette vérification, nous allons insérer un vérificateur
 de type dans la chaîne de compilation.
 L'intérêt du typage est donc de vérifier que le programme s'exécutera correctement, sans avoir besoin d'exécuter celui-ci. 
 Il permet aussi d'obtenir des informations très précises sur la source des erreurs.
