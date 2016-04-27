@@ -552,8 +552,8 @@ termes acceptés par l'analyse de type sont fortement normalisants.
 
 \begin{remark}
   Le fait d'obtenir \todo{pas français :} la garantie que l'ensemble de nos termes sont fortement normalisants signifie que
-  notre langage n'est plus \emph{Turing complet}. En effet nous ne pourrons plus exprimer les programmes
-  qui ne terminent pas. Cependant ce n'est pas gênant car nous ne cherchons pas à écrire ce genre de
+  notre langage n'est plus Turing complet. En effet, nous ne pourrons plus exprimer les programmes
+  qui ne terminent pas. Cependant, ce n'est pas gênant car nous ne cherchons pas à écrire ce genre de
   programmes dans notre système.
 \end{remark}
 
@@ -565,18 +565,18 @@ La fonction de $\beta$-réduction consiste donc à contracter une
 application dont le membre de gauche est une abstraction. Le cas
 échéant, l'opération échoue. Pour ce faire, nous appelons la fonction
 de substitution pour substituer la première variable (d'indice \(0\))
-par l'argument dans le corps de la fonction :
+par l'argument dans le corps de la fonction : 
 %
 \codefrom{untyped}{lambda}{reduction}
 
 Les seuls termes pouvant se réduire étant les redex, nous effectuons la substitution sur celle-ci,
 sinon le terme est retourné sans modification.
-Passons maintenant à l'évaluation:
+Passons maintenant à l'évaluation:\todo{il y a un problème dans le code ci-dessous}
 
 \codefrom{untyped}{lambda}{evaluation}
 \codefrom{untyped}{lambda}{evaluation_bis}
 
-La fonction \fun{eval} à pour but de détecter les applications et d'en évaluer le membre de gauche.
+La fonction \fun{eval} a pour but de détecter les applications et d'en évaluer le membre de gauche.
 Une fois le membre de gauche évalué, nous pouvons tenter de réduire l'ensemble de l'application.
 
 \subsection{Encodages à la Church}
@@ -696,7 +696,7 @@ sera question d'analyser certaines parties du code et non sa totalité.
 \newcommand{\NFalse}{\lstinline!False!}
 \newcommand{\NIfte}{\lstinline!IfThenElse!}
 
-Afin d'implémenter les boléens dans notre langage, une possibilité
+Afin d'implémenter les booléens dans notre langage, une possibilité
 consiste à exporter l'encodage à la Church des termes \True{},
 \False{} et \Ifte{} définis en Section~\ref{church-bool}. Cependant
 nous avons choisi d'enrichir le noyau de notre langage afin de
@@ -727,7 +727,7 @@ sont triviales. Pour le terme \NIfte{}, il faut rappeler la fonction de
 substitution sur l'ensemble des arguments du constructeur.  En
 particulier, il n'est pas nécessaire d'incrémenter la valeur de
 \lstinline!var! étant donné que ce constructeur ne lie aucune
-variables.
+variable.
 
 
 La réduction est étendue au-delà de la \(\beta\)-réduction par une
@@ -764,7 +764,7 @@ Tout comme pour les booléens, il nous faut enrichir la grammaire
 formelle du $\lambda$-calcul
 %
 \begin{bnf}
-  t &::= & (\ldots) &\mbox{(lambda terme)} \\
+  t &::= & (\ldots) &\mbox{($\lambda$-terme)} \\
   &|& \zero & \mbox{(zero)} \\
   &|& \succs\: t & \mbox{(succ)} \\
   &|& \iter\: t\:t\:t & \mbox{(iter)}
@@ -912,7 +912,7 @@ La spécification des types se traduit naturellement en OCaml :
 Un système de type est un système formel permettant de vérifier que l'ensemble de nos termes sont
 correctement typés. Il sera question de définir un ensemble de règles pour chacun des termes de notre langage.
 Le typage nous apportera certaines propriétés quant à la normalisation de nos termes comme nous le verrons
-dans la section \ref{meta_theorie}. 
+dans la Section~\ref{meta_theorie}. 
 
 \subsubsection{Spécification}
 
@@ -950,7 +950,7 @@ liste ordonnée de paires variable/type :
 \end{array}
 \]
 
-\caption{Lambda calcul simplement typé}
+\caption{$\lambda$-calcul simplement typé}
 \label{fig:typage-simple}
 \end{figure} 
 
