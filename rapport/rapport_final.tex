@@ -2103,6 +2103,7 @@ Définissons maintenant l'éliminateur dfold comme un terme synthétisable:
     \Gamma\vdash Nat \ni n \\ 
     \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P \\
     \Gamma\vdash Vec\:\alpha\:n\ni v \\
+    \Gamma\vdash P\: \zero \:(dnil\: \alpha)\ni a \\
     \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f}
             {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}
 \end{array}\]
@@ -2313,6 +2314,72 @@ car nous débutons avec un contexte vide.
 Pour vérifier que l'implémentation de notre type checker se comporte correctement tentons
 executer \equal{1+2}{N}{4} de la même façon. Cela nous retourne bien le booléens \fun{false} comme
 attendue.
+
+\subsubsection{Preuve sur les vecteurs}
+
+Nous allons effectuer la preuve que la concaténation d'un vecteur de taille $n$ et d'un vecteur
+de taille $m$ nous donne un vecteur de taille $n+m$.
+Commençons tout d'abord par essayer d'énoncer cette preuve de façon intuitive. Nous souhaitons introduire
+de la dépendance sur le type des vecteurs cependant celui ci doit être le même. Il nous faut aussi
+de la dépendance sur la taille de nos vecteurs. 
+Voici donc le type que dont nous souhaitons trouver un terme:
+
+$\forall A:* \:\forall\: m:Nat\: \forall\: xs:Vec\: A\: m\: \forall\: n:Nat\: \forall\: ys:Vec\: A\: n\: \rightarrow\: Vec\: A\: (n\: +\: m)$
+
+Cette spécification nous demande donc de crée un terme prenant quatre arguments: \\
+-$A$ qui correspond au type des deux vecteurs \\
+-$m$ la taille du premier vecteur \\
+-$xs$ un vecteur de type $A$ et de taille $m$ \\
+-$n$ la taille du second vecteur \\
+-$ys$ un vecteur de type $A$ et de taille $n$ \\
+On doit ensuite retourner un élément de type $Vec\:A\:(n\: +\: m)$. \\
+
+Le seul terme dont nous disposons pour construire un vecteur avec ce genre de dépendance est dfold.
+Construisons ce terme dans notre langage: \\
+Tout d'abord nous avons quatre type $\forall$ ce qui nous force à commencer par un terme avec quatre abstractions
+\fun{(lambda A (lambda m (lambda xs (lambda n (lambda ys (?))))))}
+
+A l'aide du constructeur $\Hole$ le type checker nous indique qu'il attend un terme de type $Vec\:A\:(n\: +\: m)$
+nous allons donc construire ce terme à l'aide de dfold car c'est le seul constructeur qui nous permet d'introduire
+de la dépendance dans les vecteurs.
+
+Rappelons la règle de typage de Dfold:
+\[\begin{array}{c}
+  \inferrule[(Dfold)]{\Gamma\vdash *\ni\alpha\:
+    \Gamma\vdash Nat \ni n \\ 
+    \Gamma\vdash \forall n:Nat.\forall v:Vec\:\alpha\:n.*\ni P \\
+    \Gamma\vdash Vec\:\alpha\:n\ni v \\
+    \Gamma\vdash P\: \zero \:(dnil\: \alpha)\ni a \\
+    \Gamma\vdash \forall n:N.\forall v:Vec\:\alpha\:n.\forall a:\alpha.(P\:n\:v\rightarrow P\:(succ\:n)\:(dcons\:a\:v))\ni f }
+            {\Gamma\vdash dfold\:\alpha\:P\:n\:v\:f\:a\in P\:n\:v}
+\end{array}\]
+
+Il nous faut donc définir un prédicat permettant $P$ permettant de générée le type $Vec\:A\:(n\: +\: m)$
+une fois appliqué.
+Voici notre prédicat $P$: \\
+\fun{(lambda m (lambda v (Vec A (+ m n))))}
+
+Trouvons maintenant la fonction $f$ nous permettant de concatener nos vecteurs: \\
+\fun{(lambda f (lambda vec1 (lambda a (lambda vec2 (dcons a vec2)))))}
+Ce qui nous donne comme terme final:
+
+\begin{lstlisting} 
+  (lambda A
+   (lambda m
+    (lambda xs
+     (lambda n
+      (lambda ys
+       (dfold A (lambda mp (lambda vp (Vec A (+ mp n))))
+         m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) ys))))))  
+\end{lstlisting}
+
+Voici la preuve rédiger à l'aide de AGDA un langage implémentant les types dépendants:
+\begin{lstlisting}
+  concat : (A : Set)(m : N)(xs : Vec A m) -> (n : N)(ys : Vec A n) -> CONCAT A m xs n ys
+  concat A m xs n ys = dfold A (lambda m xs -> CONCAT A m xs n ys)
+                             m xs (lambda m a xs xs++ys -> cons a xs++ys) ys 
+\end{lstlisting}
+
 
 
 \section*{Remerciements}

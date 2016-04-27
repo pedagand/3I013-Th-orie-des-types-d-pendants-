@@ -62,7 +62,8 @@ type value =
 (*=value_pi_star *)
   | VStar 
   | VPi of value * (value -> value)
-(*=End *)
+  (*=End *)
+  | VWhat
 (*=Value_Nat *)
   | VNat
   | VZero
@@ -332,6 +333,7 @@ let rec big_step_eval_inTm t envi =
 (*=End *)
   | Id(gA,a,b) -> VId((big_step_eval_inTm gA envi),(big_step_eval_inTm a envi),(big_step_eval_inTm b envi))
   | Refl(a) -> VRefl(big_step_eval_inTm a envi)
+  | What -> VWhat 
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 
@@ -399,7 +401,8 @@ let rec value_to_inTm i v =
   | VDNil(alpha) -> DNil(value_to_inTm i alpha)
   | VDCons(a,xs) -> DCons((value_to_inTm i a),(value_to_inTm i xs)) 
   | VId(gA,a,b) -> Id((value_to_inTm i gA),(value_to_inTm i a),(value_to_inTm i b))
-  | VRefl(a) -> Refl(value_to_inTm i a) 
+  | VRefl(a) -> Refl(value_to_inTm i a)
+  | VWhat -> What
 and neutral_to_exTm i v = 
   match v with 
   | NFree x -> boundfree i x
