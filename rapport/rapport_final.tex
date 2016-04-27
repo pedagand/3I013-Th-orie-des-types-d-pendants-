@@ -1100,9 +1100,9 @@ entièrement dirigées par la syntaxe et donc purement algorithmique.
 \label{regles typage bidirectionnel}
 
 \[\begin{array}{c@{\qquad}c}
-\boxed{\Gamma\vdash T \ni t}
+\boxed{\Gamma\vdash T \ni in}
 &
-\boxed{\Gamma\vdash t \in T}
+\boxed{\Gamma\vdash ex \in T}
 \bigskip\\
 %%
 &
@@ -1163,7 +1163,7 @@ présenté en Figure~\ref{fig:typage-simple}.
 
 \begin{itemize}
   
-\item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni t}}\\
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash T \ni in}}\\
   
   Nous disposons d'une fonction de vérification \lstinline!check!
   permettant de vérifier que le terme \fun{inT} est bien de type
@@ -1203,7 +1203,7 @@ aux types dépendants qui, eux, calculeront).
 \codefrom{typed}{lambda}{check_inv}
   
 
-\item[$\bullet$] \boxed{\boxed{\Gamma\vdash t \in T}}\\
+\item[$\bullet$] \boxed{\boxed{\Gamma\vdash ex \in T}}\\
 
 La fonction de synthèse \lstinline!synth! prend un contexte, un
 terme synthétisable et renvoie le type de celui-ci.
