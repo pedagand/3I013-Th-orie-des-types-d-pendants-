@@ -55,8 +55,8 @@ let inputs =
    ("(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (succ a))))) zero)","N",true); 
    ("(dfold N (lambda n (lambda xs N)) (succ zero) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",true);			   ("(dfold N (lambda n (lambda xs N)) (succ (succ zero)) (dcons (succ zero) (dcons (succ (succ zero)) (dnil N))) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",true);							
 
-  ("(lambda A (lambda m (lambda xs (lambda n (lambda ys (dfold A (lambda mp (lambda vp (Vec A (+ mp n)))) m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) ys))))))","(pi A * (pi m N (pi xs (vec A m) (pi n N (pi ys (vec A n))))))",true);
-
+(*  ("(lambda A (lambda m (lambda xs (lambda n (lambda ys (dfold A (lambda mp (lambda vp (Vec A (+ mp n)))) m xs (lambda nf (lambda vecun (lambda a (lambda xsf (dcons a xsf))))) ys))))))","(pi A * (pi m N (pi xs (vec A m) (pi n N (pi ys (vec A n))))))",true); *)
+ (*   ("(lambda (A a b q) (trans A (lambda (a b q) (id A b a)) a b q (lambda a (refl a))))", "(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))", true); *)
 
    ("(dfold N (lambda n (lambda xs N)) (succ (succ zero)) (dcons zero (dnil N)) (lambda n (lambda xs (lambda a (lambda x (+ a x))))) zero)","N",false);
    ("(refl (succ (succ (succ (succ zero)))))","(id N (+ (succ (succ zero)) (succ (succ zero))) (succ (succ (succ (succ zero)))))",true);
@@ -70,8 +70,6 @@ let tests = List.map (fun (term,chek, res) -> term >:: fun ctxt -> assert_equal 
 
 (* let ltests = List.map (fun (term,chek,res) -> term >:: fun ctxt -> assert_equal (lcheck [] (big_step_eval_inTm (read chek) []) (read term)) res) inputs *)
 
-
-   (* ("(lambda (A a b q) (trans A (lambda (a b q) (id A b a)) a b q (lambda a (refl a))))", "(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))", true); *)
 (* 
     ("(list N)","*",true);
     ("(nil N)","(list N)",true);

@@ -9,7 +9,7 @@ let suite =
 	    (*	    ; "test lcheck" >::: TestCheck.ltests *)
 	    ; "test pretty" >::: TestPretty.tests
 	    ; "test sub" >::: TestSub.tests
-(*	    ; "test equal" >::: TestEqual.tests*)
+	    ; "test equal" >::: TestEqual.tests
 	    ; "test big_step">::: TestBig_step.tests  
 	    ; "test lib" >::: Lib.tests
 	    ]

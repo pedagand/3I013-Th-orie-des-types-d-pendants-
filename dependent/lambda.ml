@@ -253,8 +253,8 @@ and pretty_print_exTm t l =
 	| _ -> List.nth l x
     end
   | FVar (Global x) ->  x
-  | FVar (Quote x) -> string_of_int x 
-  | FVar (Bound x) -> string_of_int x
+  | FVar (Quote x) -> "Q" ^ string_of_int x 
+  | FVar (Bound x) -> "B" ^ string_of_int x
   | Appl(x,y) -> "(" ^ pretty_print_exTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
   | Iter(p,n,f,z) -> "(iter " ^ pretty_print_inTm p l ^ " " ^ pretty_print_inTm n l ^ " " ^ pretty_print_inTm f l ^ " " ^ pretty_print_inTm z l ^ ")"
   | P0(x) -> "(p0 " ^ pretty_print_exTm x l ^ ")"
@@ -304,8 +304,53 @@ and substitution_exTm  t tsub var =
 				 (substitution_inTm b tsub var),(substitution_inTm q tsub var),(substitution_inTm x tsub var))
 
 
+let boundfree i n = 
+  match n with 
+  | Quote k -> BVar (i - k - 1)
+  | x -> FVar x
 
 let vfree n = VNeutral(NFree n)
+let gensym =
+  let c = ref 0 in
+  fun () -> incr c; "x" ^ string_of_int !c
+(*=value_to_inTm_head *)
+let rec value_to_inTm i v =
+  match v with 
+(*=End *)
+  | VLam f -> let freshVar = gensym () in
+	      Abs(Global(freshVar),value_to_inTm (i+1) (f (vfree(Quote i))))
+  | VNeutral n -> Inv(neutral_to_exTm i n)
+(*=value_to_inTm_new *)		     
+  | VPi(x,f) -> let var = gensym () in 
+		begin
+		  Pi(Global(var),
+		     (value_to_inTm i x),
+		     (value_to_inTm (i+1) (f(vfree(Quote i)))))
+		end
+(*=End *)
+  | VStar -> Star
+  | VNat -> Nat
+  | VZero -> Zero
+  | VSucc(n) -> Succ(value_to_inTm i n)
+  | VVec(alpha,n) -> Vec((value_to_inTm i alpha),(value_to_inTm i n))
+  | VDNil(alpha) -> DNil(value_to_inTm i alpha)
+  | VDCons(a,xs) -> DCons((value_to_inTm i a),(value_to_inTm i xs)) 
+  | VId(gA,a,b) -> Id((value_to_inTm i gA),(value_to_inTm i a),(value_to_inTm i b))
+  | VRefl(a) -> Refl(value_to_inTm i a)
+  | VWhat -> What
+and neutral_to_exTm i v = 
+  match v with 
+  | NFree x -> boundfree i x
+  | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
+  | NDFold(alpha,p,n,xs,f,a) -> DFold((value_to_inTm i alpha),(value_to_inTm i p),(value_to_inTm i n),
+				      (value_to_inTm i xs),(value_to_inTm i f),(value_to_inTm i a))
+  | NIter(p,n,f,a) -> Iter((value_to_inTm i p),(value_to_inTm i n),(value_to_inTm i f),(value_to_inTm i a))
+  | NTrans(gA,p,a,b,q,x) -> Trans((value_to_inTm i gA),(value_to_inTm i p),(value_to_inTm i a),
+				  (value_to_inTm i b),(value_to_inTm i q),(value_to_inTm i x))
+
+     
+
+
   
 (*=big_step_head *)
 let rec big_step_eval_inTm t envi = 
@@ -340,8 +385,9 @@ let rec big_step_eval_inTm t envi =
 and vapp v = 
   match v with 
   | ((VLam f),v) -> f v
-  | ((VNeutral n),v) -> VNeutral(NApp(n,v))
-  | _ -> failwith "must not append" 
+  | ((VNeutral n),v) -> VNeutral(NApp(n,v)) 
+  | (x,y) -> failwith ("vapp must not append gauche : " ^ (pretty_print_inTm (value_to_inTm 0 x) []) ^ "\n droite : " ^
+     (pretty_print_inTm (value_to_inTm 0 y) []) ^ "\n")
 (*=vitter *)
 and vitter (p,n,f,a) =
   match n,f with
@@ -349,7 +395,7 @@ and vitter (p,n,f,a) =
   | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
   | _ -> VNeutral(NIter(p,n,f,a))
 (*=End *)
-(*=vfold *) 
+(*=vfold *)  
 and vfold(alpha,p,n,xs,f,a) = 
   match xs,f,n with
   | (VDNil(alphi),VLam fu,VZero) -> a
@@ -379,73 +425,44 @@ let boundfree i n =
   | Quote k -> BVar (i - k - 1)
   | x -> FVar x
 
-let gensym =
-  let c = ref 0 in
-  fun () -> incr c; "x" ^ string_of_int !c
-(*=value_to_inTm_head *)
-let rec value_to_inTm i v =
-  match v with 
-(*=End *)
-  | VLam f -> value_to_inTm (i+1) (f (vfree(Quote i)))
-  | VNeutral n -> Inv(neutral_to_exTm i n)
-(*=value_to_inTm_new *)		     
-  | VPi(x,f) -> let var = gensym () in 
-		begin
-		  Pi(Global(var),
-		     (value_to_inTm i x),
-		     (value_to_inTm (i+1) (f(vfree(Quote i)))))
-		end
-(*=End *)
-  | VStar -> Star
-  | VNat -> Nat
-  | VZero -> Zero
-  | VSucc(n) -> Succ(value_to_inTm i n)
-  | VVec(alpha,n) -> Vec((value_to_inTm i alpha),(value_to_inTm i n))
-  | VDNil(alpha) -> DNil(value_to_inTm i alpha)
-  | VDCons(a,xs) -> DCons((value_to_inTm i a),(value_to_inTm i xs)) 
-  | VId(gA,a,b) -> Id((value_to_inTm i gA),(value_to_inTm i a),(value_to_inTm i b))
-  | VRefl(a) -> Refl(value_to_inTm i a)
-  | VWhat -> What
-and neutral_to_exTm i v = 
-  match v with 
-  | NFree x -> boundfree i x
-  | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
-  | NDFold(alpha,p,n,xs,f,a) -> DFold((value_to_inTm i alpha),(value_to_inTm i p),(value_to_inTm i n),
-				      (value_to_inTm i xs),(value_to_inTm i f),(value_to_inTm i a))
-  | NIter(p,n,f,a) -> Iter((value_to_inTm i p),(value_to_inTm i n),(value_to_inTm i f),(value_to_inTm i a))
-  | NTrans(gA,p,a,b,q,x) -> Trans((value_to_inTm i gA),(value_to_inTm i p),(value_to_inTm i a),
-				  (value_to_inTm i b),(value_to_inTm i q),(value_to_inTm i x))
 
 
 let rec equal_inTm t1 t2 = 
   match (t1,t2) with 
   | (Abs(_,x1),Abs(_,x2)) -> equal_inTm x1 x2
-  | (Pi(_,x1,y1),Pi(_,x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Pi(_,x1,y1),Pi(_,x2,y2)) ->  equal_inTm x1 x2 && equal_inTm y1 y2
   | (Star,Star) -> true 
   | (Zero,Zero) -> true 
   | (Succ(n1),Succ(n2)) -> equal_inTm n1 n2
   | (Nat,Nat) -> true
   | (Inv(x1),Inv(x2)) -> equal_exTm x1 x2
-  | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
-  | (Cross(x1,y1),Cross(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 && equal_inTm y1 y2
+  | (Cross(x1,y1),Cross(x2,y2)) -> equal_inTm x1 x2 && equal_inTm y1 y2
   | (What,What) -> true
-  | (Vec(x1,y1),Vec(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
+  | (Vec(x1,y1),Vec(x2,y2)) -> equal_inTm x1 x2 && equal_inTm y1 y2
   | (DNil x1,DNil x2) -> equal_inTm x1 x2
-  | (DCons(x1,y1),DCons(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2 
-  | _ -> false
+  | (DCons(x1,y1),DCons(x2,y2)) -> equal_inTm x1 x2 && equal_inTm y1 y2
+  | (Id(x1,y1,z1),Id(x2,y2,z2)) -> equal_inTm x1 x2 && equal_inTm y1 y2 && equal_inTm z1 z2
+  | (Refl(x1),Refl(x2)) -> equal_inTm x1 x2 
+  | (List(x1),List(x2)) -> equal_inTm x1 x2 
+  | (Nil(x1),Nil(x2)) -> equal_inTm x1 x2
+  | (Cons(x1,y1,z1),Cons(x2,y2,z2)) -> equal_inTm x1 x2 && equal_inTm y1 y2 && equal_inTm z1 z2
+  | _ -> false    
 and equal_exTm t1 t2 = 
   match (t1,t2) with 
-  | (Ann(x1,y1),Ann(x2,y2)) -> equal_inTm x1 x2 = equal_inTm y1 y2
-  | (BVar(x1),BVar(x2)) -> x1 = x2
-  | (FVar(x1),FVar(x2)) -> x1 = x2
-  | (Appl(x1,y1),Appl(x2,y2)) -> equal_exTm x1 x2 = equal_inTm y1 y2 
+  | (Ann(x1,y1),Ann(x2,y2)) -> equal_inTm x1 x2 && equal_inTm y1 y2
+  | (BVar(x1),BVar(x2)) -> x1 = x2 
+  | (FVar(Global(x1)),FVar(Global(x2))) -> x1 = x2
+  | (FVar(Quote(x1)),FVar(Quote(x2))) -> x1 = x2
+  | (FVar(Bound(x1)),FVar(Quote(x2))) -> x1 = x2
+  | (Appl(x1,y1),Appl(x2,y2)) -> equal_exTm x1 x2 && equal_inTm y1 y2 
   | (Iter(w1,x1,y1,z1),Iter(w2,x2,y2,z2)) -> 
-     equal_inTm w1 w2 = equal_inTm x1 x2 = equal_inTm y1 y2 = equal_inTm z1 z2
+     equal_inTm w1 w2 = equal_inTm x1 x2 = equal_inTm y1 y2 && equal_inTm z1 z2
   | (P0(x1),P0(x2)) -> equal_exTm x1 x2
   | (P1(x1),P1(x2)) -> equal_exTm x1 x2
   | (DFold(alpha1,p1,n1,xs1,f1,a1),DFold(alpha2,p2,n2,xs2,f2,a2)) -> equal_inTm alpha1 alpha2 = equal_inTm p1 p2 
-								     = equal_inTm p1 p2 = equal_inTm n1 n2 
-								     = equal_inTm xs1 xs2 = equal_inTm f1 f2 = equal_inTm a1 a2
+								     && equal_inTm p1 p2 = equal_inTm n1 n2 
+								     && equal_inTm xs1 xs2 = equal_inTm f1 f2 = equal_inTm a1 a2
   | _ -> false
 
 
@@ -646,7 +663,7 @@ let rec contexte_to_string contexte =
   match contexte with 
   | [] -> "|" 	    
   | (Global s,w) :: tail -> "(" ^ s ^ "," ^ pretty_print_inTm (value_to_inTm 0 w) [] ^ ");" ^ contexte_to_string tail  
-  | _ -> failwith "Must not append"
+  | _ -> failwith "contexte_to_string Must not append"
 
 
 
@@ -665,10 +682,13 @@ let rec check contexte inT ty steps =
      let ret = synth contexte x (pretty_print_inTm inT [] ^ ";" ^ steps) in 
      if res_debug_synth ret
      then 
-       begin 
-	 if equal_inTm (value_to_inTm 0 (ty)) (value_to_inTm 0 (ret_debug_synth ret))
+       begin
+	 let terme_un = value_to_inTm 0 (ty) in
+	 let terme_deux = value_to_inTm 0 (ret_debug_synth ret) in
+	 if equal_inTm terme_un terme_deux
 	 then create_report true (contexte_to_string contexte) steps "NO"
-	 else create_report false (contexte_to_string contexte) steps "Inv: ret and ty are not equal"
+	 else create_report false (contexte_to_string contexte) steps ("Inv: ret and ty are not equal (terme_un = " ^ pretty_print_inTm terme_un [] ^ ") 
+(terme_deux = " ^ pretty_print_inTm terme_deux [] ^ ")")
        end
      else create_report false (contexte_to_string contexte) steps ("Inv: Synth of x goes wrong \n ----Rapport du Inv---\n" ^ print_report_synth ret ^ "\n------Fin Rapport Inv---\n")
   | Star -> 
@@ -888,11 +908,12 @@ and synth contexte exT steps =
 					     begin 
 					       if res_debug check_x
 					       then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) [])
-					       else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: x wrong type") VStar 
+					       else create_retSynth (create_report false (contexte_to_string contexte) steps ("Trans: x wrong type \n-----Rapport check _x----\n" ^ print_report check_x ^ "-----fin Rapport chec_x-----")) VStar 
 					     end 
 					   else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: p wrong type") VStar 
 					 end 
-				       else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: q wrong type") VStar 
+				       else create_retSynth (create_report false (contexte_to_string contexte) steps
+							       ("Trans: q wrong type\n-----Rapport check _q----\n" ^ print_report check_q ^ "-----fin Rapport chec_q-----")) VStar 
 				     end 
 				   else create_retSynth (create_report false (contexte_to_string contexte) steps "Trans: b must be of type gA") VStar 
 				 end
@@ -904,6 +925,15 @@ and synth contexte exT steps =
   | _ -> failwith "HAHAHAHAHAHAHA"
 
 
+let run_check terme typ =
+  let report = check [] (read terme)
+    (big_step_eval_inTm (read typ) []) ""  in
+  let () = Printf.printf "%s" (print_report report) in
+  let () = Printf.printf "---------finish------------" in
+  () 
+  
+  
+     
 
 (* let () = Printf.printf "%s" (print_report (check [] (read "(lamba x x)") (big_step_eval_inTm (read "(-> * *)") []) "")) *)
 
