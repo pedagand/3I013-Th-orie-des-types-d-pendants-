@@ -20,7 +20,7 @@ let test1 test_ctxt = assert_equal
 
 (* let test2 test_ctxt = assert_equal (big_step_eval_exTm testsucc [] ) (int_to_value 1) poser la question de ce test qui ne marche pas *)
 (* test de check *)
-let test2 test_ctxt = assert_equal (check [] (Inv(Iter((Succ(Zero)),(Abs(Global "x",Succ(Inv(BVar 0)))),(Ann(Zero,Nat))))) Nat) (true)
+(* let test2 test_ctxt = assert_equal (check [] (Inv(Iter((Succ(Zero)),(Abs(Global "x",Succ(Inv(BVar 0)))),(Ann(Zero,Nat))))) Nat) (true) *)
 
 
 

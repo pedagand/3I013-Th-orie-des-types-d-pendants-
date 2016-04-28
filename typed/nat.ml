@@ -9,8 +9,8 @@ let succ = Abs(Global "n",Abs(Global "f",Abs(Global "x",Inv(Appl(BVar 1,(Inv(App
 (* a refaire quand j'aurais l'évaluation de l'itération qui marche *)
 let rec int_to_value i = 
   match i with 
-  | 0 -> big_step_eval_exTm (Appl(Ann(succ,(Fleche(Nat,Fleche(Nat,Nat)))),zero)) [] 
-  | i -> big_step_eval_exTm (Appl(Ann(succ,(Fleche(Nat,Fleche(Nat,Nat)))),(value_to_inTm 0 (int_to_value (i-1))))) []
+  | 0 -> eval_exTm (Appl(Ann(succ,(Fleche(Nat,Fleche(Nat,Nat)))),zero)) [] 
+  | i -> eval_exTm (Appl(Ann(succ,(Fleche(Nat,Fleche(Nat,Nat)))),(value_to_inTm 0 (int_to_value (i-1))))) []
 
   
   

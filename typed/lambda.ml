@@ -142,6 +142,7 @@ and  parse_type env t =
 
 
 let read t = parse_term [] (Sexp.of_string t)
+let read_type t = parse_type [] (Sexp.of_string t)
 					     		 	
 let rec pretty_print_inTm t l = 
   match t with 
@@ -357,6 +358,10 @@ let rec reduction_forte t i  =
 	 | _ -> SP1(reduction_forte x i)
        end
 
+
+
+	 
+
 (*=big_step_eval_exTm_ann *)
 let rec eval_exTm t envi = 
   match t with
@@ -416,8 +421,52 @@ and eval_inTm t envi =
   | Succ n -> VSucc (eval_inTm n envi)
   | Pair(x,y) -> VPair((eval_inTm x envi),(eval_inTm y envi))
   | True -> VTrue 
-  | False -> VFalse 
-		
+  | False -> VFalse
+
+let gensym =
+  let c = ref 0 in
+  fun () -> incr c; "x" ^ string_of_int !c
+let rec value_to_inTm i v =
+  match v with 
+  | VLam f -> let freshVar = gensym() in
+	      Abs(Global(freshVar),value_to_inTm (i+1) (f (vfree(Quote i))))
+  | VNeutral n -> Inv(neutral_to_exTm i n)
+  | VTrue -> True
+  | VFalse -> False
+  | VSucc x -> Succ(value_to_inTm i x)
+  | VZero -> Zero
+  | VPair(x,y) -> Pair((value_to_inTm i x),(value_to_inTm i y))
+and neutral_to_exTm i v = 
+  match v with 
+  | NFree x -> boundfree i x
+  | NApp(n,x) -> Appl((neutral_to_exTm i n),(value_to_inTm i x))
+
+
+let rec equal_inTm t_un t_deux =
+  match (t_un,t_deux) with
+  | (Abs(_,x1),Abs(_,x2)) -> equal_inTm x1 x2
+  | (Inv(x1),Inv(x2)) -> equal_exTm x1 x2
+  | (True,True) -> true
+  | (False,False) -> true
+  | (Zero,Zero) -> true
+  | (Succ(x1),Succ(x2)) -> equal_inTm x1 x2
+  | (Pair(x1,y1),Pair(x2,y2)) -> equal_inTm x1 x2 && equal_inTm y1 y2
+  | _ -> false
+and equal_exTm t_un t_deux =
+  match (t_un,t_deux) with
+  | (Appl(x1,y1),Appl(x2,y2)) -> equal_exTm x1 x2 && equal_inTm y1 y2
+  | (FVar(x1),FVar(x2)) -> x1 = x2
+  | (BVar(x1),BVar(x2)) -> x1 = x2
+  | (Ann(x1,_),Ann(x2,_)) -> equal_inTm x1 x2
+  | (Ifte(x1,y1,z1),Ifte(x2,y2,z2)) -> equal_inTm x1 x2 &&
+     equal_exTm y1 y2 && equal_exTm z1 z2
+  | (Iter(x1,y1,z1),Iter(x2,y2,z2)) -> equal_inTm x1 x2 &&
+     equal_inTm y1 y2 && equal_exTm z1 z2
+  | (P0(x1),P0(x2)) -> equal_exTm x1 x2
+  | (P1(x1),P1(x2)) -> equal_exTm x1 x2
+  | _ -> false
+     
+     
 
 	       
 let rec typed_to_simple_inTm t = 
@@ -441,14 +490,10 @@ and typed_to_simple_exTm t =
     | P0(x) -> SP0(typed_to_simple_exTm x)
     | P1(x) -> SP1(typed_to_simple_exTm x)
 
-
-let gensym =
-  let c = ref 0 in
-  fun () -> incr c; "x" ^ string_of_int !c
-
     
 (*=check_def *)
-let rec check contexte ty inT
+    
+let rec check contexte ty inT 
     = match inT with
 (*=End *)
 (*=check_abs *)
@@ -539,7 +584,15 @@ and synth contexte exT
 (*=End *)
 	
 		     
+let run_check terme typ =
+  let res_check = check [] (read_type typ) (read terme) in
+  let () = Printf.printf "%b" (res_check) in
+  res_check
+  
+  
 
+
+let test = run_check "(lambda x x)" "(-> N N)"
 
 
 

@@ -1,10 +1,10 @@
 open OUnit2
 
 let suite =
-  test_list [ "Parser tests" >::: ParserT.tests
-            ; "Boolean test" >::: BooleanT.tests 
-            ; "Nat test" >::: NatT.tests
-	    ; "test unit" >::: TestUnit.eval]
+  test_list [ "check test" >::: TestCheck.tests ;
+	      "parser test" >::: ParserT.tests ;
+	      "Eval test" >::: TestEval.tests
+	    ]
 
 let () =
   run_test_tt_main suite
