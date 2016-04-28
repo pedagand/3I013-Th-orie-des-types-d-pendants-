@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+  <head>
+    <title>Proof</title>
+    <link href="proof.css" type="text/css" rel="stylesheet">    
+  </head>
+  <body id="lol">
+    <script>
+      var compteur = 0;
+      var nom = "level" + compteur
+      var prec = function() {
+                  alert("prec"); 
+      }
+      var suiv = function() {
+      compteur ++;
+      nom = "level" + compteur;
+      document.getElementById("level1").style.color = "red";
+      }
+       
+    </script>
+    <p id="test1"> lol </p>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+      <mfrac>
+	<mfrac>
+	  <mi id="level2" mathsize="big">2</mi>
+	  <mi id="level1" mathsize="big">1</mi>
+	</mfrac>
+	<mi id="level0" mathsize="big">&empty;&vdash; 0</mi>
+      </mfrac>
+    </math>
+
+    <input type="button" value="prec" id="prec" onclick="prec()">
+    <input type="button" value="suiv" id="suiv" onclick="suiv()">
+    
+  </body>
+</html>
+
+
+
+  
