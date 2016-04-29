@@ -1,5 +1,10 @@
 open Sexplib
 
+  (* to run in top level 
+  #use "topfind";;
+  #require "sexplib";;
+  #require "oUnit";;
+  *)
 
 type name =
   | Global of string 
@@ -676,7 +681,7 @@ let rec check contexte inT ty steps =
        match ty with 
        | VPi(s,t) -> let freshVar = gensym () in 
 		     check (((Global freshVar),s)::contexte) (substitution_inTm y (FVar(Global(freshVar))) 0) (t (vfree (Global freshVar))) (pretty_print_inTm inT [] ^ ";"^ steps) 
-       | _ -> create_report false (contexte_to_string contexte) steps "Abs type must be a Pi"
+       | _ -> create_report false (contexte_to_string contexte) steps ("Abs type must be a Pi inT: " ^ pretty_print_inTm inT [] ^ "ty: " ^ pretty_print_inTm (value_to_inTm 0 ty) [] ^ "||||||")
      end 
   | Inv(x) -> 
      let ret = synth contexte x (pretty_print_inTm inT [] ^ ";" ^ steps) in 
@@ -890,7 +895,7 @@ and synth contexte exT steps =
 			   let check_q = check contexte q (big_step_eval_inTm (Id(gA,a,b)) [])(pretty_print_exTm exT [] ^ ";") in
 			   let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
 			   let check_p = check contexte p (big_step_eval_inTm type_p []) (pretty_print_exTm exT [] ^ ";") in
-			   let check_x = check contexte x (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),b),q))) []) (pretty_print_exTm exT [] ^ ";") in
+			   let check_x = check contexte x (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),a),Refl(a)))) []) (pretty_print_exTm exT [] ^ ";") in
 			   if res_debug check_gA 
 			   then
 			     begin 
