@@ -9,5 +9,8 @@ nat: nat.ml
 test.native: test.ml
 	ocamlbuild -use-ocamlfind test.native
 
+%.native:%.ml
+	ocamlbuild -use-ocamlfind $@
+
 clean: 
 	ocamlbuild -clean
