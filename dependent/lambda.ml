@@ -753,7 +753,7 @@ let rec check contexte inT ty steps =
        | VVec(alpha,VSucc(n)) -> let check_xs = check contexte xs (VVec(alpha,n)) (pretty_print_inTm inT [] ^ ";"^ steps) in 
 				 if res_debug(check_xs)
 				 then check contexte a alpha (pretty_print_inTm inT [] ^ ";"^ steps)
-				 else create_report false (contexte_to_string contexte) steps "DCons : xs must be of type (VVec alpha n)"
+				 else create_report false (contexte_to_string contexte) steps ("DCons int "^ pretty_print_inTm inT [] ^ " must be of type " ^ pretty_print_inTm (value_to_inTm 0 ty)[] ^ "||||\n")
        | _ -> create_report false (contexte_to_string contexte) steps "DCons : ty must be a VVec"
      end
   (*=check_what *)
@@ -879,7 +879,7 @@ and synth contexte exT steps =
 						   then create_retSynth (create_report true (contexte_to_string contexte) steps "NO") (big_step_eval_inTm (Inv(Appl(Appl(Ann(p,type_p),n),xs))) [])
 						   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold a must be of type alpha") VStar
 						 end 						   
-					       else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold f must be of type ...") VStar
+					       else create_retSynth (create_report false (contexte_to_string contexte) steps ("DFold f wrong type \n-----Rapport check _f:" ^ pretty_print_inTm f []^ "----\n" ^ print_report check_f ^ "-----fin Rapport chec_f-----")) VStar
 					     end 
 					   else create_retSynth (create_report false (contexte_to_string contexte) steps "DFold xs must be of type Vec alpha n") VStar
 					 end
@@ -895,7 +895,7 @@ and synth contexte exT steps =
 			   let check_q = check contexte q (big_step_eval_inTm (Id(gA,a,b)) [])(pretty_print_exTm exT [] ^ ";") in
 			   let type_p = Pi(Global"a",gA,Pi(Global"b",gA,Pi(Global"NO",Id(gA,Inv(BVar 1),Inv(BVar 0)),Star))) in 
 			   let check_p = check contexte p (big_step_eval_inTm type_p []) (pretty_print_exTm exT [] ^ ";") in
-			   let check_x = check contexte x (big_step_eval_inTm (Inv(Appl(Appl(Appl(Ann(p,type_p),a),a),Refl(a)))) []) (pretty_print_exTm exT [] ^ ";") in
+			   let check_x = check contexte x (big_step_eval_inTm (Pi(Global"a",gA,(Inv(Appl(Appl(Appl(Ann(p,type_p),Inv(BVar 0)),Inv(BVar 0)),Refl(Inv(BVar 0))))))) []) (pretty_print_exTm exT [] ^ ";") in
 			   if res_debug check_gA 
 			   then
 			     begin 
