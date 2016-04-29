@@ -15,24 +15,24 @@
       var suiv = function() {
       compteur ++;
       nom = "level" + compteur;
-      document.getElementById("level1").style.color = "red";
+      var elem = document.getElementById(nom)
+      elem.className = "show";
       }
        
-    </script>
-    <p id="test1"> lol </p>
+    </script>  
     <math xmlns="http://www.w3.org/1998/Math/MathML">
       <mfrac>
 	<mfrac>
-	  <mi id="level2" mathsize="big">2</mi>
-	  <mi id="level1" mathsize="big">1</mi>
+	  <mi id="level2" class="hide" mathsize="big">2</mi>
+	  <mi id="level1" class="hide" mathsize="big">1</mi>
 	</mfrac>
-	<mi id="level0" mathsize="big">&empty;&vdash; 0</mi>
+	<mi class="show" mathsize="big">&empty;&vdash; 0</mi>
       </mfrac>
     </math>
 
     <input type="button" value="prec" id="prec" onclick="prec()">
     <input type="button" value="suiv" id="suiv" onclick="suiv()">
-    
+      
   </body>
 </html>
 

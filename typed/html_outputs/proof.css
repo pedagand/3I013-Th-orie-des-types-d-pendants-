@@ -1,12 +1,10 @@
-#level0 {
-    color: red;
+
+.hide{
+    color:white;
 }
 
-#level2 {
-    color: green;
+.show {
+    color:black;
 }
 
-#test1 {
-    color: yellow;
-}
 
