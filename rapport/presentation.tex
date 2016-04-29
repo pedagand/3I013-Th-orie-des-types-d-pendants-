@@ -1,0 +1,158 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{amsthm, amssymb, amsmath}
+\usepackage{mathpartir}
+\usepackage{amsmath}
+
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+  language=[Objective]Caml,
+  %% emph={[2]Nil,Cons,FZe,FSu,ze,su,Ze,Su},
+  %% emphstyle={[2]\Constructor},
+  %% emph={[3]lookup,failwith},
+  %% emphstyle={[3]\Function},
+  %% emph={[4]vec,fin,nat,list,tree,completeTree},
+  %% emphstyle={[4]\Canonical},
+  morecomment=[s]{(*}{*)},
+  rangeprefix=\(\*\=,
+  rangesuffix=\ \*\),
+  includerangemarker=false,
+  extendedchars=\true,
+  inputencoding=utf8,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  basicstyle=\ttfamily\small,
+  framesep=4mm,
+  moredelim=*[s][\itshape]{(*}{*)},
+  moredelim=[is][\textcolor{darkgray}]{§}{§},
+  escapechar=°,
+  keywordstyle=\color[rgb]{0.627451, 0.125490, 0.941176},
+  stringstyle=\color[rgb]{0.545098, 0.278431, 0.364706},
+  commentstyle=\color[rgb]{0.698039, 0.133333, 0.133333},
+  numberstyle=\color[rgb]{0.372549, 0.619608, 0.627451},
+  boxpos=t,
+  literate= {'a}{{$\alpha$}}1%
+    {->}{{${\to}$}}2
+    {*}{{${\times}$}}1
+    {::}{{${:\::}$}}1
+}
+
+\newcommand{\codefrom}[3]
+           {\lstinputlisting[linerange={#3}-End]{../#1/#2.ml}}
+\newcommand{\fun}[1]{\lstinline!#1!}
+
+\setbeamertemplate{navigation symbols}{} 
+
+\usetheme{Boadilla}
+
+\title{Titre}
+
+\author{Prénom Nom}
+
+\institute[\textsc{Upmc}]{Université Pierre et Marie Curie}
+
+\date{date}
+
+
+\begin{document}
+
+\begin{frame}
+
+\titlepage
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Titre}
+\framesubtitle{Sous titre}
+
+\begin{block}{Boite}
+  \begin{itemize}
+  \item Un bullet
+  \item Deux bullets
+  \item Trois bullets
+  \end{itemize}
+\end{block}
+
+\begin{block}{}
+  $$f(x) = y$$
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+
+\frametitle{Autre titre}
+
+%% Attention, pour écrire du code, il faut mettre "fragile" en option du slide
+\begin{lstlisting}
+ let test = foo
+\end{lstlisting}
+
+\begin{block}{}
+  Foo.
+\end{block}
+
+\end{frame}
+
+\newcommand{\intg}{\ensuremath{\mathsf{int}}}
+\newcommand{\bool}{\ensuremath{\mathsf{bool}}}
+\newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
+\newcommand{\App}[2]{\ensuremath{#1\:#2}}
+\newcommand{\Var}[1]{\ensuremath{#1}}
+\newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
+\newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
+\newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
+\newcommand{\ifte}[4][]{\ensuremath{\mathsf{if}_{#1}\: #2\: \mathsf{then}\: #3\: \mathsf{else}\: #4}}
+\newcommand{\true}{\ensuremath{\mathsf{true}}}
+\newcommand{\false}{\ensuremath{\mathsf{false}}}
+\newcommand{\zero}{\ensuremath{\mathsf{zero}}} 
+\newcommand{\succs}{\ensuremath{\mathsf{succ}}}
+\newcommand{\iter}{\ensuremath{\mathsf{iter}}}
+
+\begin{frame}
+  \[
+  \inferrule[]%
+    {\visible<2->{
+        \inferrule[]
+           {\visible<3->{
+               \inferrule[]              
+                  {\visible<4->{
+                     \inferrule[]
+                       {\visible<5->{x:\intg\rightarrow \bool \in E}}
+                       {E \vdash x:\intg\rightarrow \bool} \qquad
+                     \inferrule[]
+                       {\visible<6->{y:\intg\in E}}
+                       {E \vdash y:\intg}}}
+                  {E \vdash \App{x}{y} : \bool}}}
+           {\Delta\vdash \Lam{y}{\App{x}{y}}:\intg \rightarrow \bool}}}
+    {\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(\intg\rightarrow \bool) \rightarrow \intg \rightarrow \bool}
+  \]
+
+  \begin{align*}
+    \Delta &\triangleq \Gamma,x:\intg\rightarrow \bool \\
+    E &\triangleq \Gamma,x:\intg\rightarrow \bool,y:\intg \\
+  \end{align*}
+\end{frame}
+
+
+\begin{frame}
+
+\begin{center}
+\large{(Backup slides)}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+  \ldots
+\end{frame}
+
+\end{document}
