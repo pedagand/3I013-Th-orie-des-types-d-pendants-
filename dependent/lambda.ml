@@ -62,7 +62,7 @@ and exTm =
 (*=value_head *)
 type value = 
 (*=End *)
-  | VLam of (value -> value)
+  | VLam of name * (value -> value)
   | VNeutral of neutral 
 (*=value_pi_star *)
   | VStar 
@@ -287,7 +287,7 @@ let rec substitution_inTm t tsub var =
   | Cons(alpha,a,xs) -> Cons((substitution_inTm alpha tsub var),(substitution_inTm a tsub var),(substitution_inTm xs tsub var))
   | Vec(alpha,n) -> Vec((substitution_inTm alpha tsub var),(substitution_inTm n tsub var))
   | DNil(alpha) -> DNil(substitution_inTm alpha tsub var)
-  | DCons(a,xs) -> DCons((substitution_inTm a tsub var),(substitution_inTm a tsub var))
+  | DCons(a,xs) -> DCons((substitution_inTm a tsub var),(substitution_inTm xs tsub var))
   | What -> What
   | Id(gA,a,b) -> Id((substitution_inTm gA tsub var),(substitution_inTm a tsub var),(substitution_inTm b tsub var))
   | Refl(a) -> Refl(substitution_inTm a tsub var)
@@ -322,8 +322,8 @@ let gensym =
 let rec value_to_inTm i v =
   match v with 
 (*=End *)
-  | VLam f -> let freshVar = gensym () in
-	      Abs(Global(freshVar),value_to_inTm (i+1) (f (vfree(Quote i))))
+  | VLam (n,f) -> 
+	      Abs(n,value_to_inTm (i+1) (f (vfree(Quote i))))
   | VNeutral n -> Inv(neutral_to_exTm i n)
 (*=value_to_inTm_new *)		     
   | VPi(x,f) -> let var = gensym () in 
@@ -364,7 +364,7 @@ let rec big_step_eval_inTm t envi =
 (*=big_step_inv *)
   | Inv(i) -> big_step_eval_exTm i envi
 (*=End *)
-  | Abs(x,y) -> VLam(function arg -> (big_step_eval_inTm y (arg::envi)))
+  | Abs(x,y) -> VLam(x,function arg -> (big_step_eval_inTm y (arg::envi)))
 (*=big_step_new *)
   | Star -> VStar
   | Pi (v,x,y) -> 
@@ -389,22 +389,22 @@ let rec big_step_eval_inTm t envi =
   | _ -> failwith "a faire plus tard"
 and vapp v = 
   match v with 
-  | ((VLam f),v) -> f v
+  | ((VLam (x,f)),v) -> f v
   | ((VNeutral n),v) -> VNeutral(NApp(n,v)) 
   | (x,y) -> failwith ("vapp must not append gauche : " ^ (pretty_print_inTm (value_to_inTm 0 x) []) ^ "\n droite : " ^
      (pretty_print_inTm (value_to_inTm 0 y) []) ^ "\n")
 (*=vitter *)
 and vitter (p,n,f,a) =
   match n,f with
-  | (VZero,VLam fu) -> a
-  | (VSucc(x),VLam fu) -> vapp(fu n,(vitter (p,x,f,a)))
+  | (VZero,VLam (x,fu)) -> a
+  | (VSucc(x),VLam (nom,fu)) -> vapp(fu n,(vitter (p,x,f,a)))
   | _ -> VNeutral(NIter(p,n,f,a))
 (*=End *)
 (*=vfold *)  
 and vfold(alpha,p,n,xs,f,a) = 
   match xs,f,n with
-  | (VDNil(alphi),VLam fu,VZero) -> a
-  | (VDCons(elem,y),VLam fu,VSucc(ni)) -> 
+  | (VDNil(alphi),VLam (nom,fu),VZero) -> a
+  | (VDCons(elem,y),VLam (nom,fu),VSucc(ni)) -> 
      vapp(vapp(vapp(fu n,xs),elem),vfold(alpha,p,ni,y,f,a))
   | _ -> VNeutral(NDFold(alpha,p,n,xs,f,a))
 (*=End *)
