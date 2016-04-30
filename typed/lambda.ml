@@ -490,9 +490,10 @@ and typed_to_simple_exTm t =
     | P0(x) -> SP0(typed_to_simple_exTm x)
     | P1(x) -> SP1(typed_to_simple_exTm x)
 
-    
-(*=check_def *)
-    
+
+
+       
+(*=check_def *)       
 let rec check contexte ty inT 
     = match inT with
 (*=End *)
@@ -587,12 +588,10 @@ and synth contexte exT
 let run_check terme typ =
   let res_check = check [] (read_type typ) (read terme) in
   let () = Printf.printf "%b" (res_check) in
-  res_check
+  true
   
   
 
-
-let test = run_check "(lambda x x)" "(-> N N)"
 
 
 
