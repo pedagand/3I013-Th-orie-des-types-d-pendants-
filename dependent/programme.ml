@@ -3,7 +3,7 @@ open Lambda
 (* to run in top level
 #use "topfind";;
 #require "sexplib";;
-#require "oUnit";; 
+#require "oUnit";;  
 *)
   
 let sym = "(lambda (A a b q) (trans A (lambda (a b c) (id A b a)) a b q (lambda a (refl a))))"
