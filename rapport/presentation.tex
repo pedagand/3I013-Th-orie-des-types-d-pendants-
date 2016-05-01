@@ -43,7 +43,25 @@
 
 \newcommand{\codefrom}[3]
            {\lstinputlisting[linerange={#3}-End]{../#1/#2.ml}}
-\newcommand{\fun}[1]{\lstinline!#1!}
+           \newcommand{\fun}[1]{\lstinline!#1!}
+
+\newcommand{\intg}{\ensuremath{\mathsf{int}}}
+\newcommand{\bool}{\ensuremath{\mathsf{bool}}}
+\newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
+\newcommand{\App}[2]{\ensuremath{#1\:#2}}
+\newcommand{\Var}[1]{\ensuremath{#1}}
+\newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
+\newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
+\newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
+\newcommand{\ifte}[4][]{\ensuremath{\mathsf{if}_{#1}\: #2\: \mathsf{then}\: #3\: \mathsf{else}\: #4}}
+\newcommand{\true}{\ensuremath{\mathsf{true}}}
+\newcommand{\false}{\ensuremath{\mathsf{false}}}
+\newcommand{\zero}{\ensuremath{\mathsf{zero}}} 
+\newcommand{\succs}{\ensuremath{\mathsf{succ}}}
+\newcommand{\iter}{\ensuremath{\mathsf{iter}}}
+\newcommand{\subst}[3]{#1[#2 := #3]}
+\newcommand{\Inv}[1]{\ensuremath{\mathsf{inv}(#1)}}
+\newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
 
 \setbeamertemplate{navigation symbols}{} 
 
@@ -60,16 +78,19 @@
 
 \begin{document}
 
+
 \begin{frame}
 
 \titlepage
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}
 
-\frametitle{Le $\lambda$-calcul}
-\framesubtitle{Présentation formelle}
+\frametitle{Le $\lambda$-calcul non typé}
+\framesubtitle{Présentation formelle} 
 
 %voici la définition inductive des lambda termes
 
@@ -81,14 +102,152 @@
   \end{itemize}
 \end{block}
 
-\begin{block}{}
-  $$f(x) = y$$
+\begin{block}{Exemple}
+  $\Lam{x}{(\Lam{y}{(\App{x}{y})})}\equiv(lambda\:x\:(lambda\:y\:(x\:y)))$
+\end{block}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Le $\lambda$-calcul non typé}
+\framesubtitle{Réduction et évaluation}
+
+\begin{block}{Reduction}
+  $\App{\Lam{x}{x}}{t}\leadsto \subst{x}{x}{t} \leadsto \Var{t}$
+\end{block}
+
+\begin{block}{évaluation}
+  \begin{align*}
+    Trace de lexecution de levaluation dans le programme
+    avec commande trace dans utop
+  \end{align*} 
 \end{block}
 
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Le $\lambda$-calcul non typé}
+\framesubtitle{Extensions}
 
+\begin{block}{Les booléens}
+  \begin{itemize}
+  \item $\true$ 
+  \item $\false$
+  \item $\ifte{c}{t}{u}$
+  \end{itemize}
+\end{block}
+
+\begin{block}{Les entiers}
+  \begin{itemize}
+  \item $\zero$ 
+  \item $\succs$ 
+  \item $\iter\:n\:f\:a$ 
+  \end{itemize}
+  $(+\:1\:1) \equiv \Lam{x}{\Lam{y}{\iter\: x\:(\Lam{n}{\succs\:n})\:y  }}$
+\end{block}  
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Le $\lambda$-calcul simplement typé}
+\framesubtitle{Motivations} 
+
+\begin{block}{}
+  f = (lambda x (lambda y (ifte x (succ y) y)))
+  \begin{itemize}
+  \item f 3 true $\rightarrow$ exeption
+  \item f true 3 $\rightarrow$ 4  
+  \end{itemize}
+\end{block}
+
+\begin{block}{}
+  Il nous faut un moyen de pouvoir vérifier nos termes avant de les éxécuter
+\end{block}
+
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Le $\lambda$-calcul simplement typé}
+  \framesubtitle{Motivations} 
+  \[\begin{array}{c@{\qquad}c}  
+\boxed{\Gamma\vdash T \ni in}
+&
+\boxed{\Gamma\vdash ex \in T}
+\bigskip\\
+%%
+&
+\inferrule[(Var)]
+          {x:T \in \Gamma}
+          {\Gamma \vdash x \in T }
+\medskip\\
+\inferrule[(Abs)]
+          {T = A \rightarrow B \\
+          \Gamma, x:A \vdash B \ni t}
+          {\Gamma \vdash T \ni \Lam{x}{t}}
+&
+\inferrule[(App)]
+          {\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s}
+          {\Gamma\vdash \App{f}{s}\in B}
+\medskip\\
+%%
+\inferrule[(Inv)]
+          {\Gamma \vdash t \in T' \:\: T=T'}
+          {\Gamma\vdash T \ni \Inv{t}}
+&
+\inferrule[(Ann)]
+          {\Gamma\vdash T \ni t}
+          {\Gamma\vdash \Ann{t}{T} \in T}
+\end{array}\]
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{Le $\lambda$-calcul simplement typé}
+  \framesubtitle{Exemple de dérivation de typage}
+  
+  \[
+  \inferrule[]%
+    {\visible<2->{
+        \inferrule[]
+           {\visible<3->{
+               \inferrule[]              
+                  {\visible<4->{
+                     \inferrule[]
+                       {\visible<5->{x:\bool\in \Delta}}
+                       {\Delta \vdash \bool \ni x} \qquad
+                     \inferrule[]
+                       {\visible<6->{y:\intg\in \Delta}}
+                       {\Delta \vdash y\in\intg}
+                  \inferrule[]
+                            {\visible<6->{
+                                \inferrule[]
+                                          {y:\intg\in\Delta}
+                                          {\intg\ni y}
+                            }}
+                           {\Delta\vdash \succs\:y\in\intg}}}
+                  {\Delta \vdash \intg \ni \ifte{x}{\succs\:y}{y}   }}}
+           {\Gamma\vdash \intg \rightarrow \intg \ni \Lam{y}{\ifte{x}{\succs\:y}{y}}}}}
+    {\varnothing\vdash \bool \rightarrow \intg \rightarrow \intg \ni \Lam{x}{\Lam{y}{\ifte{x}{\succs\:y}{y}}}}
+    \]
+
+    \begin{align*}
+    \Gamma &\triangleq x:\bool \\
+    \Delta &\triangleq \Gamma,y:\intg \\
+  \end{align*}
+  
+  
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{Les types dépendants}
+  \framesubtitle{Intuition}
+  
+  
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
 
 \frametitle{Autre titre}
@@ -104,21 +263,8 @@
 
 \end{frame}
 
-\newcommand{\intg}{\ensuremath{\mathsf{int}}}
-\newcommand{\bool}{\ensuremath{\mathsf{bool}}}
-\newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
-\newcommand{\App}[2]{\ensuremath{#1\:#2}}
-\newcommand{\Var}[1]{\ensuremath{#1}}
-\newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
-\newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
-\newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
-\newcommand{\ifte}[4][]{\ensuremath{\mathsf{if}_{#1}\: #2\: \mathsf{then}\: #3\: \mathsf{else}\: #4}}
-\newcommand{\true}{\ensuremath{\mathsf{true}}}
-\newcommand{\false}{\ensuremath{\mathsf{false}}}
-\newcommand{\zero}{\ensuremath{\mathsf{zero}}} 
-\newcommand{\succs}{\ensuremath{\mathsf{succ}}}
-\newcommand{\iter}{\ensuremath{\mathsf{iter}}}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \[
   \inferrule[]%
@@ -144,7 +290,7 @@
   \end{align*}
 \end{frame}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 
 \begin{center}
