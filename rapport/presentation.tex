@@ -315,7 +315,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
                        {\visible<5->{x:\bool\in \Delta}}
                        {\Delta \vdash \bool \ni x} \qquad
                      \inferrule[]
-                       {\visible<6->{y:\intg\in \Delta}}
+                       {\visible<2-4>{y:\intg\in \Delta}}
                        {\Delta \vdash y\in\intg}
                   \inferrule[]
                             {\visible<6->{
@@ -420,30 +420,30 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   %% Pierre: Tracer l'exécution de 'check (Id Nat (2 + 1) 4) refl'
 
 
-\if 0
-  \begin{block}{}
-    ``t est une preuve de P'' $\equiv$ ``t est de type P (t:P) ``
-  \end{block}
+%% \if 0
+%%   \begin{block}{}
+%%     ``t est une preuve de P'' $\equiv$ ``t est de type P (t:P) ``
+%%   \end{block}
   
-  \begin{block}{Egalité}
-  \[
-  \begin{array}{cc}
+%%   \begin{block}{Egalité}
+%%   \[
+%%   \begin{array}{cc}
     
-    \inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
-              {\Gamma\vdash * \ni Id\:A\:a\:b}
-              \quad\quad
-  \inferrule[(Refl)]{\Gamma\vdash A \ni a}
-            {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}
-  \end{array}
-  \]
-  \end{block}
+%%     \inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
+%%               {\Gamma\vdash * \ni Id\:A\:a\:b}
+%%               \quad\quad
+%%   \inferrule[(Refl)]{\Gamma\vdash A \ni a}
+%%             {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}
+%%   \end{array}
+%%   \]
+%%   \end{block}
   
-  \visible<2->{
-  \begin{block}{\equal{2 + 2}{N}{4}}
-    $Id(Nat,2 + 2,4)$ \\
-    \visible<3->{$refl\:4$}
-  \end{block}}
-  \fi
+%%   \visible<2->{
+%%   \begin{block}{\equal{2 + 2}{N}{4}}
+%%     $Id(Nat,2 + 2,4)$ \\
+%%     \visible<3->{$refl\:4$}
+%%   \end{block}}
+%%   \fi
 
 
 
@@ -507,7 +507,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
      \item C
      \item Slow.fast typechecker
      \item Tactics
-     \item Proofs & complexity
+     \item Proofs \& complexity
      \item Untyped reduction: Krivine machine
      \item Rational bidirectionalisation
     \end{itemize}
