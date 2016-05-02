@@ -58,7 +58,7 @@
 \newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
 \newcommand{\Snd}[1]{\ensuremath{#1.\pi_1}}
 \newcommand{\Pair}[2]{\ensuremath{(#1, #2)}}
-\newcommand{\ifte}[4][]{\ensuremath{\mathsf{if}_{#1}\: #2\: \mathsf{then}\: #3\: \mathsf{else}\: #4}}
+\newcommand{\ifte}[4]{\ensuremath{\mathsf{ifte}\:#1\: #2\:\:#3\:\: #4}}
 \newcommand{\true}{\ensuremath{\mathsf{true}}}
 \newcommand{\false}{\ensuremath{\mathsf{false}}}
 \newcommand{\zero}{\ensuremath{\mathsf{zero}}} 
@@ -106,9 +106,9 @@
 
   \begin{block}{Objectif}
     \begin{itemize}
-    \item E
-    \item F
-    \item G
+    \item A
+    \item 2 + 2 = 4
+    \item C
     \end{itemize}
   \end{block}  
 
@@ -172,17 +172,12 @@
 \frametitle{Le $\lambda$-calcul non typé}
 \framesubtitle{Réduction et évaluation}
 
-%% Pierre: Pas nécessaire ?
-\begin{block}{Réduction}
-  $\App{\Lam{x}{x}}{t}\leadsto \subst{x}{x}{t} \leadsto \Var{t}$
-\end{block}
-
 %% Pierre: Faire comme dans le rapport
 \begin{block}{Évaluation}
-  \begin{align*}
-    Trace de lexecution de levaluation dans le programme
-    avec commande trace dans utop
-  \end{align*} 
+    $\:\:\:\:\:\:$evaluation ((lambda x (lambda y (x y))) t u) \\
+    $\rightarrow$ evaluation (substitution (lambda y (x y) u) x t) \\
+    $\rightarrow$ evaluation (substitution (t y) y u) \\
+    $\rightarrow$ (t u)
 \end{block}
 
 \end{frame}
@@ -210,7 +205,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
       \begin{itemize}
       \item $\true$ 
       \item $\false$
-      \item $\ifte{c}{t}{u}$
+      \item $\ifte{}{c}{t}{u}$
       \end{itemize}
     \end{block}
   \end{column}
@@ -231,11 +226,14 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \frametitle{Le $\lambda$-calcul simplement typé}
 \framesubtitle{Motivations} 
 
-\begin{block}{}
-  %% Pierre: mettre en boite
-  %% Pierre: écrire dans lstlisting
-  f = (lambda x (lambda y (ifte x (succ y) y)))
+\begin{block}{exemple de fonction}
+  \begin{minipage}{.5\linewidth}
+    \begin{lstlisting}
+      f = (lambda x (lambda y (lambda fu (ifte x (fu y) y))))
+    \end{lstlisting}
+  \end{minipage}
 \end{block}
+
 
 \vfill
 
@@ -257,44 +255,6 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-  \frametitle{Le $\lambda$-calcul simplement typé}
-  \framesubtitle{Règles de typage bidirectionnelles} 
-
-  %% Pierre: Supprimer
-
-  \[\begin{array}{c@{\qquad}c}  
-\boxed{\Gamma\vdash T \ni in}
-&
-\boxed{\Gamma\vdash ex \in T}
-\bigskip\\
-%%
-&
-\inferrule[(Var)]
-          {x:T \in \Gamma}
-          {\Gamma \vdash x \in T }
-\medskip\\
-\inferrule[(Abs)]
-          {T = A \rightarrow B \\
-          \Gamma, x:A \vdash B \ni t}
-          {\Gamma \vdash T \ni \Lam{x}{t}}
-&
-\inferrule[(App)]
-          {\Gamma \vdash f \in A\rightarrow B \quad \Gamma\vdash A \ni s}
-          {\Gamma\vdash \App{f}{s}\in B}
-\medskip\\
-%%
-\inferrule[(Inv)]
-          {\Gamma \vdash t \in T' \:\: T=T'}
-          {\Gamma\vdash T \ni \Inv{t}}
-&
-\inferrule[(Ann)]
-          {\Gamma\vdash T \ni t}
-          {\Gamma\vdash \Ann{t}{T} \in T}
-\end{array}\]
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Le $\lambda$-calcul simplement typé}
   \framesubtitle{Exemple de dérivation de typage}
@@ -311,27 +271,29 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
            {\visible<3->{
                \inferrule[]              
                   {\visible<4->{
-                     \inferrule[]
-                       {\visible<5->{x:\bool\in \Delta}}
-                       {\Delta \vdash \bool \ni x} \qquad
-                     \inferrule[]
-                       {\visible<2-4>{y:\intg\in \Delta}}
-                       {\Delta \vdash y\in\intg}
-                  \inferrule[]
-                            {\visible<6->{
-                                \inferrule[]
-                                          {y:\intg\in\Delta}
-                                          {\intg\ni y}
-                            }}
-                           {\Delta\vdash \succs\:y\in\intg}}}
-                  {\Delta \vdash \intg \ni \ifte{x}{\succs\:y}{y}   }}}
-           {\Gamma\vdash \intg \rightarrow \intg \ni \Lam{y}{\ifte{x}{\succs\:y}{y}}}}}
-    {\varnothing\vdash \bool \rightarrow \intg \rightarrow \intg \ni \Lam{x}{\Lam{y}{\ifte{x}{\succs\:y}{y}}}}
+                     \inferrule[]{
+                     \visible<5->{
+                     \inferrule[]{\visible<6->{x:\bool\in\Delta}}{\Delta\vdash x \in \visible<6->{\bool}}}}                     
+                           {\Delta\vdash \bool \ni x}%level4gauche
+                  \inferrule[]{
+                    \visible<7->{
+                    \inferrule[]{\visible<8->{fu:(\intg \rightarrow \intg)\in \Delta}}{\Delta\vdash fu \in \visible<8->{(\intg \rightarrow \intg)}}}
+                  \visible<9->{\inferrule[]{
+                    \visible<10->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
+                  }{\Delta\vdash\intg \ni y}}}
+                  {\inferrule[]{}
+                            {\Delta\vdash \intg \ni (fu\:y)}}%level4midle
+                  \inferrule[]{
+                    \visible<11->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
+                  }{\Delta\vdash \intg \ni y}}}%level4droite 
+                  {\Delta \vdash \intg \ni \ifte{\intg}{x}{(fu\:y)}{y}}}}%level3
+           {\Gamma\vdash \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y}})})}}}%level1
+    {\varnothing\vdash \bool \rightarrow \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{x}{(\Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y)})})}}}%level0
     \]
 
     \begin{align*}
     \visible<2->{\Gamma &\triangleq x:\bool} \\
-    \visible<3->{\Delta &\triangleq \Gamma,y:\intg} \\
+    \visible<3->{\Delta &\triangleq \Gamma,y:\intg,\:fu:\intg\rightarrow\intg} \\
   \end{align*}
   
   
@@ -353,55 +315,9 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   %% Pierre: mieux exprimer
   \large{\textit{Peut-on garantir la taille des listes à la compilation ?}}
 \end{flushright}
-
   
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-  \frametitle{Les types dépendants}
-  \framesubtitle{Règles de typage bi-directionnel}
 
-  %% Pierre: supprimer
-  
-  \[
-  \begin{array}{cc}
-  \boxed{\Gamma\vdash T \ni in}
-  &
-  \boxed{\Gamma\vdash ex \in T}
-  \bigskip
-  \\ 
-  &
-  \cfrac{x:T \in \Gamma}
-        {\Gamma \vdash x \in T }\mbox{(Var)}
-  \medskip
-  \\
-  \cfrac{\Gamma \vdash t \in T' \:\: T=T'}
-        {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}
-  &
-  \cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
-        {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}
-  \medskip
-  \\
-  \highlight{
-  \cfrac{}
-        {\Gamma \vdash * \ni *}\mbox{(Star)} }
-  \medskip
-  \\
-  \highlight{
-  \cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
-        {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)} }
-  \medskip
-  \\
-  \cfrac{\Gamma,x:S\vdash T \ni t}
-        {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)} 
-  & 
-  \cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
-        {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)} 
-  \end{array}
-  \]
-
-
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Les types dépendants}

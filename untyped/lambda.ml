@@ -432,7 +432,7 @@ module ChurchNatT =
 (*    let tests = 
       ["test 3">:: test3;
       "test 4">:: test4 ] *)
-
+end 
 end
 
     
