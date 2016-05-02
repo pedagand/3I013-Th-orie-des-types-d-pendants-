@@ -103,7 +103,7 @@
   \begin{itemize}
   \item $x$ \mbox{variable}
   \item $\lambda x.t$ \mbox{abstraction}
-  \item $t\:u$
+  \item $t\:u$ \mbox{application}
   \end{itemize}
 \end{block}
 
@@ -239,8 +239,8 @@
     \]
 
     \begin{align*}
-    \Gamma &\triangleq x:\bool \\
-    \Delta &\triangleq \Gamma,y:\intg \\
+    \visible<2->{\Gamma &\triangleq x:\bool} \\
+    \visible<3->{\Delta &\triangleq \Gamma,y:\intg} \\
   \end{align*}
   
   
@@ -337,6 +337,43 @@
   
 
 
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{Les types dépendants}
+  \framesubtitle{Synmétrie de l'égalité}
+  
+    \[
+  \inferrule[]%
+    {\visible<2->{
+        \inferrule[]
+           {\visible<3->{
+               \inferrule[]              
+                  {\visible<4->{
+                     \inferrule[]
+                       {\visible<5->{x:\bool\in \Delta}}
+                       {\Delta \vdash \bool \ni x} \qquad
+                     \inferrule[]
+                       {\visible<6->{y:\intg\in \Delta}}
+                       {\Delta \vdash y\in\intg}
+                  \inferrule[]
+                            {\visible<6->{
+                                \inferrule[]
+                                          {y:\intg\in\Delta}
+                                          {\intg\ni y}
+                            }}
+                           {\Delta\vdash \succs\:y\in\intg}}}
+                  {\Delta \vdash \intg \ni \ifte{x}{\succs\:y}{y}   }}}
+           {\Gamma\vdash \intg \rightarrow \intg \ni \Lam{y}{\ifte{x}{\succs\:y}{y}}}}}
+    {\varnothing\vdash \forall A:*(\forall a,b:A\:(id\:A\:a\:b \rightarrow id\:A\:b\:a)) \ni \Lam{x}{\Lam{y}{\ifte{x}{\succs\:y}{y}}}}
+    \]
+
+    \begin{align*}
+    \Gamma &\triangleq x:\bool \\
+    \Delta &\triangleq \Gamma,y:\intg \\
+  \end{align*}
+  
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
