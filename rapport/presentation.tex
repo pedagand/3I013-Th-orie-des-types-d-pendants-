@@ -68,6 +68,8 @@
 \newcommand{\Inv}[1]{\ensuremath{\mathsf{inv}(#1)}}
 \newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
 \newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
+\newcommand{\refl}{\ensuremath{\mathsf{refl}}}
+\newcommand{\id}[3]{\ensuremath{\mathsf{id}\:#1\: #2\:\:#3}}
 
 \setbeamertemplate{navigation symbols}{} 
 
@@ -330,11 +332,36 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Les types dépendants}
+  \framesubtitle{Correspondance de Curry Howard}
+
+   \begin{block}{}
+     ``t est une preuve de P'' $\equiv$ ``t est de type P (t:P) ``
+   \end{block}
+  
+   \visible<2->{\begin{block}{}
+     \[
+     \inferrule[]{
+       \visible<3->{\inferrule[]{\:}{\varnothing\vdash\intg \ni 4}}
+       \visible<4->{\inferrule[]{\:}{\varnothing\vdash(2+2)\equiv4}}
+     }{\varnothing\vdash\id{\intg}{(2+2)}{4} \ni \refl}
+     \]
+   \end{block}}
+
+   \visible<5->{\begin{block}{}
+       \[
+       \inferrule[]{
+         \visible<6->{\inferrule[]{\:}{\varnothing\vdash\intg \ni 4}}
+         \visible<7->{\inferrule[]{\:}{\varnothing\vdash(2+1)\not\equiv4}}
+       }{\varnothing\vdash\id{\intg}{(2+1)}{4} \ni \refl}
+       \]
+   \end{block}}
+
   %Pierre: Trouver un autre titre
   
   %% Pierre: Tracer l'exécution de 'check (Id Nat (2 + 2) 4) refl'
   %% Pierre: Tracer l'exécution de 'check (Id Nat (2 + 1) 4) refl'
-
+  
+  
 
 %% \if 0
 %%   \begin{block}{}
