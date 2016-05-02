@@ -29,7 +29,7 @@
   showspaces=false,
   showstringspaces=false,
   showtabs=false,
-  basicstyle=\ttfamily\small,
+  basicstyle=\ttfamily,
   framesep=4mm,
   moredelim=*[s][\itshape]{(*}{*)},
   moredelim=[is][\textcolor{darkgray}]{§}{§},
@@ -43,6 +43,7 @@
     {->}{{${\to}$}}2
     {*}{{${\times}$}}1
     {::}{{${:\::}$}}1
+    {lambda}{{$\lambda$}}1
 }
 
 \newcommand{\codefrom}[3]
@@ -51,7 +52,7 @@
 
 \newcommand{\intg}{\ensuremath{\mathsf{int}}}
 \newcommand{\bool}{\ensuremath{\mathsf{bool}}}
-\newcommand{\Lam}[2]{\ensuremath{\lambda #1. #2}}
+\newcommand{\Lam}[2]{\ensuremath{\lambda #1\: #2}}
 \newcommand{\App}[2]{\ensuremath{#1\:#2}}
 \newcommand{\Var}[1]{\ensuremath{#1}}
 \newcommand{\Fst}[1]{\ensuremath{#1.\pi_0}}
@@ -93,12 +94,65 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
+  \frametitle{Introduction}
+
+  \begin{block}{Motivation}
+    \begin{itemize}
+    \item A
+    \item B
+    \item C
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Objectif}
+    \begin{itemize}
+    \item E
+    \item F
+    \item G
+    \end{itemize}
+  \end{block}  
+
+\end{frame}
+\newenvironment{bnf}
+               {\[\begin{array}{lcl@{\qquad}r}}
+               {\end{array}\]}
+
+
+\begin{frame}[b,fragile]
 
 \frametitle{Le $\lambda$-calcul non typé}
 \framesubtitle{Présentation formelle} 
 
-%voici la définition inductive des lambda termes
+\vfill
 
+\begin{block}{Un programme}
+\begin{center}
+\begin{minipage}{.5\linewidth}
+\begin{lstlisting}
+(lambda x (lambda y (x y))
+\end{lstlisting}
+\end{minipage}
+\end{center}
+\end{block}
+
+\vfill
+
+\begin{block}{Syntaxe}
+
+\begin{bnf}
+  t &::= & &\mbox{($\lambda$-terme)} \\
+  &|& \Var{x} & \mbox{(variable)} \\
+  &|& \Lam{x}{t} & \mbox{(abstraction)} \\
+  &|& (\App{t}{t})          & \mbox{(application)}
+\end{bnf}
+
+%% Pierre: vérifier que tous les '\App{}{}' sont (bien) parenthésés.
+
+\end{block}
+
+
+%voici la définition inductive des lambda termes
+\if 0
 \begin{block}{Les $\lambda$-termes}
   \begin{itemize}
   \item $x$ \mbox{variable}
@@ -110,6 +164,7 @@
 \begin{block}{Exemple}
   $\Lam{x}{(\Lam{y}{(\App{x}{y})})}\equiv(lambda\:x\:(lambda\:y\:(x\:y)))$
 \end{block}
+\fi
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,11 +172,13 @@
 \frametitle{Le $\lambda$-calcul non typé}
 \framesubtitle{Réduction et évaluation}
 
-\begin{block}{Reduction}
+%% Pierre: Pas nécessaire ?
+\begin{block}{Réduction}
   $\App{\Lam{x}{x}}{t}\leadsto \subst{x}{x}{t} \leadsto \Var{t}$
 \end{block}
 
-\begin{block}{évaluation}
+%% Pierre: Faire comme dans le rapport
+\begin{block}{Évaluation}
   \begin{align*}
     Trace de lexecution de levaluation dans le programme
     avec commande trace dans utop
@@ -131,45 +188,71 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
+\begin{frame}[b,fragile]
 \frametitle{Le $\lambda$-calcul non typé}
 \framesubtitle{Extensions}
 
-\begin{block}{Les booléens}
-  \begin{itemize}
-  \item $\true$ 
-  \item $\false$
-  \item $\ifte{c}{t}{u}$
-  \end{itemize}
+\begin{block}{Addition}
+\begin{center}
+\begin{minipage}{.9\linewidth}
+\begin{lstlisting}
+x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
+\end{lstlisting}
+\end{minipage}
+\end{center}
 \end{block}
 
-\begin{block}{Les entiers}
-  \begin{itemize}
-  \item $\zero$ 
-  \item $\succs$ 
-  \item $\iter\:n\:f\:a$ 
-  \end{itemize}
-  $(+\:1\:1) \equiv \Lam{x}{\Lam{y}{\iter\: x\:(\Lam{n}{\succs\:n})\:y  }}$
-\end{block}  
+\vfill
+
+\begin{columns}
+  \begin{column}{.45\linewidth}
+    \begin{block}{Les booléens}
+      \begin{itemize}
+      \item $\true$ 
+      \item $\false$
+      \item $\ifte{c}{t}{u}$
+      \end{itemize}
+    \end{block}
+  \end{column}
+  \begin{column}{.45\linewidth}
+    \begin{block}{Les entiers}
+      \begin{itemize}
+      \item $\zero$ 
+      \item $\succs$ 
+      \item $\iter\:n\:f\:a$ 
+      \end{itemize}
+    \end{block}
+  \end{column}
+\end{columns}
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
+\begin{frame}[b,fragile]
 \frametitle{Le $\lambda$-calcul simplement typé}
 \framesubtitle{Motivations} 
 
 \begin{block}{}
+  %% Pierre: mettre en boite
+  %% Pierre: écrire dans lstlisting
   f = (lambda x (lambda y (ifte x (succ y) y)))
-  \begin{itemize}
-  \item f 3 true $\rightarrow$ exeption
-  \item f true 3 $\rightarrow$ 4  
-  \end{itemize}
 \end{block}
 
-\begin{block}{}
-  Il nous faut un système permettant de vérifier 
-  la réduction des termes avant éxecution.
-\end{block}
+\vfill
 
+\begin{columns}
+  \begin{column}{.3\linewidth}
+    \lstinline!f true 3! $\rightarrow$ \lstinline!4!
+  \end{column}
+  \begin{column}{.3\linewidth}
+    \lstinline!f 3 true! $\not\rightarrow$
+  \end{column}
+\end{columns}
+
+\vfill
+
+\begin{flushright}
+  \large{\textit{Peut-on rejeter ce programme à la compilation ?}}
+\end{flushright}
 
 
 \end{frame}
@@ -178,6 +261,9 @@
 \begin{frame}
   \frametitle{Le $\lambda$-calcul simplement typé}
   \framesubtitle{Règles de typage bidirectionnelles} 
+
+  %% Pierre: Supprimer
+
   \[\begin{array}{c@{\qquad}c}  
 \boxed{\Gamma\vdash T \ni in}
 &
@@ -213,6 +299,11 @@
   \frametitle{Le $\lambda$-calcul simplement typé}
   \framesubtitle{Exemple de dérivation de typage}
   
+  %% Pierre: Régler problème de timiing
+  %% Pierre: Utiliser ifte
+  %% Pierre: Trouver un exemple avec une application
+  %% Pierre: Expliciter la phase d'inversion
+
   \[
   \inferrule[]%
     {\visible<2->{
@@ -247,18 +338,30 @@
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
+\begin{frame}[b,fragile]
   \frametitle{Le $\lambda$-calcul simplement typé}
   \framesubtitle{Les limites}
 
   Slide avec exemple du ``et'' logique entre deux vecteurs 
   dans un stystème de type simple
+
+  %% Pierre: donner une entrée qui réussi et une entrée qui échoue
+
+  \vfill
+
+\begin{flushright}
+  %% Pierre: mieux exprimer
+  \large{\textit{Peut-on garantir la taille des listes à la compilation ?}}
+\end{flushright}
+
   
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Les types dépendants}
   \framesubtitle{Règles de typage bi-directionnel}
+
+  %% Pierre: supprimer
   
   \[
   \begin{array}{cc}
@@ -303,15 +406,21 @@
 \begin{frame}
   \frametitle{Les types dépendants}
   \framesubtitle{Les vecteurs}
-  
+
+  %% Pierre: mettre l'exemple du && pour les vecteurs
   Parler de l'exemple avec maintenant les types dépendants
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Les types dépendants}
-  \framesubtitle{Correspondance de Curry Howard}
+  %Pierre: Trouver un autre titre
   
+  %% Pierre: Tracer l'exécution de 'check (Id Nat (2 + 2) 4) refl'
+  %% Pierre: Tracer l'exécution de 'check (Id Nat (2 + 1) 4) refl'
+
+
+\if 0
   \begin{block}{}
     ``t est une preuve de P'' $\equiv$ ``t est de type P (t:P) ``
   \end{block}
@@ -334,7 +443,7 @@
     $Id(Nat,2 + 2,4)$ \\
     \visible<3->{$refl\:4$}
   \end{block}}
-  
+  \fi
 
 
 
@@ -342,7 +451,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Les types dépendants}
-  \framesubtitle{Synmétrie de l'égalité}
+  \framesubtitle{Correspondance de Curry Howard}
+
+  %% Pierre: attention aux types dans ifte
   
     \[
   \inferrule[]%
@@ -376,6 +487,36 @@
   
 
 \end{frame}
+
+
+\begin{frame}
+  \frametitle{Conclusion}
+
+  \begin{block}{Résumé}
+    \begin{itemize}
+     \item A 
+     \item B
+     \item C 
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Extensions}
+    \begin{itemize}
+     \item A 
+     \item B
+     \item C
+     \item Slow.fast typechecker
+     \item Tactics
+     \item Proofs & complexity
+     \item Untyped reduction: Krivine machine
+     \item Rational bidirectionalisation
+    \end{itemize}
+  \end{block}
+
+
+\end{frame}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
 
