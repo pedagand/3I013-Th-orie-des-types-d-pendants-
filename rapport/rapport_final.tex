@@ -2171,7 +2171,7 @@ qui nous permet d'effectuer l'évaluation:
 \codefrom{dependent}{lambda}{vfold}
 
 
-\subsubsection{L'égalite} 
+\subsubsection{L'égalité} 
 \label{egalite}
 
 \newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
@@ -2192,7 +2192,7 @@ et de son éliminateur \emph{Trans}.
 \begin{itemize}
    
 \item[$\bullet$] \boxed{\inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
-  {\Gamma\vdash * \ni Id\:A\:a\:b}}\\
+  {\Gamma\vdash * \ni Id\:A\:a\:b}}\\ 
   Pour le terme $Id\:A\:a\:b$ il nous faut tout d'abord évaluer $A$ afin de pouvoir 
   vérifier les termes $a$ et $b$
   \codefrom{dependent}{lambda}{check_head} 

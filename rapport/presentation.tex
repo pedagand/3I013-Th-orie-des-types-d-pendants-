@@ -5,6 +5,10 @@
 \usepackage{amsthm, amssymb, amsmath}
 \usepackage{mathpartir}
 \usepackage{amsmath}
+\usepackage{color}
+\setlength{\fboxsep}{0pt}
+\newcommand{\highlight}[1]{\text{\colorbox{gray}{$#1$}}}
+
 
 \usepackage{xcolor}
 \usepackage{listings}
@@ -62,6 +66,7 @@
 \newcommand{\subst}[3]{#1[#2 := #3]}
 \newcommand{\Inv}[1]{\ensuremath{\mathsf{inv}(#1)}}
 \newcommand{\Ann}[2]{\ensuremath{(#1\: :\: #2)}}
+\newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
 
 \setbeamertemplate{navigation symbols}{} 
 
@@ -161,7 +166,8 @@
 \end{block}
 
 \begin{block}{}
-  Il nous faut un moyen de pouvoir vérifier nos termes avant de les éxécuter
+  Il nous faut un système permettant de vérifier 
+  la réduction des termes avant éxecution.
 \end{block}
 
 
@@ -171,7 +177,7 @@
 
 \begin{frame}
   \frametitle{Le $\lambda$-calcul simplement typé}
-  \framesubtitle{Motivations} 
+  \framesubtitle{Règles de typage bidirectionnelles} 
   \[\begin{array}{c@{\qquad}c}  
 \boxed{\Gamma\vdash T \ni in}
 &
@@ -242,10 +248,96 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
+  \frametitle{Le $\lambda$-calcul simplement typé}
+  \framesubtitle{Les limites}
+
+  Slide avec exemple du ``et'' logique entre deux vecteurs 
+  dans un stystème de type simple
+  
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
   \frametitle{Les types dépendants}
-  \framesubtitle{Intuition}
+  \framesubtitle{Règles de typage bi-directionnel}
   
+  \[
+  \begin{array}{cc}
+  \boxed{\Gamma\vdash T \ni in}
+  &
+  \boxed{\Gamma\vdash ex \in T}
+  \bigskip
+  \\ 
+  &
+  \cfrac{x:T \in \Gamma}
+        {\Gamma \vdash x \in T }\mbox{(Var)}
+  \medskip
+  \\
+  \cfrac{\Gamma \vdash t \in T' \:\: T=T'}
+        {\Gamma\vdash T \ni inv(t)}\mbox{(Inv)}
+  &
+  \cfrac{\Gamma\vdash * \ni T \:\:\Gamma\vdash T \ni t}
+        {\Gamma\vdash (t:T) \in T}\mbox{(Ann)}
+  \medskip
+  \\
+  \highlight{
+  \cfrac{}
+        {\Gamma \vdash * \ni *}\mbox{(Star)} }
+  \medskip
+  \\
+  \highlight{
+  \cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
+        {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)} }
+  \medskip
+  \\
+  \cfrac{\Gamma,x:S\vdash T \ni t}
+        {\Gamma \vdash \forall x:S.T \ni \lambda x. t}\mbox{(Abs)} 
+  & 
+  \cfrac{\Gamma \vdash f \in \forall x:S.T \quad \Gamma\vdash S \ni s }
+        {\Gamma\vdash f\:s\in \subst{T}{s}{x}}\mbox{(App)} 
+  \end{array}
+  \]
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{Les types dépendants}
+  \framesubtitle{Les vecteurs}
   
+  Parler de l'exemple avec maintenant les types dépendants
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+  \frametitle{Les types dépendants}
+  \framesubtitle{Correspondance de Curry Howard}
+  
+  \begin{block}{}
+    ``t est une preuve de P'' $\equiv$ ``t est de type P (t:P) ``
+  \end{block}
+  
+  \begin{block}{Egalité}
+  \[
+  \begin{array}{cc}
+    
+    \inferrule[(Id)]{\Gamma\vdash *\ni A \:\: \Gamma\vdash A \ni a \:\: \Gamma\vdash A \ni b }
+              {\Gamma\vdash * \ni Id\:A\:a\:b}
+              \quad\quad
+  \inferrule[(Refl)]{\Gamma\vdash A \ni a}
+            {\Gamma\vdash Id\:A\:a\:a\ni refl\:a}
+  \end{array}
+  \]
+  \end{block}
+  
+  \visible<2->{
+  \begin{block}{\equal{2 + 2}{N}{4}}
+    $Id(Nat,2 + 2,4)$ \\
+    \visible<3->{$refl\:4$}
+  \end{block}}
+  
+
+
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]
