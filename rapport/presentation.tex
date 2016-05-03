@@ -102,14 +102,14 @@
 \begin{frame}
   \frametitle{Introduction}
 
-  \begin{block}{Pourquoi les types dépendants}
+  \begin{block}{Pourquoi les types dépendants?}
     \begin{itemize}
-    \item Languages de programmation (IDRIS, ATS...)
+    \item Langages de programmation (IDRIS, ATS...)
     \item Assistants de preuve (Coq, Agda...)
     \end{itemize}
   \end{block}
 
-  \begin{block}{Pourquoi implémenter une nouvelle théorie des types}
+  \begin{block}{Pourquoi implémenter une nouvelle théorie des types?}
     \begin{itemize}
     \item Typage bidirectionnel
     \item Aspect pédagogique
@@ -305,7 +305,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \end{block}
 
 
-\visible<2->{\begin{block}{Ambiguité}
+\visible<2->{\begin{block}{Ambiguïté}
     \[
     \begin{array}{c}
       \inferrule[]
@@ -393,7 +393,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
                   \inferrule[]{
                     \visible<11->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
                   }{\Delta\vdash \intg \ni y}}}%level4droite 
-                  {\Delta \vdash \intg \ni \ifte{\intg}{x}{(fu\:y)}{y}}}}%level3
+                  {\Delta \vdash \ifte{\intg}{x}{(fu\:y)}{y} \in \visible<12->{\intg}}}}%level3
            {\Gamma\vdash \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y}})})}}}%level1
     {\varnothing\vdash \bool \rightarrow \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{x}{(\Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y)})})}}}%level0
     \]
@@ -421,9 +421,9 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 %%                 {(\Lam{nf}{\Lam{vecun}{\Lam{a}{\Lam{xsf}{\cons{a}{xsf}}}}})} {ys}       })})})})}$ }
 %% \end{block}
 
-\begin{block}{exemple de fonction dépendante}
+\begin{block}{Exemple de fonction dépendante}
   \begin{align*}
-    &\mathsf{Type\:de\:la\:concatenation\::} \\
+    &\mathsf{Type\:de\:la\:concaténation\::} \\
     & \forall A:*(\forall m:\intg  \\
     &\quad\quad\quad\quad(\forall xs:(\vect{A}{m}) && \\
     &\quad\quad\quad\quad\quad\quad(\forall n:\intg & \\
@@ -448,7 +448,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \frametitle{Les types dépendants}
   \framesubtitle{Equivalence entre les termes et les types}
 
-  \begin{block}{nouveaux constructeurs}
+  \begin{block}{Nouveaux constructeurs}
     \[
     \begin{array}{cc}
     \cfrac{}
@@ -479,7 +479,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
      ``t est une preuve de P'' $\equiv$ ``t est de type P (t:P) ``
    \end{block}
   
-   \visible<2->{\begin{block}{}
+   \visible<2->{\begin{block}{2 + 2 = 4}
      \[
      \inferrule[]{
        \visible<3->{\inferrule[]{\:}{\varnothing\vdash\intg \ni 4}}
@@ -488,7 +488,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
      \]
    \end{block}}
 
-   \visible<5->{\begin{block}{}
+   \visible<5->{\begin{block}{2 + 1 $\ne$ 4}
        \[
        \inferrule[]{
          \visible<6->{\inferrule[]{\:}{\varnothing\vdash\intg \ni 4}}
