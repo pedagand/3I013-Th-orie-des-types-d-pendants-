@@ -13,6 +13,8 @@ type typ =
   | Nat 
   | Fleche of typ * typ
   | Croix of typ * typ 
+  | List of typ
+
   (*=End *)
 		     
 (* Correspondance avec le papier 
@@ -30,6 +32,8 @@ type inTm =
 (*=inTm_pair *)
   | Pair of inTm * inTm 
 (*=End *)
+  | Nil of typ
+  | Cons of typ * inTm * inTm 
 (*=exTm *)
 and exTm = 
   | FVar of name
@@ -43,6 +47,7 @@ and exTm =
   | P0 of exTm
   | P1 of exTm 
 (*=End *)
+  | Fold of inTm * inTm * inTm * inTm 
 
 type lambda_term =
   | SFVar of string 
@@ -82,6 +87,7 @@ let rec typ_to_string t =
   | Nat -> "N"
   | Fleche(x,y) -> typ_to_string x ^ "->" ^ typ_to_string y
   | Croix(x,y) -> "(" ^ typ_to_string x ^ " X " ^ typ_to_string y ^ ")"
+  | List(x) -> "(list "^ typ_to_string x ^ ")"
 
 
 let rec parse_term env t = 
@@ -102,6 +108,10 @@ let rec parse_term env t =
       | Sexp.Atom "false" -> False 
       | Sexp.List [Sexp.Atom "succ"; n] ->
 	 Succ(parse_term env n)
+      | Sexp.List [Sexp.Atom "nil"; a] ->
+	 Nil(parse_type env a)
+      | Sexp.List [Sexp.Atom "cons";t;a;b] ->
+	 Cons((parse_type env t),(parse_term env a),(parse_term env b))
       | Sexp.List [Sexp.Atom ",";x;y] ->
 	 Pair((parse_term env x),(parse_term env y))
       | _ -> Inv(parse_exTm env t)
@@ -124,6 +134,8 @@ and parse_exTm env t =
   | Sexp.Atom v -> lookup_var env 0 (Global(v)) 
   | Sexp.List [Sexp.Atom "iter"; n ; f ; a] -> 
      Iter((parse_term env n),(parse_term env f),(parse_exTm env a))
+  | Sexp.List [Sexp.Atom "fold";a;b;c;d] ->
+     Fold((parse_term env a),(parse_term env b),(parse_term env c),(parse_term env d))
   | Sexp.List (f::args) -> 
      List.fold_left 
        (fun x y -> Appl(x, y))
@@ -138,6 +150,8 @@ and  parse_type env t =
      Croix((parse_type [] x),(parse_type[] y))
   | Sexp.List [Sexp.Atom "->"; x ;y] ->
      Fleche((parse_type [] x),(parse_type [] y)) 
+  | Sexp.List [Sexp.Atom "list";x] ->
+     List(parse_type [] x)
   | _ -> failwith "erreur dans le parsing (type)" 
 
 
@@ -154,6 +168,8 @@ let rec pretty_print_inTm t l =
   | Zero -> "zero"
   | Succ x -> "(succ " ^ pretty_print_inTm x l ^ ")"
   | Pair (x,y) -> "(, " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
+  | Nil x -> "(nil " ^ pretty_print_type x l ^ ")"
+  | Cons(a,x,y) -> "(cons " ^ pretty_print_type a l ^ " " ^ pretty_print_inTm x l ^ " " ^ pretty_print_inTm y l ^ ")"
 and pretty_print_exTm t l =
   match t with 
   | FVar (Global x) -> x 
@@ -166,12 +182,14 @@ and pretty_print_exTm t l =
   | Iter(n,f,a) -> "(iter " ^ pretty_print_inTm n l ^ " " ^ pretty_print_inTm f l ^ " " ^  pretty_print_exTm a l ^ ")"
   | P0(x) -> "(p0 " ^ pretty_print_exTm x l ^ ")"
   | P1(x) -> "(p1 " ^ pretty_print_exTm x l ^ ")"
+  | Fold(a,b,c,d) -> "(fold " ^ pretty_print_inTm a l ^ " " ^ pretty_print_inTm b l ^ " "^ pretty_print_inTm c l ^ " "^ pretty_print_inTm d l ^ ")" 
 and pretty_print_type t l = 
   match t with 
   | Bool -> "B"
   | Nat -> "N"
   | Fleche(x,y) -> "(-> " ^ pretty_print_type x l ^ " " ^ pretty_print_type y l ^ ")" 
   | Croix(x,y) ->  "(* " ^ pretty_print_type x l ^ " " ^ pretty_print_type y l ^ ")" 
+  | List(a) -> "(list " ^ pretty_print_type a l ^ ")"
     
 
 let rec lambda_term_to_string t = 
@@ -235,6 +253,8 @@ let rec substitution_inTm t tsub var =
   | Zero -> Zero
   | Succ x -> Succ(substitution_inTm x tsub var)
   | Pair(x,y) -> Pair((substitution_inTm x tsub var),(substitution_inTm y tsub var))
+  | Nil(a) -> Nil(a)
+  | Cons(a,x,y) -> Cons(a,(substitution_inTm x tsub var),(substitution_inTm y tsub var))
 and substitution_exTm  t tsub var = 
   match t with 
   | FVar x -> FVar x
@@ -246,6 +266,7 @@ and substitution_exTm  t tsub var =
   | Iter(n,f,a) -> Iter((substitution_inTm n tsub var),(substitution_inTm f tsub var),(substitution_exTm a tsub var))
   | P0(x) -> P0(substitution_exTm x tsub var)
   | P1(x) -> P1(substitution_exTm x tsub var)
+  | Fold(a,b,c,d) -> Fold((substitution_inTm a tsub var),(substitution_inTm b tsub var),(substitution_inTm c tsub var),(substitution_inTm d tsub var))
 
 
 let rec substitution t var tsub 
@@ -294,6 +315,8 @@ let rec relie_libre_inTm i bv t =
   | Succ(x) -> Succ(relie_libre_inTm i bv x)
   | Pair(x,y) -> Pair((relie_libre_inTm i bv x),(relie_libre_inTm i bv y))
 (*=relie_libre_exTm *)
+  | Nil(a) -> Nil(a) 
+  | Cons(a,x,y) -> Cons(a,(relie_libre_inTm i bv x),(relie_libre_inTm i bv y))
 and relie_libre_exTm  i bv t = 
   match t with 
   | BVar v -> BVar v 
@@ -306,6 +329,7 @@ and relie_libre_exTm  i bv t =
   | P0(x) -> P0(relie_libre_exTm i bv x)
   | P1(x) -> P1(relie_libre_exTm i bv x)
   | Iter(n,f,a) -> Iter((relie_libre_inTm i bv n),(relie_libre_inTm i bv f),(relie_libre_exTm i bv a))
+  | Fold(a,b,c,d) -> Fold((relie_libre_inTm i bv a),(relie_libre_inTm i bv b),(relie_libre_inTm i bv c),(relie_libre_inTm i bv d))
 
 
 
@@ -397,6 +421,7 @@ let rec eval_exTm t envi =
 	       | VPair(a,b) -> a
 	       | _ -> failwith "Imposibl: P1 can't be applied to something else then a pair"
        end 				      
+    | _ -> failwith "big_step a faire plus tard"
 and viter (v, f,a) = 
   match v with
   | VZero ->  a
@@ -422,6 +447,8 @@ and eval_inTm t envi =
   | Pair(x,y) -> VPair((eval_inTm x envi),(eval_inTm y envi))
   | True -> VTrue 
   | False -> VFalse
+  | _ -> failwith "a faire plus tard big_step"
+
 
 let gensym =
   let c = ref 0 in
@@ -478,6 +505,7 @@ let rec typed_to_simple_inTm t =
     | Zero -> SZero
     | Succ x -> SSucc (typed_to_simple_inTm x)
     | Pair(x,y) -> SPair((typed_to_simple_inTm x),(typed_to_simple_inTm y))
+    | _ -> failwith "typed to simple later"
 and typed_to_simple_exTm t = 
   match t with 
     | BVar x -> SBVar x 
@@ -489,7 +517,7 @@ and typed_to_simple_exTm t =
     | Iter(n,f,a) -> SIter((typed_to_simple_inTm n),(typed_to_simple_inTm f),(typed_to_simple_exTm a))
     | P0(x) -> SP0(typed_to_simple_exTm x)
     | P1(x) -> SP1(typed_to_simple_exTm x)
-
+    | _ -> failwith "typed to simple later"
 
 
        
@@ -527,6 +555,22 @@ let rec check contexte ty inT
 	 | _ -> failwith "Type of a pair must be a Croix"
        end 
 (*=End *)
+    | Nil(a) -> 
+       begin 
+	 match ty with 
+	 | List(alpha) -> if alpha = a then true else false
+	 | _ -> failwith "nil must be of type List"
+       end
+    | Cons(alpha,a,xs) -> 
+       begin 
+	 match ty with 
+	   | List(alpha_typ) -> if alpha = alpha_typ &&
+				     check contexte alpha a &&
+				       check contexte xs ty
+				then true 
+				else failwith "cons not good"
+	   | _ -> failwith "cons must be of type List"
+       end 
 (*=synth_def *)
 and synth contexte exT 
     = match exT with
@@ -583,6 +627,7 @@ and synth contexte exT
 	 | _ -> failwith "P1 must be applied to a pair" 	   
        end 
 (*=End *)
+    | Fold(a,b,c,d) -> 
 	
 		     
 let run_check terme typ =

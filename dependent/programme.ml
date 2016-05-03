@@ -7,7 +7,7 @@ open Lambda
 *)
   
 let sym = "(lambda (A a b q) (trans A (lambda (a b c) (id A b a)) a b q (lambda a (refl a))))"
-let type_sym = "(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))"  
+let type_sym = "(pi A * (pi a A (pi b A (-> (id A a b) (id A b a)))))"
 
 let () = run_check sym type_sym
 
