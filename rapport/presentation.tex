@@ -243,7 +243,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \framesubtitle{Motivations} 
 %%du point de vue des programmeurs les types permettent lors de la compilation de vérifier que le programme ne comporte pas d'erreurs comme par exemple l'application d'une fonction aux mauvais arguments, en effet ici le premier argument x est utilisé dans la fonction comme la condition de la structure ifthenelse. Ce premier argument doit nécéssairement etre un booléens 
 
-\begin{block}{exemple de fonction}
+\begin{block}{Exemple de fonction}
   \begin{minipage}{.5\linewidth}
     \begin{lstlisting}
       f = (lambda x (lambda y (lambda fu (ifte x (fu y) y))))
@@ -278,7 +278,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \frametitle{Le $\lambda$-calcul simplement typé}
 
 
-\begin{block}{règles de typage}
+\begin{block}{Règles de typage}
 \[
 \begin{array}{c}
 \inferrule[(Var)]%
@@ -329,7 +329,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \frametitle{Le $\lambda$-calcul simplement typé}
 \framesubtitle{Système de type bidirectionnel}
 
-\begin{block}{syntaxe des termes bidirectionnels}
+\begin{block}{Syntaxe des termes bidirectionnels}
 \begin{bnf}
   ex &::= &&\mbox{(termes synthétisables)} \\
   &|& \App{ex}{in} & \mbox{(application)} \\
