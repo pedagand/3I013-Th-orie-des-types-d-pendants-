@@ -482,8 +482,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
    \visible<2->{\begin{block}{2 + 2 = 4}
      \[
      \inferrule[]{
-       \visible<3->{\inferrule[]{\:}{\varnothing\vdash\intg \ni 4}}
-       \visible<4->{\inferrule[]{\:}{\varnothing\vdash(2+2)\equiv4}}
+       \visible<3->{\inferrule[]{\:}{\varnothing\vdash(2+2)\equiv4}}
      }{\varnothing\vdash\id{\intg}{(2+2)}{4} \ni \refl}
      \]
    \end{block}}
@@ -491,8 +490,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
    \visible<5->{\begin{block}{2 + 1 $\ne$ 4}
        \[
        \inferrule[]{
-         \visible<6->{\inferrule[]{\:}{\varnothing\vdash\intg \ni 4}}
-         \visible<7->{\inferrule[]{\:}{\varnothing\vdash(2+1)\not\equiv4}}
+         \visible<4->{\inferrule[]{\:}{\varnothing\vdash(2+1)\not\equiv4}}
        }{\varnothing\vdash\id{\intg}{(2+1)}{4} \ni \refl}
        \]
    \end{block}}
