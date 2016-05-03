@@ -100,17 +100,16 @@
 
   \begin{block}{Motivation}
     \begin{itemize}
-    \item A
-    \item B
-    \item C
+    \item Garanties à la compilation
+    \item Preuves logiques
     \end{itemize}
   \end{block}
 
   \begin{block}{Objectif}
     \begin{itemize}
-    \item A
+    \item Système de type simple
+    \item Système de type dépendant
     \item 2 + 2 = 4
-    \item C
     \end{itemize}
   \end{block}  
 
@@ -130,7 +129,7 @@
 \begin{block}{Un programme}
 \begin{center}
 \begin{minipage}{.5\linewidth}
-\begin{lstlisting}
+\begin{lstlisting} 
 (lambda x (lambda y (x y))
 \end{lstlisting}
 \end{minipage}
@@ -305,11 +304,19 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \begin{frame}[b,fragile]
   \frametitle{Le $\lambda$-calcul simplement typé}
   \framesubtitle{Les limites}
-
-  Slide avec exemple du ``et'' logique entre deux vecteurs 
-  dans un stystème de type simple
-
+  
+\begin{block}{exemple de fonction}
+  \begin{minipage}{.5\linewidth}
+    \begin{lstlisting}
+      and : List Bool -> List Bool -> List Bool
+      and xs = (Fold (List Bool) Bool xs 
+              (f (pas finis)) 
+              (Nil alpha)) 
+    \end{lstlisting}
+  \end{minipage} 
+\end{block}
   %% Pierre: donner une entrée qui réussi et une entrée qui échoue
+
 
   \vfill
 
@@ -325,8 +332,8 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \frametitle{Les types dépendants}
   \framesubtitle{Les vecteurs}
 
-  %% Pierre: mettre l'exemple du && pour les vecteurs
-  Parler de l'exemple avec maintenant les types dépendants
+  %% Pierre: mettre l'exemple du && pour les vecteurs  
+  Parler de l'exemple précéndent avec les types dépendants
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -396,37 +403,23 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \frametitle{Les types dépendants}
   \framesubtitle{Correspondance de Curry Howard}
 
-  %% Pierre: attention aux types dans ifte
-  
-    \[
-  \inferrule[]%
-    {\visible<2->{
-        \inferrule[]
-           {\visible<3->{
-               \inferrule[]              
-                  {\visible<4->{
-                     \inferrule[]
-                       {\visible<5->{x:\bool\in \Delta}}
-                       {\Delta \vdash \bool \ni x} \qquad
-                     \inferrule[]
-                       {\visible<6->{y:\intg\in \Delta}}
-                       {\Delta \vdash y\in\intg}
-                  \inferrule[]
-                            {\visible<6->{
-                                \inferrule[]
-                                          {y:\intg\in\Delta}
-                                          {\intg\ni y}
-                            }}
-                           {\Delta\vdash \succs\:y\in\intg}}}
-                  {\Delta \vdash \intg \ni \ifte{x}{\succs\:y}{y}   }}}
-           {\Gamma\vdash \intg \rightarrow \intg \ni \Lam{y}{\ifte{x}{\succs\:y}{y}}}}}
-    {\varnothing\vdash \forall A:*(\forall a,b:A\:(id\:A\:a\:b \rightarrow id\:A\:b\:a)) \ni \Lam{x}{\Lam{y}{\ifte{x}{\succs\:y}{y}}}}
-    \]
 
-    \begin{align*}
-    \Gamma &\triangleq x:\bool \\
-    \Delta &\triangleq \Gamma,y:\intg \\
-  \end{align*}
+  sym : $\forall A:*(\forall a,b:A(\forall q:(\id{A}{a}{b}) (\id{A}{b}{a})))$ \\
+  sym = 
+  \only<1>{?}\only<2->{(lambda A (lambda a (lambda b (lambda q (\only<2>{?}
+    \only<3->{(trans A \only<3>{(?1)}\only<4->{(lambda (a b c) (id A b a))} \only<3-4>{(?2)}\only<5->{a} \only<3-5>{(?3)}\only<6->{b} \only<3-6>{(?4)}\only<7->{q} \only<3-7>{(?5)}\only<8->{(lambda a (refl))}))}   ))
+  }
+
+
+  \vfill
+  
+  %% \only<3>{P : $\forall a,b:A(\forall i:\id{A}{a}{b}}( lol )$}
+  %% \only<4>{lol}
+  %% \only<5>{lol}
+  %% \only<6>{lol}
+  %% \only<7>{lol}
+  
+  
   
 
 \end{frame}
@@ -437,17 +430,14 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
   \begin{block}{Résumé}
     \begin{itemize}
-     \item A 
-     \item B
-     \item C 
+     \item $\lambda$-calcul
+     \item Système de type
+     \item Automatisations de démonstration de preuves 
     \end{itemize}
   \end{block}
 
   \begin{block}{Extensions}
     \begin{itemize}
-     \item A 
-     \item B
-     \item C
      \item Slow.fast typechecker
      \item Tactics
      \item Proofs \& complexity
@@ -459,61 +449,5 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 \end{frame}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]
-
-\frametitle{Autre titre}
-
-%% Attention, pour écrire du code, il faut mettre "fragile" en option du slide
-\begin{lstlisting}
- let test = foo
-\end{lstlisting}
-
-\begin{block}{}
-  Foo.
-\end{block}
-
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-  \[
-  \inferrule[]%
-    {\visible<2->{
-        \inferrule[]
-           {\visible<3->{
-               \inferrule[]              
-                  {\visible<4->{
-                     \inferrule[]
-                       {\visible<5->{x:\intg\rightarrow \bool \in E}}
-                       {E \vdash x:\intg\rightarrow \bool} \qquad
-                     \inferrule[]
-                       {\visible<6->{y:\intg\in E}}
-                       {E \vdash y:\intg}}}
-                  {E \vdash \App{x}{y} : \bool}}}
-           {\Delta\vdash \Lam{y}{\App{x}{y}}:\intg \rightarrow \bool}}}
-    {\Gamma\vdash \Lam{x}{\Lam{y}{\App{x}{y}}}:(\intg\rightarrow \bool) \rightarrow \intg \rightarrow \bool}
-  \]
-
-  \begin{align*}
-    \Delta &\triangleq \Gamma,x:\intg\rightarrow \bool \\
-    E &\triangleq \Gamma,x:\intg\rightarrow \bool,y:\intg \\
-  \end{align*}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}
-
-\begin{center}
-\large{(Backup slides)}
-\end{center}
-
-\end{frame}
-
-\begin{frame}
-  \ldots
-\end{frame}
 
 \end{document}
