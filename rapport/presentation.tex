@@ -333,7 +333,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \begin{block}{syntaxe des termes bidirectionnels}
 \begin{bnf}
   ex &::= &&\mbox{(termes synthétisables)} \\
-  &|& \App{ex}{in} & \mbox{(application)} \\
+  &|& (\App{ex}{in}) & \mbox{(application)} \\
   &|& \Var{x} & \mbox{(variable)} \\
   &|& \Ann{in}{T} & \mbox{(annotation)} \\
   in &::= &&\mbox{(termes vérifiables)} \\
