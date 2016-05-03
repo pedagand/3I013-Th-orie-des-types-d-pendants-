@@ -257,10 +257,10 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 \begin{columns}
   \begin{column}{.3\linewidth}
-    \lstinline!f true 3! $\rightarrow$ \lstinline!4!
+    \lstinline!f true 3 succ! $\rightarrow$ \lstinline!4!
   \end{column}
   \begin{column}{.3\linewidth}
-    \lstinline!f 3 true! $\not\rightarrow$
+    \lstinline!f 3 true succ! $\not\rightarrow$
   \end{column}
 \end{columns}
 
