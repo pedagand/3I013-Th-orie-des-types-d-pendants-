@@ -423,7 +423,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 \begin{block}{Exemple de fonction dépendante}
   \begin{align*}
-    &\mathsf{Type\:de\:la\:concaténation\::} \\
+    &\mathsf{Type\:de\:la\:concat\acute{e}nation\::} \\
     & \forall A:*(\forall m:\intg  \\
     &\quad\quad\quad\quad(\forall xs:(\vect{A}{m}) && \\
     &\quad\quad\quad\quad\quad\quad(\forall n:\intg & \\
@@ -438,7 +438,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \end{block}
 
 
-  \vfill
+
 
   
 \end{frame}
@@ -463,7 +463,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 
   \begin{block}{Fonction identité}
-    $\forall x:*\: x \ni \Lam{x}{x}$
+    $\forall \alpha :*\:(\forall x:alpha\: (alpha)) \ni \Lam{\alpha}{\Lam{x}{x}}$
   \end{block}
   
   %% Pierre: mettre l'exemple du && pour les vecteurs  
@@ -537,10 +537,9 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \frametitle{Les types dépendants}
   \framesubtitle{Correspondance de Curry Howard}
 
-    sym : $\forall A:*(\forall a,b:A(\forall q:(\id{A}{a}{b}) (\id{A}{b}{a})))$ \\ 
-    sym = 
-    \only<1>{?}\only<2->{(lambda A (lambda a (lambda b (lambda q (\only<2>{?}
-      \only<3->{(trans A \only<3>{(?1)}\only<4->{P} \only<3-4>{(?2)}\only<5->{a} \only<3-5>{(?3)}\only<6->{b} \only<3-6>{(?4)}\only<7->{q} \only<3-7>{(?5)}\only<8->{(lambda a (refl))}))}   ))
+    sym : Pi A: *(Pi a,b:A(Pi q:(Id A a b) (Id A b a))) \\ 
+    sym = \only<1>{?}\only<2->{(lambda A (lambda a (lambda b (lambda q ( \\
+      \quad\quad\quad\quad\only<2>{?}\only<3->{(trans A \only<3>{(?1)}\only<4->{P} \only<3-4>{(?2)}\only<5->{a} \only<3-5>{(?3)}\only<6->{b} \only<3-6>{(?4)}\only<7->{q} \only<3-7>{(?5)}\only<8->{(lambda a (refl))}))}   ))
     }
     
     \vfill
@@ -548,19 +547,15 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
     \visible<4->{P = (lambda (a b c) (id A b a))}
 
 
-
   \begin{block}{Réponses du vérificateur de type}
-    \only<3-4>{?1 : $\forall a,b:A(\forall i:\id{A}{a}{b}\:\:(*))$\quad\quad\quad} 
+    \only<3-4>{?1 : Pi a,b:A(Pi i:\id{A}{a}{b}\:\:(*))\quad\quad\quad} 
     \only<4-5>{?2 : A\quad\quad\quad}
     \only<5-6>{?3 : A\quad\quad\quad}
     \only<6-7>{?4 : \id{A}{a}{b}\quad\quad\quad}
-    \only<7-8>{?5 : $\forall a:A\: $(P(a,a,relf)) }
+    \only<7-8>{?5 : Pi a:A\: (P(a,a,relf)) }
   
   \end{block}
   
-  
-  
-
 \end{frame}
 
 
