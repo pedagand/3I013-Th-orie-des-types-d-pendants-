@@ -79,7 +79,7 @@
 
 \usetheme{Boadilla}
 
-\title{Titre}
+\title{Implémentation de la théorie des types dépendants}
 
 \author{Roman Delgado}
 
@@ -303,9 +303,9 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
     \[
     \begin{array}{c}
       \inferrule[]
-              {\visible<3->{\inferrule{\Gamma, \Var{x} : ?_A \vdash \true : \bool}
+              {\inferrule{\Gamma, \Var{x} : ?_A \vdash \true : \bool}
                 {\Gamma\vdash (\Lam{x}{\true}): ?_A \rightarrow \bool }%level1gauche
-                         \:\:\:\inferrule[]{}{\Gamma\vdash \Lam{y}{\Var{y}}:?_A}}%level1droit 
+                         \:\:\:\inferrule[]{}{\Gamma\vdash \Lam{y}{\Var{y}}:?_A}%level1droit 
               }
               {\Gamma\vdash \App{(\Lam{x}{\true})}{(\Lam{y}{\Var{y}})}:\bool}%level0
               
@@ -405,16 +405,31 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \frametitle{Les types dépendants}
   \framesubtitle{Première approche}
   
+%% \begin{block}{exemple de fonction dépendante}
+%%       Type de la concatenation : \\
+%%       $\forall A:*(\forall m:\intg(\forall xs:(\vect{A}{m})(\forall n:\intg (\forall ys:(\vect{A}{m}) (\vect{A}{(m + n)}))))$
+%%       \\
+%%       $\:$ \\
+%%     \visible<2->{  Terme = \\
+%%       $\Lam{A}{(\Lam{m}{(\Lam{xs}{(\Lam{n}{(\Lam{ys}{(\dfold{A}{(\Lam{mp}{\Lam{vp}{\vect{A}{(mp + n)}}})}{m}{xs}  
+%%                 {(\Lam{nf}{\Lam{vecun}{\Lam{a}{\Lam{xsf}{\cons{a}{xsf}}}}})} {ys}       })})})})}$ }
+%% \end{block}
+
 \begin{block}{exemple de fonction dépendante}
-      Type de la concatenation : \\
-      $\forall A:*(\forall m:\intg(\forall xs:(\vect{A}{m})(\forall n:\intg (\forall ys:(\vect{A}{m}) (\vect{A}{(m + n)}))))$
-      \\
-      $\:$ \\
-    \visible<2->{  Terme = \\
-      $\Lam{A}{(\Lam{m}{(\Lam{xs}{(\Lam{n}{(\Lam{ys}{(\dfold{A}{(\Lam{mp}{\Lam{vp}{\vect{A}{(mp + n)}}})}{m}{xs}  
-                {(\Lam{nf}{\Lam{vecun}{\Lam{a}{\Lam{xsf}{\cons{a}{xsf}}}}})} {ys}       })})})})}$ }
+  \begin{align*}
+    &\mathsf{Type\:de\:la\:concatenation\::} \\
+    & \forall A:*(\forall m:\intg  \\
+    &\quad\quad\quad\quad(\forall xs:(\vect{A}{m}) && \\
+    &\quad\quad\quad\quad\quad\quad(\forall n:\intg & \\
+    &\quad\quad\quad\quad\quad\quad\quad\quad(\forall ys:(\vect{A}{m}) (\vect{A}{(m + n)})))) \\
+  \visible<2->{
+    &\mathsf{Terme = } \\
+    &\Lam{A}{(\Lam{m}{(\Lam{xs}{(\Lam{n}{(\Lam{ys}{ \\
+              &\quad\quad\quad\quad\mathsf{fold}({A}{(\Lam{mp}{\Lam{vp}{\vect{A}{(mp + n)}}})}{m}{xs} \\
+              &\quad\quad\quad\quad\quad\quad{(\Lam{nf}{\Lam{vecun}{\Lam{a}{\Lam{xsf}{\cons{a}{xsf}}}}})} {ys}       })})})})}}
+  \end{align*}
+
 \end{block}
-  %% Pierre: donner une entrée qui réussi et une entrée qui échoue 
 
 
   \vfill
