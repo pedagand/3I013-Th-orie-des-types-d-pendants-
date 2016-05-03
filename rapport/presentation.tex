@@ -70,6 +70,10 @@
 \newcommand{\equal}[3]{\ensuremath{#1 =_#2 #3}} 
 \newcommand{\refl}{\ensuremath{\mathsf{refl}}}
 \newcommand{\id}[3]{\ensuremath{\mathsf{id}\:#1\: #2\:\:#3}}
+\newcommand{\vect}[2]{\ensuremath{\mathsf{vec}\:#1\: #2}}
+\newcommand{\dfold}[6]{\ensuremath{\mathsf{fold}\:#1\:#2\:#3\:#4\:#5\:#6}}
+\newcommand{\cons}[2]{\ensuremath{\mathsf{cons}\:#1\: #2}}
+
 
 \setbeamertemplate{navigation symbols}{} 
 
@@ -98,22 +102,32 @@
 \begin{frame}
   \frametitle{Introduction}
 
-  \begin{block}{Motivation}
+  \begin{block}{Pourquoi les types dépendants}
     \begin{itemize}
-    \item Garanties à la compilation
-    \item Preuves logiques
+    \item Languages de programmation (IDRIS, ATS...)
+    \item Assistants de preuve (Coq, Agda...)
     \end{itemize}
   \end{block}
 
-  \begin{block}{Objectif}
+  \begin{block}{Pourquoi implémenter une nouvelle théorie des types}
     \begin{itemize}
-    \item Système de type simple
-    \item Système de type dépendant
-    \item 2 + 2 = 4
+    \item Typage bidirectionnel
+    \item Aspect pédagogique
     \end{itemize}
   \end{block}  
+  \begin{block}{Approche}
+    \begin{itemize}
+    \item Difficulté d'implémenter les types dépendants 
+
+      %Les types dépendants sont un enrichissement d'une théorie des types déja existante il nous faut donc commencer par implémenter une théorie des types simples. Le lambda calcul étant un language de programmation dont le noyau est simple il est un très bon cas d'étude. On implémente donc une théorie des types sur ce language que l'on enrichira pour introduire les types dépendants
+    \item Le $\lambda$-calcul non typé 
+    \item Le $\lambda$-calcul simplement typé 
+    \item Les types dépendants
+    \end{itemize}
+  \end{block}
 
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newenvironment{bnf}
                {\[\begin{array}{lcl@{\qquad}r}}
                {\end{array}\]}
@@ -178,6 +192,7 @@
     $\:\:\:\:\:\:$evaluation ((lambda x (lambda y (x y))) t u) \\
     $\rightarrow$ evaluation (substitution (lambda y (x y) u) x t) \\
     $\rightarrow$ evaluation (substitution (t y) y u) \\
+    $\rightarrow$ evaluation (t u) \\
     $\rightarrow$ (t u)
 \end{block}
 
@@ -226,6 +241,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \begin{frame}[b,fragile]
 \frametitle{Le $\lambda$-calcul simplement typé}
 \framesubtitle{Motivations} 
+%%du point de vue des programmeurs les types permettent lors de la compilation de vérifier que le programme ne comporte pas d'erreurs comme par exemple l'application d'une fonction aux mauvais arguments, en effet ici le premier argument x est utilisé dans la fonction comme la condition de la structure ifthenelse. Ce premier argument doit nécéssairement etre un booléens 
 
 \begin{block}{exemple de fonction}
   \begin{minipage}{.5\linewidth}
@@ -247,11 +263,94 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \end{column}
 \end{columns}
 
+%%comment éviter ce genre d'érreurs en les détectants lors de la compilation du programme.
+
 \vfill
 
 \begin{flushright}
   \large{\textit{Peut-on rejeter ce programme à la compilation ?}}
 \end{flushright}
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[b,fragile]
+\frametitle{Le $\lambda$-calcul simplement typé}
+
+
+\begin{block}{règles de typage}
+\[
+\begin{array}{c}
+\inferrule[(Var)]%
+             {x:T\,\in\Gamma}%
+             {\Gamma\vdash x:T} 
+\medskip\\
+\inferrule[(Abs)]%
+          {\Gamma, x:A \vdash t:B}%
+          {\Gamma \vdash \Lam{\Var{x}}{t} \,:\, A\rightarrow B}
+\qquad
+\inferrule[(App)]%
+          {\Gamma \vdash f : A\rightarrow B \\
+           \Gamma \vdash s : A}%
+          {\Gamma\vdash \App{f}{s} : B}
+\end{array}
+\]
+\end{block}
+
+
+\visible<2->{\begin{block}{Ambiguité}
+    \[
+    \begin{array}{c}
+      \inferrule[]
+              {\visible<3->{\inferrule{\Gamma, \Var{x} : ?_A \vdash \true : \bool}
+                {\Gamma\vdash (\Lam{x}{\true}): ?_A \rightarrow \bool }%level1gauche
+                         \:\:\:\inferrule[]{}{\Gamma\vdash \Lam{y}{\Var{y}}:?_A}}%level1droit 
+              }
+              {\Gamma\vdash \App{(\Lam{x}{\true})}{(\Lam{y}{\Var{y}})}:\bool}%level0
+              
+    \end{array}  
+    \]    
+\end{block}}
+
+%%ici il y un problème, on ne fait pas la distinction entre le fait de vérifier que le terme à le bon type et le fait de synthétiser un type.
+
+
+%pour implémenter cette spécification nous rencontrons un problème comme sur cet exemple. Ici nous devons vérifier que cette  
+%%application est bien de type BOol. Nous avons un manque d'informations quand au type de A. 
+%%Nous allons donc séparer nos termes en deux catégories les termes pouvant se trouver à gauche d
+%%Notre but étant d'implémenter cette théorie des types, le problème de cette spécification est qu'elle est compréhensible par un humain mais elle ne traduit pas le déroulement 
+%%de l'algorithme du vérificateur de type. 
+
+
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[b,fragile]
+\frametitle{Le $\lambda$-calcul simplement typé}
+\framesubtitle{Système de type bidirectionnel}
+
+\begin{block}{syntaxe des termes bidirectionnels}
+\begin{bnf}
+  ex &::= &&\mbox{(termes synthétisables)} \\
+  &|& \App{ex}{in} & \mbox{(application)} \\
+  &|& \Var{x} & \mbox{(variable)} \\
+  &|& \Ann{in}{T} & \mbox{(annotation)} \\
+  in &::= &&\mbox{(termes vérifiables)} \\
+  &|& \Lam{x}{in} & \mbox{(abstraction)} \\
+  &|& \Inv{ex} & \mbox{(inversion)}
+\end{bnf}
+\end{block}
+%%Nous avons désormais la distinction entre les termes vérifiables et synthétisables, ce qui dans notre implémentation se traduit par 
+%%la création de deux fonctions mutuellements récursives, l'une pour vérifier l'autre pour synthétiser.
+%%Dans la spécification nous utiliserons donc les deux symboles suivants
+\begin{block}{Fonctions de typage}
+  \begin{itemize}
+    \item $\Gamma\vdash T \ni in$
+    \item $\Gamma\vdash ex \in T$
+  \end{itemize}
+\end{block}
+
+
 
 
 \end{frame}
@@ -301,39 +400,52 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[b,fragile]
-  \frametitle{Le $\lambda$-calcul simplement typé}
-  \framesubtitle{Les limites}
+\begin{frame}
+  \frametitle{Les types dépendants}
+  \framesubtitle{Première approche}
   
-\begin{block}{exemple de fonction}
-  \begin{minipage}{.5\linewidth}
-    \begin{lstlisting}
-      and : List Bool -> List Bool -> List Bool
-      and xs = (Fold (List Bool) Bool xs 
-              (f (pas finis)) 
-              (Nil alpha)) 
-    \end{lstlisting}
-  \end{minipage} 
+\begin{block}{exemple de fonction dépendante}
+      Type de la concatenation : \\
+      $\forall A:*(\forall m:\intg(\forall xs:(\vect{A}{m})(\forall n:\intg (\forall ys:(\vect{A}{m}) (\vect{A}{(m + n)}))))$
+      \\
+      $\:$ \\
+    \visible<2->{  Terme = \\
+      $\Lam{A}{(\Lam{m}{(\Lam{xs}{(\Lam{n}{(\Lam{ys}{(\dfold{A}{(\Lam{mp}{\Lam{vp}{\vect{A}{(mp + n)}}})}{m}{xs}  
+                {(\Lam{nf}{\Lam{vecun}{\Lam{a}{\Lam{xsf}{\cons{a}{xsf}}}}})} {ys}       })})})})}$ }
 \end{block}
-  %% Pierre: donner une entrée qui réussi et une entrée qui échoue
+  %% Pierre: donner une entrée qui réussi et une entrée qui échoue 
 
 
   \vfill
 
-\begin{flushright}
-  %% Pierre: mieux exprimer
-  \large{\textit{Peut-on garantir la taille des listes à la compilation ?}}
-\end{flushright}
   
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
   \frametitle{Les types dépendants}
-  \framesubtitle{Les vecteurs}
+  \framesubtitle{Equivalence entre les termes et les types}
 
+  \begin{block}{nouveaux constructeurs}
+    \[
+    \begin{array}{cc}
+    \cfrac{}
+          {\Gamma \vdash * \ni *}\mbox{(Star)} 
+          \medskip
+          \\          
+    \cfrac{\Gamma \vdash * \ni S\:\:\Gamma,x:S \vdash *\ni T}
+          {\Gamma\vdash * \ni \forall x:S.T}\mbox{(Pi)}
+    \end{array}
+          \]
+  \end{block}
+
+
+  \begin{block}{Fonction identité}
+    $\forall x:*\: x \ni \Lam{x}{x}$
+  \end{block}
+  
   %% Pierre: mettre l'exemple du && pour les vecteurs  
-  Parler de l'exemple précéndent avec les types dépendants
+
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,21 +515,26 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \frametitle{Les types dépendants}
   \framesubtitle{Correspondance de Curry Howard}
 
+    sym : $\forall A:*(\forall a,b:A(\forall q:(\id{A}{a}{b}) (\id{A}{b}{a})))$ \\ 
+    sym = 
+    \only<1>{?}\only<2->{(lambda A (lambda a (lambda b (lambda q (\only<2>{?}
+      \only<3->{(trans A \only<3>{(?1)}\only<4->{P} \only<3-4>{(?2)}\only<5->{a} \only<3-5>{(?3)}\only<6->{b} \only<3-6>{(?4)}\only<7->{q} \only<3-7>{(?5)}\only<8->{(lambda a (refl))}))}   ))
+    }
+    
+    \vfill
 
-  sym : $\forall A:*(\forall a,b:A(\forall q:(\id{A}{a}{b}) (\id{A}{b}{a})))$ \\
-  sym = 
-  \only<1>{?}\only<2->{(lambda A (lambda a (lambda b (lambda q (\only<2>{?}
-    \only<3->{(trans A \only<3>{(?1)}\only<4->{(lambda (a b c) (id A b a))} \only<3-4>{(?2)}\only<5->{a} \only<3-5>{(?3)}\only<6->{b} \only<3-6>{(?4)}\only<7->{q} \only<3-7>{(?5)}\only<8->{(lambda a (refl))}))}   ))
-  }
+    \visible<4->{P = (lambda (a b c) (id A b a))}
 
 
-  \vfill
+
+  \begin{block}{Réponses du vérificateur de type}
+    \only<3-4>{?1 : $\forall a,b:A(\forall i:\id{A}{a}{b}\:\:(*))$\quad\quad\quad} 
+    \only<4-5>{?2 : A\quad\quad\quad}
+    \only<5-6>{?3 : A\quad\quad\quad}
+    \only<6-7>{?4 : \id{A}{a}{b}\quad\quad\quad}
+    \only<7-8>{?5 : $\forall a:A\: $(P(a,a,relf)) }
   
-  %% \only<3>{P : $\forall a,b:A(\forall i:\id{A}{a}{b}}( lol )$}
-  %% \only<4>{lol}
-  %% \only<5>{lol}
-  %% \only<6>{lol}
-  %% \only<7>{lol}
+  \end{block}
   
   
   
@@ -438,10 +555,9 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
   \begin{block}{Extensions}
     \begin{itemize}
-     \item Slow.fast typechecker
+     \item Amélioration du logiciel
      \item Tactics
-     \item Proofs \& complexity
-     \item Untyped reduction: Krivine machine
+     \item Prouver ce système et analyser sa compléxité
      \item Rational bidirectionalisation
     \end{itemize}
   \end{block}
