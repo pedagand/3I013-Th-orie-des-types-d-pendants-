@@ -191,6 +191,7 @@
 \begin{block}{Évaluation}
     $\:\:\:\:\:\:$evaluation ((lambda x (lambda y (x y))) t u) \\
     $\rightarrow$ evaluation (substitution (lambda y (x y) u) x t) \\
+    $\rightarrow$ evaluation ((lambda y (t y)) u) \\
     $\rightarrow$ evaluation (substitution (t y) y u) \\
     $\rightarrow$ evaluation (t u) \\
     $\rightarrow$ (t u)
@@ -256,10 +257,10 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 
 \begin{columns}
   \begin{column}{.3\linewidth}
-    \lstinline!f true 3! $\rightarrow$ \lstinline!4!
+    \lstinline!f true 3 succ! $\rightarrow$ \lstinline!4!
   \end{column}
   \begin{column}{.3\linewidth}
-    \lstinline!f 3 true! $\not\rightarrow$
+    \lstinline!f 3 true succ! $\not\rightarrow$
   \end{column}
 \end{columns}
 
@@ -332,7 +333,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 \begin{block}{Syntaxe des termes bidirectionnels}
 \begin{bnf}
   ex &::= &&\mbox{(termes synthétisables)} \\
-  &|& \App{ex}{in} & \mbox{(application)} \\
+  &|& (\App{ex}{in}) & \mbox{(application)} \\
   &|& \Var{x} & \mbox{(variable)} \\
   &|& \Ann{in}{T} & \mbox{(annotation)} \\
   in &::= &&\mbox{(termes vérifiables)} \\
@@ -556,9 +557,9 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \begin{block}{Extensions}
     \begin{itemize}
      \item Amélioration du logiciel
-     \item Tactics
+     \item Tactiques
      \item Prouver ce système et analyser sa compléxité
-     \item Rational bidirectionalisation
+     \item Rationaliser la bidirectionalisation
     \end{itemize}
   \end{block}
 
