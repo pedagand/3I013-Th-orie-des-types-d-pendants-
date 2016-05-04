@@ -418,7 +418,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
     \visible<2->{$ \bool\rightarrow\bool\ni\Lam{x}{x}$ \\
     ......}
     
-    \visible<3->{$\forall \alpha :*\:(\forall x:alpha\: (alpha)) \ni \Lam{\alpha}{\Lam{x}{x}}$}
+    \visible<3->{$\forall \alpha :*\:(\forall x:\alpha\: (\alpha)) \ni \Lam{\alpha}{\Lam{x}{x}}$}
   \end{block}
 
 
@@ -446,7 +446,7 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
     & \forall A:*(\forall m:\intg  \\
     &\quad\quad\quad\quad(\forall xs:(\vect{A}{m}) && \\
     &\quad\quad\quad\quad\quad\quad(\forall n:\intg & \\
-    &\quad\quad\quad\quad\quad\quad\quad\quad(\forall ys:(\vect{A}{m}) (\vect{A}{(m + n)})))) \\
+    &\quad\quad\quad\quad\quad\quad\quad\quad(\forall ys:(\vect{A}{n}) (\vect{A}{(m + n)})))) \\
   \visible<2->{
     &\mathsf{Terme = } \\
     &\Lam{A}{(\Lam{m}{(\Lam{xs}{(\Lam{n}{(\Lam{ys}{ \\
