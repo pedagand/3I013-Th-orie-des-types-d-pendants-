@@ -353,8 +353,8 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
 %%Dans la spécification nous utiliserons donc les deux symboles suivants
 \begin{block}{Fonctions de typage}
   \begin{itemize}
-    \item $\Gamma\vdash T \ni in$
-    \item $\Gamma\vdash ex \in T$
+    \item Vérification : $\Gamma\vdash T \ni in$ 
+    \item Synthèse : $\Gamma\vdash ex \in T$
   \end{itemize}
 \end{block}
 
@@ -372,10 +372,37 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   %% Pierre: Trouver un exemple avec une application
   %% Pierre: Expliciter la phase d'inversion
 
+  %% \[
+  %% \inferrule[]%
+  %%   {\visible<2->{
+  %%       \inferrule[]
+  %%          {\visible<3->{
+  %%              \inferrule[]              
+  %%                 {\visible<4->{
+  %%                    \inferrule[]{
+  %%                    \visible<5->{
+  %%                    \inferrule[]{\visible<6->{x:\bool\in\Delta}}{\Delta\vdash x \in \visible<6->{\bool}}}}                     
+  %%                          {\Delta\vdash \bool \ni x}%level4gauche
+  %%                 \inferrule[]{
+  %%                   \visible<7->{
+  %%                   \inferrule[]{\visible<8->{fu:(\intg \rightarrow \intg)\in \Delta}}{\Delta\vdash fu \in \visible<8->{(\intg \rightarrow \intg)}}}
+  %%                 \visible<9->{\inferrule[]{
+  %%                   \visible<10->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
+  %%                 }{\Delta\vdash\intg \ni y}}}
+  %%                 {\inferrule[]{}
+  %%                           {\Delta\vdash \intg \ni (fu\:y)}}%level4midle
+  %%                 \inferrule[]{
+  %%                   \visible<11->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
+  %%                 }{\Delta\vdash \intg \ni y}}}%level4droite 
+  %%                 {\Delta \vdash \ifte{\intg}{x}{(fu\:y)}{y} \in \visible<12->{\intg}}}}%level3
+  %%          {\Gamma\vdash \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y}})})}}}%level1
+  %%   {\varnothing\vdash \bool \rightarrow \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{x}{(\Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y)})})}}}%level0
+  %%   \]
+
   \[
   \inferrule[]%
-    {\visible<2->{
-        \inferrule[]
+    {\visible<2->{\inferrule[]{
+        \inferrule[]{
            {\visible<3->{
                \inferrule[]              
                   {\visible<4->{
@@ -394,10 +421,12 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
                   \inferrule[]{
                     \visible<11->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
                   }{\Delta\vdash \intg \ni y}}}%level4droite 
-                  {\Delta \vdash \ifte{\intg}{x}{(fu\:y)}{y} \in \visible<12->{\intg}}}}%level3
+                  {\Delta \vdash \ifte{\intg}{x}{(fu\:y)}{y} \in \visible<12->{\intg}}}}}%level3
+        {\Delta \vdash \intg \ni\ifte{\intg}{x}{(fu\:y)}{y}}}
            {\Gamma\vdash \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y}})})}}}%level1
     {\varnothing\vdash \bool \rightarrow \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{x}{(\Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y)})})}}}%level0
     \]
+
 
     \begin{align*}
     \visible<2->{\Gamma &\triangleq x:\bool} \\
@@ -550,21 +579,22 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \framesubtitle{Correspondance de Curry Howard}
 
     sym : Pi A: *(Pi a,b:A(Pi q:(Id A a b) (Id A b a))) \\ 
-    sym = \only<1>{?}\only<2->{(lambda A (lambda a (lambda b (lambda q ( \\
-      \quad\quad\quad\quad\only<2>{?}\only<3->{(trans A \only<3>{(?1)}\only<4->{P} \only<3-4>{(?2)}\only<5->{a} \only<3-5>{(?3)}\only<6->{b} \only<3-6>{(?4)}\only<7->{q} \only<3-7>{(?5)}\only<8->{(lambda a (refl))}))}   ))
+    sym = \only<1->{(lambda A (lambda a (lambda b (lambda q ( \\
+      \quad\quad\quad\quad\only<1>{?}\only<2->{(trans A \only<2>{(?1)}\only<3->{P} \only<2-3>{(?2)}\only<4->{a} \only<2-4>{(?3)}\only<5->{b} \only<2-5>{(?4)}\only<6->{q} \only<2-6>{(?5)}\only<7->{(lambda a (refl))}))}   ))
     }
     
     \vfill
 
-    \visible<4->{P = (lambda (a b c) (id A b a))}
+    \visible<3->{P = (lambda (a b c) (id A b a))}
 
 
   \begin{block}{Réponses du vérificateur de type}
-    \only<3-4>{?1 : Pi a,b:A(Pi i:\id{A}{a}{b}\:\:(*))\quad\quad\quad} 
-    \only<4-5>{?2 : A\quad\quad\quad}
-    \only<5-6>{?3 : A\quad\quad\quad}
-    \only<6-7>{?4 : \id{A}{a}{b}\quad\quad\quad}
-    \only<7-8>{?5 : Pi a:A\: (P(a,a,relf)) }
+    \only<1>{? : \id{A}{b}{a}}
+    \only<2-3>{?1 : Pi a,b:A(Pi i:\id{A}{a}{b}\:\:(*))\quad\quad\quad} 
+    \only<3-4>{?2 : A\quad\quad\quad}
+    \only<4-5>{?3 : A\quad\quad\quad}
+    \only<5-6>{?4 : \id{A}{a}{b}\quad\quad\quad}
+    \only<6-7>{?5 : Pi a:A\: (P(a,a,relf)) }
   
   \end{block}
   
