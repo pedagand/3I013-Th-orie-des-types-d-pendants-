@@ -402,27 +402,27 @@ x + y = (lambda x (lambda y (iter x (lambda n (succ n)) y)))
   \[
   \inferrule[]%
     {\visible<2->{\inferrule[]{
-        \inferrule[]{
-           {\visible<3->{
+        \visible<3->{\inferrule[]{
+           {\visible<4->{
                \inferrule[]              
-                  {\visible<4->{
+                  {\visible<5->{
                      \inferrule[]{
-                     \visible<5->{
-                     \inferrule[]{\visible<6->{x:\bool\in\Delta}}{\Delta\vdash x \in \visible<6->{\bool}}}}                     
+                     \visible<6->{
+                     \inferrule[]{\visible<7->{x:\bool\in\Delta}}{\Delta\vdash x \in \visible<7->{\bool}}}}                     
                            {\Delta\vdash \bool \ni x}%level4gauche
                   \inferrule[]{
-                    \visible<7->{
-                    \inferrule[]{\visible<8->{fu:(\intg \rightarrow \intg)\in \Delta}}{\Delta\vdash fu \in \visible<8->{(\intg \rightarrow \intg)}}}
-                  \visible<9->{\inferrule[]{
-                    \visible<10->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
+                    \visible<8->{
+                    \inferrule[]{\visible<9->{fu:(\intg \rightarrow \intg)\in \Delta}}{\Delta\vdash fu \in \visible<9->{(\intg \rightarrow \intg)}}}
+                  \visible<10->{\inferrule[]{
+                    \visible<11->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
                   }{\Delta\vdash\intg \ni y}}}
                   {\inferrule[]{}
                             {\Delta\vdash \intg \ni (fu\:y)}}%level4midle
                   \inferrule[]{
-                    \visible<11->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
+                    \visible<12->{\inferrule[]{y:\intg\in\Delta}{\Delta\vdash y \in \intg}}
                   }{\Delta\vdash \intg \ni y}}}%level4droite 
-                  {\Delta \vdash \ifte{\intg}{x}{(fu\:y)}{y} \in \visible<12->{\intg}}}}}%level3
-        {\Delta \vdash \intg \ni\ifte{\intg}{x}{(fu\:y)}{y}}}
+                  {\Delta \vdash \ifte{\intg}{x}{(fu\:y)}{y} \in \visible<13->{\intg}}}}}%level3
+        {\Delta \vdash \intg \ni\ifte{\intg}{x}{(fu\:y)}{y}}}}
            {\Gamma\vdash \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y}})})}}}%level1
     {\varnothing\vdash \bool \rightarrow \intg \rightarrow (\intg \rightarrow \intg) \rightarrow \intg \ni \Lam{x}{(\Lam{y}{(\Lam{fu}{(\ifte{\intg}{x}{(fu\:y)}{y)})})}}}%level0
     \]
